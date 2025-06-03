@@ -24,60 +24,6 @@
         .text-accent2 { color: #F5A313; }
         .border-accent2 { border-color: #F5A313; }
 
-        /* Custom switch styling (kept for other sections if needed, but changed for "Guardar esta dirección/contacto") */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 28px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #FB8313; /* Accent orange */
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #FB8313;
-        }
-
-        input:checked + .slider:before {
-            -webkit-transform: translateX(20px);
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
-        }
-
         /* Multi-step form styling */
         .form-step {
             display: none; /* Hide all steps by default */
@@ -353,7 +299,8 @@
 
                         <div id="entrega-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 p-4 bg-white rounded-md shadow-inner">
                             <h4 class="col-span-full text-md font-semibold text-primary mb-2">Datos de Entrega</h4>
-                            <div id="entrega-contact-details" class="contents"> <div class="relative">
+                            <div id="entrega-contact-details" class="contents"> 
+                                <div class="relative">
                                     <label for="gestion-entrega-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
                                     <div class="flex items-center">
                                         <input type="text" id="gestion-entrega-nombre" name="gestion-entrega-nombre" placeholder="Nombre completo del cliente" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder-gray-400">
@@ -386,7 +333,8 @@
                                     <label for="gestion-entrega-referencia" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
                                     <textarea id="gestion-entrega-referencia" name="gestion-entrega-referencia" rows="2" placeholder="Ej: Casa con portón verde, Preguntar por..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
                                 </div>
-                            </div> <div class="col-span-1 md:col-span-2">
+                            </div> 
+                            <div class="col-span-1 md:col-span-2">
                                 <label for="gestion-fecha-entrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega</label>
                                 <div class="flex items-center space-x-2">
                                     <div class="relative flex-grow">
@@ -551,7 +499,7 @@
         </div>
     </div>
 
-        <script>
+    <script>
         // --- Global variables for step management ---
         let currentStepGestiones = 1;
         const totalSteps = 4; // Total steps for Gestiones form
@@ -587,8 +535,8 @@
 
             stepIndicators.forEach((indicator, index) => {
                 const stepNum = parseInt(indicator.dataset.step);
-                const iconDiv = indicator.querySelector(`.step-icon-gestiones div`);
-                const textP = indicator.querySelector(`.step-text-gestiones`);
+                const iconDiv = indicator.querySelector(`.step-icon-gestiones div`); // Specific to Gestiones for now
+                const textP = indicator.querySelector(`.step-text-gestiones`); // Specific to Gestiones for now
 
                 if (iconDiv && textP) { 
                     iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1', 'bg-gray-200', 'text-gray-400');
@@ -705,7 +653,6 @@
                 if (isEntregaAlOrigen && needsPickup) {
                     entregaContactDetails.classList.add('hidden');
                     clearAndToggleFields(false); // Disable contact details
-                    // Enable and prefill date/time
                     const fechaEntregaEl = document.getElementById('gestion-fecha-entrega');
                     const horarioEntregaEl = document.getElementById('gestion-entrega-horario');
                     if (fechaEntregaEl) {
@@ -716,9 +663,9 @@
                         horarioEntregaEl.value = document.getElementById('gestion-origen-horario')?.value || '';
                         horarioEntregaEl.disabled = false;
                     }
-                } else { // Covers "Enviar a otro lugar" OR ("Enviar de vuelta al origen" AND "Necesita retirar" is 'No')
+                } else { 
                     entregaContactDetails.classList.remove('hidden');
-                    clearAndToggleFields(true); // Enable all fields
+                    clearAndToggleFields(true); 
                 }
             } else {
                 entregaFields.classList.add('hidden');
@@ -738,7 +685,7 @@
             { nombre: "Elena Gómez", telefono: "0971981745", direccion: "Boulevard de los Sueños Rotos 45, Capital" },
         ];
 
-        function mostrarContactos(inputNombre, inputTelefono, inputDireccion, listaDivId) {
+        function mostrarContactos(inputNombreId, inputTelefonoId, inputDireccionId, listaDivId) {
             const listaDiv = document.getElementById(listaDivId);
             if (!listaDiv) return; 
 
@@ -754,9 +701,9 @@
                     item.textContent = contacto.nombre;
                     item.classList.add('contacts-dropdown-item');
                     item.addEventListener('click', () => {
-                        if (inputNombre) document.getElementById(inputNombre).value = contacto.nombre;
-                        if (inputTelefono) document.getElementById(inputTelefono).value = contacto.telefono;
-                        if (inputDireccion) document.getElementById(inputDireccion).value = contacto.direccion;
+                        if (inputNombreId) document.getElementById(inputNombreId).value = contacto.nombre;
+                        if (inputTelefonoId) document.getElementById(inputTelefonoId).value = contacto.telefono;
+                        if (inputDireccionId) document.getElementById(inputDireccionId).value = contacto.direccion;
                         listaDiv.classList.add('hidden');
                     });
                     listaDiv.appendChild(item);
@@ -793,13 +740,12 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
-                    console.log("Ubicación obtenida. Implementar geocodificación inversa.");
                 }, error => {
-                    console.warn(`ERROR(${error.code}): ${error.message}`);
-                    // ... (manejo de errores visual)
+                    console.warn(`Error de geolocalización: ${error.message}`);
+                    alert(`Error al obtener ubicación: ${error.message}. Asegúrate de haber concedido permisos.`);
                 });
             } else {
-                // ... (manejo de error si no hay geolocalización)
+                alert("La geolocalización no es soportada por este navegador.");
             }
         }
 
@@ -834,11 +780,11 @@
             const getElValue = (id) => document.getElementById(id)?.value || '';
             const getRadioLabel = (name) => {
                 const radio = document.querySelector(`input[name="${name}"]:checked`);
-                return radio ? radio.labels[0].textContent.trim() : 'N/A';
+                return radio && radio.labels && radio.labels[0] ? radio.labels[0].textContent.trim() : 'N/A';
             };
             const getSelectText = (id) => {
                 const select = document.getElementById(id);
-                return select && select.options[select.selectedIndex] ? select.options[select.selectedIndex].textContent : 'N/A';
+                return select && select.options && select.options[select.selectedIndex] ? select.options[select.selectedIndex].textContent : 'N/A';
             };
             const setSummaryText = (id, value) => {
                 const el = document.getElementById(id);
@@ -888,7 +834,7 @@
                         setSummaryText('resumen-gestion-entrega-telefono', getElValue('gestion-entrega-telefono'));
                         setSummaryText('resumen-gestion-entrega-ubicacion', getElValue('gestion-entrega-ubicacion'));
                         setSummaryText('resumen-gestion-entrega-referencia', getElValue('gestion-entrega-referencia'));
-                    } else { // Entrega al origen y SÍ se retira del origen, no se muestran estos datos de contacto de entrega
+                    } else { 
                         setSummaryText('resumen-gestion-entrega-nombre', 'Usar datos de origen');
                         setSummaryText('resumen-gestion-entrega-telefono', 'Usar datos de origen');
                         setSummaryText('resumen-gestion-entrega-ubicacion', 'Usar datos de origen');
@@ -904,7 +850,8 @@
             setSummaryText('resumen-pago-servicio-quien', getRadioLabel('pago-servicio-quien'));
             setSummaryText('resumen-pago-servicio-forma', getRadioLabel('pago-servicio-forma'));
             
-            document.getElementById('costo-estimado').textContent = 'Gs. 41.000'; // Hardcoded
+            const costoEstimadoEl = document.getElementById('costo-estimado');
+            if(costoEstimadoEl) costoEstimadoEl.textContent = 'Gs. 41.000'; 
         }
 
         const gestionesForm = document.getElementById('gestionesForm');
@@ -920,16 +867,12 @@
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', () => {
                 if (customModal) customModal.classList.add('hidden');
-                // Si el mensaje contiene "Redirigiendo", entonces hacemos la redirección real
                 if (modalMessage && modalMessage.textContent.includes("Redirigiendo al dashboard")) {
                     window.location.href = 'dashboard.html';
                 }
             });
         }
         
-        // Asegúrate que el botón de cierre del modal también dispare la redirección si es necesario.
-        // La redirección principal ahora se maneja después de que el modal es cerrado por el usuario.
-
         if (gestionesForm) {
             gestionesForm.addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -962,7 +905,6 @@
                 localStorage.setItem('gestionesDemo', JSON.stringify(gestionesGuardadas));
 
                 showCustomModal('¡Solicitud de Gestión Enviada con Éxito! Redirigiendo al dashboard...');
-                // La redirección se activará cuando el usuario cierre el modal (ver el listener de closeModalBtn)
             });
         }
 
