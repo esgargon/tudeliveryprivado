@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Delivery Privado - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Un gris claro para el fondo */
+        }
+        /* Estilos para el botón principal de solicitar */
+        .btn-solicitar {
+            background-color: #003992; /* Azul corporativo */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-solicitar:hover {
+            background-color: #F5A313; /* Naranja/Amarillo para hover */
+        }
+        /* Estilos para el botón de la tarjeta */
+        .card-btn-solicitar {
+            background-color: #003992; /* Azul corporativo */
+            color: white;
+            padding: 0.6rem 1.2rem; /* Ligeramente más pequeño que el principal */
+            border-radius: 0.4rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .card-btn-solicitar:hover {
+            background-color: #F5A313; /* Naranja/Amarillo para hover */
+        }
+
+        /* Estilo para el ítem de navegación activo */
+        .nav-link-active {
+            color: #003992; /* Azul corporativo */
+            font-weight: 600;
+            position: relative;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px; /* Ajusta según sea necesario */
+            width: 100%;
+            height: 2px;
+            background-color: #003992; /* Azul corporativo */
+        }
+
+        /* Estilos para el modal */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-sm py-4 px-6 flex items-center justify-between relative z-10">
+        <div class="flex items-center space-x-6">
+            <a href="#" class="font-bold text-lg flex items-center space-x-2" style="color: #003992;">
+                <i class="fas fa-box-open"></i>
+                <span>Tu Delivery Privado</span>
+            </a>
+
+            <div class="hidden md:flex space-x-6 text-gray-600">
+                <a href="#" class="nav-link-active flex items-center space-x-1 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-home"></i> <span>Inicio</span>
+                </a>
+                <a href="#" class="flex items-center space-x-1 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-box"></i> <span>Mis Pedidos</span>
+                </a>
+                <a href="#" class="flex items-center space-x-1 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-address-book"></i> <span>Contactos</span>
+                </a>
+                <a href="#" class="flex items-center space-x-1 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-chart-bar"></i> <span>Reportes</span>
+                </a>
+                <a href="#" class="flex items-center space-x-1 hover:text-blue-700 transition-colors">
+                    <i class="fas fa-user-circle"></i> <span>Perfil</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <img src="https://via.placeholder.com/40" alt="Avatar de Raphael" class="w-10 h-10 rounded-full border-2 object-cover" style="border-color: #003992;">
+            
+            <!-- MODIFICADO: href apunta a index.html -->
+            <a href="index.html" class="flex items-center space-x-2 text-gray-600 hover:text-blue-700 transition-colors">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-blue-700 focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="md:hidden bg-white shadow-md absolute top-full left-0 w-full z-10 hidden">
+        <div class="flex flex-col p-4 space-y-2">
+            <a href="#" class="py-2 px-3 hover:bg-gray-100 rounded flex items-center space-x-2 nav-link-active">
+                <i class="fas fa-home"></i> <span>Inicio</span>
+            </a>
+            <a href="#" class="py-2 px-3 hover:bg-gray-100 rounded flex items-center space-x-2">
+                <i class="fas fa-box"></i> <span>Mis Pedidos</span>
+            </a>
+            <a href="#" class="py-2 px-3 hover:bg-gray-100 rounded flex items-center space-x-2">
+                <i class="fas fa-address-book"></i> <span>Contactos</span>
+            </a>
+            <a href="#" class="py-2 px-3 hover:bg-gray-100 rounded flex items-center space-x-2">
+                <i class="fas fa-chart-bar"></i> <span>Reportes</span>
+            </a>
+            <a href="#" class="py-2 px-3 hover:bg-gray-100 rounded flex items-center space-x-2">
+                <i class="fas fa-user-circle"></i> <span>Perfil</span>
+            </a>
+        </div>
+    </div>
+    <script>
+        // JavaScript para el menú hamburguesa
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <section class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4" style="color: #003992;">Bienvenido a Tu Delivery Privado</h1>
+            <p class="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
+                <span id="dynamic-greeting-time"></span>, Raphael! Tu solución integral para envíos, gestiones, cobranzas y compras.
+                Rápido, seguro y confiable.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-lg shadow-md p-6 md:p-8 max-w-3xl mx-auto mb-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Hola, Raphael!</h2>
+                    <p class="text-gray-600">Aquí puedes gestionar tus servicios y ver su progreso.</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-lg" style="background-color: #e6efff;">
+                <div class="flex items-center space-x-3 cursor-pointer" id="points-info">
+                    <i class="fas fa-star text-2xl" style="color: #F5A313;"></i>
+                    <div>
+                        <p class="text-gray-700 text-sm">Puntos Acumulados</p>
+                        <p class="text-3xl font-bold" style="color: #003992;">120</p>
+                    </div>
+                </div>
+                <button class="btn-solicitar flex items-center space-x-2" id="canjear-puntos-btn">
+                    <i class="fas fa-gift"></i>
+                    <span>Canjear Puntos</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center 
+                        transform hover:scale-105 hover:shadow-lg transition-all duration-300">
+                <div class="text-4xl mb-4" style="color: #FB8313;">
+                    <i class="fas fa-truck-fast"></i> 
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nuevo Envío</h3>
+                <p class="text-gray-600 mb-6 flex-grow">Solicita un envío rápido y seguro para tus paquetes.</p>
+                <button class="card-btn-solicitar w-full">Solicitar</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
+                        transform hover:scale-105 hover:shadow-lg transition-all duration-300">
+                <div class="text-4xl mb-4" style="color: #FB8313;">
+                    <i class="fas fa-clipboard-list"></i> 
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nueva Gestión</h3>
+                <p class="text-gray-600 mb-6 flex-grow">Realizamos trámites y diligencias por ti, con eficiencia.</p>
+                <button class="card-btn-solicitar w-full">Solicitar</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
+                        transform hover:scale-105 hover:shadow-lg transition-all duration-300">
+                <div class="text-4xl mb-4" style="color: #FB8313;">
+                    <i class="fas fa-money-bill-wave"></i> 
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nueva Cobranza</h3>
+                <p class="text-gray-600 mb-6 flex-grow">Gestionamos tus cobros de manera eficiente y segura.</p>
+                <button class="card-btn-solicitar w-full">Solicitar</button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
+                        transform hover:scale-105 hover:shadow-lg transition-all duration-300">
+                <div class="text-4xl mb-4" style="color: #FB8313;">
+                    <i class="fas fa-cart-shopping"></i> 
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nueva Compra</h3>
+                <p class="text-gray-600 mb-6 flex-grow">Compramos y te entregamos justo lo que necesitas.</p>
+                <button class="card-btn-solicitar w-full">Solicitar</button>
+            </div>
+        </section>
+
+        <section class="max-w-6xl mx-auto mb-12 bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center space-x-2">
+                <i class="fas fa-history" style="color: #003992;"></i>
+                <span>Actividad Reciente</span>
+            </h2>
+            <ul class="space-y-3 text-gray-700">
+                <li class="flex justify-between items-center border-b pb-2 last:border-b-0">
+                    <span><i class="fas fa-check-circle text-green-500 mr-2"></i>Envío #123456 completado.</span>
+                    <span class="text-sm text-gray-500">Hace 2 horas</span>
+                </li>
+                <li class="flex justify-between items-center border-b pb-2 last:border-b-0">
+                    <span><i class="fas fa-hourglass-half text-yellow-500 mr-2"></i>Gestión de documentos en progreso.</span>
+                    <span class="text-sm text-gray-500">Ayer</span>
+                </li>
+                <li class="flex justify-between items-center border-b pb-2 last:border-b-0">
+                    <span><i class="fas fa-money-check-alt mr-2" style="color: #003992;"></i>Cobranza #7890 iniciada.</span>
+                    <span class="text-sm text-gray-500">Hace 3 días</span>
+                </li>
+            </ul>
+            <button class="btn-solicitar mt-6 px-6 py-2 text-base mx-auto block">Ver todo mi historial</button>
+        </section>
+
+    <div id="points-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden modal-overlay z-50">
+        <div class="bg-white rounded-lg p-8 shadow-xl max-w-md w-full relative">
+            <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl" id="close-modal-btn">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">Canjear Puntos</h3>
+            <p class="text-gray-700 mb-4">Actualmente tienes <span class="font-bold" style="color: #003992;">120 puntos</span> acumulados.</p>
+            <p class="text-gray-600 mb-6">Aquí podrás ver el historial de tus puntos, cómo ganarlos y las opciones de canje disponibles (descuentos, envíos gratis, etc.).</p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6">
+                <li>200 puntos: Envío gratis en tu próximo pedido.</li>
+                <li>500 puntos: 10% de descuento en cualquier servicio.</li>
+                <li>1000 puntos: Crédito de $10 para futuras compras.</li>
+            </ul>
+            <div class="flex justify-end">
+                <button class="btn-solicitar">Explorar Recompensas</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // JavaScript para el modal de canje de puntos
+        document.getElementById('canjear-puntos-btn').addEventListener('click', function() {
+            document.getElementById('points-modal').classList.remove('hidden');
+        });
+        document.getElementById('points-info').addEventListener('click', function() {
+            document.getElementById('points-modal').classList.remove('hidden');
+        });
+        document.getElementById('close-modal-btn').addEventListener('click', function() {
+            document.getElementById('points-modal').classList.add('hidden');
+        });
+        // Cierra el modal si se hace clic fuera de él
+        document.getElementById('points-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('points-modal').classList.add('hidden');
+            }
+        });
+
+        // JavaScript para el saludo dinámico
+        window.onload = function() {
+            const greetingSpan = document.getElementById('dynamic-greeting-time');
+            const hour = new Date().getHours();
+            let greeting = '';
+            if (hour < 12) {
+                greeting = 'Buenos días';
+            } else if (hour < 19) {
+                greeting = 'Buenas tardes';
+            } else {
+                greeting = 'Buenas noches';
+            }
+            greetingSpan.textContent = greeting;
+        };
+    </script>
+
+
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>© 2023 Tu Delivery Privado. Todos los derechos reservados.</p>
+            <div class="mt-2 space-x-4">
+                <a href="#" class="hover:text-blue-400 transition-colors">Política de Privacidad</a>
+                <a href="#" class="hover:text-blue-400 transition-colors">Términos y Condiciones</a>
+                <a href="#" class="hover:text-blue-400 transition-colors">Ayuda</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for corporate colors and fonts */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light grey background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem; /* Added padding for smaller screens */
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* 40px */
+            border-radius: 1rem; /* 16px */
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1); /* Shadow effect */
+            width: 100%;
+            max-width: 28rem; /* 448px */
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background-color: #003992; /* Corporate blue */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            border-radius: 0.5rem; /* 8px */
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #002a6b; /* Darker blue on hover */
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .text-link {
+            color: #003992; /* Corporate blue for links */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .text-link:hover {
+            color: #FB8313; /* Corporate orange on hover */
+        }
+        .input-field {
+            border: 1px solid #d1d5db; /* Light grey border */
+            border-radius: 0.5rem; /* 8px */
+            padding: 0.75rem 1rem; /* 12px 16px */
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #003992; /* Corporate blue on focus */
+            box-shadow: 0 0 0 3px rgba(0, 57, 146, 0.2); /* Light blue shadow on focus */
+        }
+        .input-field.error {
+            border-color: #ef4444; /* Red for error */
+        }
+        .error-message {
+            color: #ef4444; /* Red for error messages */
+            font-size: 0.75rem; /* 12px */
+            margin-top: 0.25rem; /* 4px */
+        }
+        .eye-icon {
+            cursor: pointer;
+            position: absolute;
+            right: 0.75rem; /* 12px */
+            top: 50%;
+            transform: translateY(-50%);
+            /* Ensure the icon is above the input text */
+            pointer-events: auto; /* Re-enable pointer events for the icon */
+        }
+        .password-strength-container {
+            margin-top: 0.5rem;
+        }
+        .password-strength-bar {
+            height: 4px;
+            width: 0%;
+            border-radius: 9999px; /* Fully rounded */
+            transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+        .strength-text {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .strength-weak { color: #ef4444; background-color: #ef4444; } /* Red */
+        .strength-medium { color: #f97316; background-color: #f97316; } /* Orange */
+        .strength-strong { color: #22c55e; background-color: #22c55e; } /* Green */
+        .strength-very-strong { color: #003992; background-color: #003992; } /* Corporate Blue */
+
+        /* Global message styles */
+        .global-message {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .global-message.success {
+            background-color: #d1fae5; /* Green light */
+            color: #065f46; /* Green dark */
+        }
+        .global-message.error {
+            background-color: #fee2e2; /* Red light */
+            color: #991b1b; /* Red dark */
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page" class="container">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Iniciar Sesión</h2>
+        <p class="text-center text-gray-600 mb-6">Introduce tu correo/usuario y contraseña para acceder.</p>
+
+        <div id="login-global-message" class="global-message hidden"></div>
+
+        <form id="login-form">
+            <div class="mb-4">
+                <label for="login-email" class="block text-gray-700 text-sm font-medium mb-1">Correo Electrónico o Usuario</label>
+                <input type="text" id="login-email" class="input-field" placeholder="tu@email.com o Usuario Admin" required>
+                <p id="login-email-error" class="error-message hidden"></p>
+            </div>
+
+            <div class="mb-4 relative">
+                <label for="login-password" class="block text-gray-700 text-sm font-medium mb-1">Contraseña</label>
+                <input type="password" id="login-password" class="input-field pr-10" placeholder="********" required minlength="8">
+                <span class="eye-icon" onclick="togglePasswordVisibility('login-password', 'login-eye-icon')">
+                    <svg id="login-eye-icon" class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Mostrar contraseña">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </span>
+                <p id="login-password-error" class="error-message hidden"></p>
+                <a href="#" id="forgot-password-link" class="text-link text-sm mt-1 block text-right">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div class="mb-6 flex items-center">
+                <input type="checkbox" id="remember-me" class="rounded text-blue-600 focus:ring-blue-500">
+                <label for="remember-me" class="ml-2 text-gray-700 text-sm">Recordarme <span class="text-gray-500 text-xs">(Mantener sesión iniciada)</span></label>
+            </div>
+
+            <button type="submit" id="login-button" class="btn-primary w-full mb-4">
+                <span id="login-button-text">Iniciar Sesión</span>
+                <svg id="login-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+
+        <p class="text-center text-gray-600 text-sm">¿No tienes una cuenta? <a href="#" id="register-link" class="text-link font-medium">Regístrate</a></p>
+    </div>
+
+    <div id="register-page" class="container hidden">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Crear una Cuenta</h2>
+        <p class="text-center text-gray-600 mb-6">Completa el formulario para registrarte en Tu Delivery Privado.</p>
+
+        <div id="register-global-message" class="global-message hidden"></div>
+
+        <form id="register-form">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="register-name" class="block text-gray-700 text-sm font-medium mb-1">Nombre</label>
+                    <input type="text" id="register-name" class="input-field" placeholder="Juan" required>
+                    <p id="register-name-error" class="error-message hidden"></p>
+                </div>
+                <div>
+                    <label for="register-lastname" class="block text-gray-700 text-sm font-medium mb-1">Apellido</label>
+                    <input type="text" id="register-lastname" class="input-field" placeholder="Pérez" required>
+                    <p id="register-lastname-error" class="error-message hidden"></p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="register-email" class="block text-gray-700 text-sm font-medium mb-1">Correo Electrónico</label>
+                <input type="email" id="register-email" class="input-field" placeholder="tu@email.com" required>
+                <p id="register-email-error" class="error-message hidden"></p>
+            </div>
+
+            <div class="mb-4">
+                <label for="register-phone" class="block text-gray-700 text-sm font-medium mb-1">Número de Teléfono</label>
+                <input type="tel" id="register-phone" class="input-field" placeholder="09xx xxxxxx" pattern="[0-9]{4} ?[0-9]{6}" title="Formato paraguayo: 09xx xxxxxx (sin guiones)" required>
+                <p class="text-gray-500 text-xs mt-1">Formato paraguayo (ej: 0971 123456).</p>
+                <p id="register-phone-error" class="error-message hidden"></p>
+            </div>
+
+            <div class="mb-4 relative">
+                <label for="register-password" class="block text-gray-700 text-sm font-medium mb-1">Contraseña</label>
+                <input type="password" id="register-password" class="input-field pr-10" placeholder="********" required onkeyup="checkPasswordStrength()">
+                <span class="eye-icon" onclick="togglePasswordVisibility('register-password', 'register-eye-icon')">
+                    <svg id="register-eye-icon" class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Mostrar contraseña">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </span>
+                <p id="register-password-error" class="error-message hidden"></p>
+                <div class="password-strength-container flex flex-col items-start hidden" id="password-strength-info">
+                    <div id="password-strength-bar" class="password-strength-bar"></div>
+                    <p id="password-strength-text" class="strength-text"></p>
+                </div>
+                <p id="password-hint" class="text-gray-500 text-xs mt-1">Mín. 8 caracteres, 1 mayúscula, 1 número y 1 símbolo.</p>
+            </div>
+
+            <div class="mb-6 relative">
+                <label for="confirm-password" class="block text-gray-700 text-sm font-medium mb-1">Confirmar Contraseña</label>
+                <input type="password" id="confirm-password" class="input-field pr-10" placeholder="********" required onkeyup="validateConfirmPassword()">
+                <span class="eye-icon" onclick="togglePasswordVisibility('confirm-password', 'confirm-eye-icon')">
+                    <svg id="confirm-eye-icon" class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Mostrar contraseña">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </span>
+                <p id="confirm-password-error" class="error-message hidden"></p>
+            </div>
+
+            <div class="mb-6 flex items-center">
+                <input type="checkbox" id="terms-conditions" class="rounded text-blue-600 focus:ring-blue-500" required>
+                <label for="terms-conditions" class="ml-2 text-gray-700 text-sm">Acepto los <a href="#" class="text-link font-medium">Términos y Condiciones</a> y la <a href="#" class="text-link font-medium">Política de Privacidad</a>.</label>
+            </div>
+            <p id="terms-error" class="error-message hidden mb-4"></p>
+
+
+            <button type="submit" id="register-button" class="btn-primary w-full mb-4">
+                <span id="register-button-text">Registrarse</span>
+                <svg id="register-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+
+        <p class="text-center text-gray-600 text-sm">¿Ya tienes una cuenta? <a href="#" id="login-link" class="text-link font-medium">Inicia Sesión</a></p>
+    </div>
+
+    <script>
+        // Get references to page containers
+        const loginPage = document.getElementById('login-page');
+        const registerPage = document.getElementById('register-page');
+
+        // Get references to navigation links
+        const registerLink = document.getElementById('register-link');
+        const loginLink = document.getElementById('login-link');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+
+        // Get form elements
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        // Get buttons and spinners
+        const loginButton = document.getElementById('login-button');
+        const loginButtonText = document.getElementById('login-button-text');
+        const loginSpinner = document.getElementById('login-spinner');
+        const registerButton = document.getElementById('register-button');
+        const registerButtonText = document.getElementById('register-button-text');
+        const registerSpinner = document.getElementById('register-spinner');
+
+        // Global message elements
+        const loginGlobalMessage = document.getElementById('login-global-message');
+        const registerGlobalMessage = document.getElementById('register-global-message');
+
+        /**
+         * Toggles the visibility of a password input field.
+         * Changes the input type between 'password' and 'text' and updates the eye icon.
+         * @param {string} inputId - The ID of the password input field.
+         * @param {string} iconId - The ID of the eye icon SVG.
+         */
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Change icon to 'eye-off'
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.33 0 2.613.193 3.825.575M10 12a2 2 0 11-4 0 2 2 0 014 0zm7.828 4.243A9.957 9.957 0 0021.542 12C20.268 7.943 16.478 5 12 5c-.792 0-1.564.1-2.313.287m4.243 4.243a2 2 0 112.828 2.828"></path>`;
+                eyeIcon.setAttribute('aria-label', 'Ocultar contraseña');
+            } else {
+                passwordInput.type = 'password';
+                // Change icon back to 'eye'
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                eyeIcon.setAttribute('aria-label', 'Mostrar contraseña');
+            }
+        }
+
+        /**
+         * Shows a global message at the top of the form.
+         * @param {HTMLElement} messageElement - The div element for the message.
+         * @param {string} message - The text message to display.
+         * @param {string} type - 'success' or 'error'.
+         */
+        function showGlobalMessage(messageElement, message, type) {
+            messageElement.textContent = message;
+            messageElement.classList.remove('hidden', 'success', 'error');
+            messageElement.classList.add(type);
+        }
+
+        /**
+         * Hides a global message.
+         * @param {HTMLElement} messageElement - The div element for the message.
+         */
+        function hideGlobalMessage(messageElement) {
+            messageElement.classList.add('hidden');
+            messageElement.classList.remove('success', 'error');
+            messageElement.textContent = '';
+        }
+
+        /**
+         * Displays an error message for a specific input field.
+         * @param {string} inputId - The ID of the input field.
+         * @param {string} errorMessage - The error message to display.
+         */
+        function showFieldError(inputId, errorMessage) {
+            const input = document.getElementById(inputId);
+            const errorElement = document.getElementById(`${inputId}-error`);
+            input.classList.add('error');
+            errorElement.textContent = errorMessage;
+            errorElement.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the error message for a specific input field.
+         * @param {string} inputId - The ID of the input field.
+         */
+        function hideFieldError(inputId) {
+            const input = document.getElementById(inputId);
+            const errorElement = document.getElementById(`${inputId}-error`);
+            input.classList.remove('error');
+            errorElement.classList.add('hidden');
+            errorElement.textContent = '';
+        }
+
+        /**
+         * Validates a single input field.
+         * @param {HTMLInputElement} input - The input element to validate.
+         * @param {string} errorId - The ID of the error message element.
+         * @param {string} customMessage - Custom message if validation fails (optional).
+         * @returns {boolean} True if valid, false otherwise.
+         */
+        function validateInput(input, errorId, customMessage = '') {
+            if (!input.value.trim()) {
+                showFieldError(input.id, customMessage || 'Este campo es obligatorio.');
+                return false;
+            } else if (input.type === 'email' && !/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(input.value)) {
+                showFieldError(input.id, 'Introduce un correo electrónico válido.');
+                return false;
+            } else if (input.type === 'tel' && !/^[0-9]{4} ?[0-9]{6}$/.test(input.value)) {
+                showFieldError(input.id, 'Formato de teléfono inválido (ej: 0971 123456).');
+                return false;
+            }
+            hideFieldError(input.id);
+            return true;
+        }
+
+        /**
+         * Checks the strength of the password and updates the UI.
+         */
+        function checkPasswordStrength() {
+            const passwordInput = document.getElementById('register-password');
+            const password = passwordInput.value;
+            const strengthBar = document.getElementById('password-strength-bar');
+            const strengthText = document.getElementById('password-strength-text');
+            const strengthInfo = document.getElementById('password-strength-info');
+
+            if (password.length === 0) {
+                strengthInfo.classList.add('hidden');
+                hideFieldError('register-password');
+                return;
+            } else {
+                strengthInfo.classList.remove('hidden');
+            }
+
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++; // Special character
+
+            let strength = '';
+            let barColor = '';
+            let barWidth = '';
+
+            if (score <= 1) {
+                strength = 'Muy débil';
+                barColor = 'strength-weak';
+                barWidth = '25%';
+            } else if (score === 2) {
+                strength = 'Débil';
+                barColor = 'strength-medium';
+                barWidth = '50%';
+            } else if (score === 3) {
+                strength = 'Media';
+                barColor = 'strength-strong';
+                barWidth = '75%';
+            } else { // score === 4
+                strength = 'Fuerte';
+                barColor = 'strength-very-strong';
+                barWidth = '100%';
+            }
+
+            strengthBar.className = `password-strength-bar ${barColor}`;
+            strengthBar.style.width = barWidth;
+            strengthText.textContent = strength;
+            strengthText.className = `strength-text ${barColor}`;
+
+            // Basic validation for password requirements
+            if (password.length < 8) {
+                showFieldError('register-password', 'La contraseña debe tener al menos 8 caracteres.');
+            } else if (!/[A-Z]/.test(password)) {
+                showFieldError('register-password', 'La contraseña debe contener al menos una mayúscula.');
+            } else if (!/[0-9]/.test(password)) {
+                showFieldError('register-password', 'La contraseña debe contener al menos un número.');
+            } else if (!/[^A-Za-z0-9]/.test(password)) {
+                showFieldError('register-password', 'La contraseña debe contener al menos un símbolo.');
+            } else {
+                hideFieldError('register-password');
+            }
+
+            validateConfirmPassword(); // Re-validate confirm password whenever main password changes
+        }
+
+        /**
+         * Validates if the confirm password matches the main password.
+         */
+        function validateConfirmPassword() {
+            const password = document.getElementById('register-password').value;
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (confirmPassword.length > 0 && password !== confirmPassword) {
+                showFieldError('confirm-password', 'Las contraseñas no coinciden.');
+                return false;
+            } else if (confirmPassword.length === 0 && password.length > 0) {
+                 showFieldError('confirm-password', 'Confirma tu contraseña.');
+                 return false;
+            } else {
+                hideFieldError('confirm-password');
+                return true;
+            }
+        }
+
+
+        // Event listener for the "Regístrate" link on the login page
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+            document.title = 'Crear una Cuenta';
+            hideGlobalMessage(loginGlobalMessage); // Clear messages when navigating
+            // Clear any previous input values and errors when switching
+            loginForm.reset();
+            hideFieldError('login-email');
+            hideFieldError('login-password');
+        });
+
+        // Event listener for the "Inicia Sesión" link on the registration page
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            document.title = 'Iniciar Sesión';
+            hideGlobalMessage(registerGlobalMessage); // Clear messages when navigating
+            // Clear any previous input values and errors when switching
+            registerForm.reset();
+            hideFieldError('register-name');
+            hideFieldError('register-lastname');
+            hideFieldError('register-email');
+            hideFieldError('register-phone');
+            hideFieldError('register-password');
+            hideFieldError('confirm-password');
+            document.getElementById('password-strength-info').classList.add('hidden'); // Hide strength bar
+            document.getElementById('terms-conditions').checked = false; // Uncheck terms
+            document.getElementById('terms-error').classList.add('hidden'); // Hide terms error
+        });
+
+        // Event listener for "Olvidaste tu contraseña?"
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showGlobalMessage(loginGlobalMessage, 'Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.', 'success');
+            // In a real application, this would trigger an API call to send a reset email.
+            console.log('Forgot password link clicked. Placeholder for password reset flow.');
+        });
+
+
+        // Login Form Submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            hideGlobalMessage(loginGlobalMessage); // Clear previous global messages
+            let isValid = true;
+
+            // Validate email/username
+            const loginEmail = document.getElementById('login-email');
+            if (!validateInput(loginEmail)) {
+                isValid = false;
+            }
+
+            // Validate password
+            const loginPassword = document.getElementById('login-password');
+            if (!validateInput(loginPassword, 'login-password-error', 'La contraseña es obligatoria.')) {
+                isValid = false;
+            } else if (loginPassword.value.length < 8) { // Basic length check
+                showFieldError('login-password', 'La contraseña debe tener al menos 8 caracteres.');
+                isValid = false;
+            }
+
+
+            if (!isValid) {
+                showGlobalMessage(loginGlobalMessage, 'Por favor, corrige los errores en el formulario.', 'error');
+                return;
+            }
+
+            // Simulate API call
+            loginButton.disabled = true;
+            loginButtonText.classList.add('hidden');
+            loginSpinner.classList.remove('hidden');
+
+            try {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Basic validation (replace with actual backend check)
+                if (loginEmail.value === 'admin@example.com' && loginPassword.value === 'Password123!') {
+                    showGlobalMessage(loginGlobalMessage, '¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        // MODIFICADO: Redirige a dashboard.html
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    showGlobalMessage(loginGlobalMessage, 'Correo electrónico o contraseña incorrectos.', 'error');
+                }
+            } catch (error) {
+                showGlobalMessage(loginGlobalMessage, 'Error al iniciar sesión. Por favor, inténtalo de nuevo.', 'error');
+                console.error('Login error:', error);
+            } finally {
+                loginButton.disabled = false;
+                loginButtonText.classList.remove('hidden');
+                loginSpinner.classList.add('hidden');
+            }
+        });
+
+        // Register Form Submission
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            hideGlobalMessage(registerGlobalMessage); // Clear previous global messages
+            let isValid = true;
+
+            // Validate all required fields
+            const requiredInputs = registerForm.querySelectorAll('input[required]');
+            requiredInputs.forEach(input => {
+                if (!validateInput(input)) {
+                    isValid = false;
+                }
+            });
+
+            // Specific password validations
+            const registerPassword = document.getElementById('register-password');
+            const confirmPassword = document.getElementById('confirm-password');
+
+            // Trigger password strength validation for comprehensive check
+            checkPasswordStrength();
+            if (document.getElementById('register-password-error').classList.contains('hidden') === false) {
+                 isValid = false; // Password strength check failed
+            }
+
+            // Specific confirm password validation
+            if (!validateConfirmPassword()) {
+                isValid = false;
+            }
+
+            // Validate terms and conditions checkbox
+            const termsCheckbox = document.getElementById('terms-conditions');
+            const termsError = document.getElementById('terms-error');
+            if (!termsCheckbox.checked) {
+                termsError.textContent = 'Debes aceptar los Términos y Condiciones y la Política de Privacidad.';
+                termsError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                termsError.classList.add('hidden');
+            }
+
+            if (!isValid) {
+                showGlobalMessage(registerGlobalMessage, 'Por favor, corrige los errores en el formulario.', 'error');
+                return;
+            }
+
+            // Simulate API call
+            registerButton.disabled = true;
+            registerButtonText.classList.add('hidden');
+            registerSpinner.classList.remove('hidden');
+
+            try {
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Simulate successful registration
+                showGlobalMessage(registerGlobalMessage, '¡Registro exitoso! Ahora puedes iniciar sesión.', 'success');
+                // Optionally clear form after success
+                registerForm.reset();
+                hideFieldError('register-name');
+                hideFieldError('register-lastname');
+                hideFieldError('register-email');
+                hideFieldError('register-phone');
+                hideFieldError('register-password');
+                hideFieldError('confirm-password');
+                document.getElementById('password-strength-info').classList.add('hidden');
+                document.getElementById('terms-conditions').checked = false;
+
+                // Automatically switch to login page after a delay
+                setTimeout(() => {
+                    registerPage.classList.add('hidden');
+                    loginPage.classList.remove('hidden');
+                    document.title = 'Iniciar Sesión';
+                    showGlobalMessage(loginGlobalMessage, '¡Registro exitoso! Por favor, inicia sesión.', 'success');
+                }, 2000);
+
+            } catch (error) {
+                showGlobalMessage(registerGlobalMessage, 'Error al registrar la cuenta. Por favor, inténtalo de nuevo.', 'error');
+                console.error('Registration error:', error);
+            } finally {
+                registerButton.disabled = false;
+                registerButtonText.classList.remove('hidden');
+                registerSpinner.classList.add('hidden');
+            }
+        });
+
+        // Add real-time validation listeners for required fields on blur and input
+        document.querySelectorAll('.input-field[required]').forEach(input => {
+            input.addEventListener('blur', () => validateInput(input));
+            input.addEventListener('input', () => {
+                // Hide error on input for immediate feedback, but keep validation on blur/submit
+                if (input.value.trim()) {
+                    hideFieldError(input.id);
+                }
+            });
+        });
+
+        // Specific real-time validation for email
+        document.getElementById('login-email').addEventListener('input', (e) => {
+            const input = e.target;
+            if (input.value.length === 0) {
+                 hideFieldError(input.id);
+            } else if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(input.value)) {
+                showFieldError(input.id, 'Introduce un correo electrónico válido.');
+            } else {
+                hideFieldError(input.id);
+            }
+        });
+        document.getElementById('register-email').addEventListener('input', (e) => {
+            const input = e.target;
+            if (input.value.length === 0) {
+                 hideFieldError(input.id);
+            } else if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(input.value)) {
+                showFieldError(input.id, 'Introduce un correo electrónico válido.');
+            } else {
+                hideFieldError(input.id);
+            }
+        });
+
+        // Specific real-time validation for phone number (on input, clear error if format is potentially correct)
+        document.getElementById('register-phone').addEventListener('input', (e) => {
+            const input = e.target;
+            // Basic check to hide error as user types if it starts looking correct
+            if (/^[0-9]{4}/.test(input.value) || input.value.length === 0) {
+                hideFieldError(input.id);
+            }
+        });
+
+        // Specific real-time validation for terms checkbox
+        document.getElementById('terms-conditions').addEventListener('change', (e) => {
+            const termsError = document.getElementById('terms-error');
+            if (e.target.checked) {
+                termsError.classList.add('hidden');
+            } else {
+                termsError.textContent = 'Debes aceptar los Términos y Condiciones y la Política de Privacidad.';
+                termsError.classList.remove('hidden');
+            }
+        });
+
+
+    </script>
+</body>
+</html>
