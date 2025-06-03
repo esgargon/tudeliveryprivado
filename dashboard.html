@@ -19,7 +19,7 @@
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 500;
-            transition: background-color 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
         }
         .btn-solicitar:hover {
             background-color: #F5A313; /* Naranja/Amarillo para hover */
@@ -32,6 +32,7 @@
             border-radius: 0.4rem;
             font-weight: 500;
             transition: background-color 0.2s ease-in-out;
+            display: inline-block; /* Para que el text-center funcione en el <a> */
         }
         .card-btn-solicitar:hover {
             background-color: #F5A313; /* Naranja/Amarillo para hover */
@@ -58,6 +59,10 @@
             background-color: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
         }
+
+        /* Estilos para la lista de gestiones */
+        #lista-gestiones-solicitadas .text-accent1 { color: #FB8313; }
+        #lista-gestiones-solicitadas .text-primary { color: #003992; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -91,7 +96,6 @@
         <div class="flex items-center space-x-4">
             <img src="https://via.placeholder.com/40" alt="Avatar de Raphael" class="w-10 h-10 rounded-full border-2 object-cover" style="border-color: #003992;">
             
-            <!-- MODIFICADO: href apunta a index.html -->
             <a href="index.html" class="flex items-center space-x-2 text-gray-600 hover:text-blue-700 transition-colors">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
@@ -162,14 +166,14 @@
         </section>
 
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
-                        <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
+            <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center 
                         transform hover:scale-105 hover:shadow-lg transition-all duration-300">
                 <div class="text-4xl mb-4" style="color: #FB8313;">
-                    <i class="fas fa-clipboard-list"></i> 
+                    <i class="fas fa-truck-fast"></i> 
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nueva Gestión</h3>
-                <p class="text-gray-600 mb-6 flex-grow">Realizamos trámites y diligencias por ti, con eficiencia.</p>
-                <a href="form-gestion.html" class="card-btn-solicitar w-full text-center">Solicitar</a> <!-- MODIFICADO -->
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Nuevo Envío</h3>
+                <p class="text-gray-600 mb-6 flex-grow">Solicita un envío rápido y seguro para tus paquetes.</p>
+                <button class="card-btn-solicitar w-full">Solicitar</button>
             </div>
 
             <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
@@ -179,7 +183,7 @@
                 </div>
                 <h3 class="text-xl font-semibold text-gray-800 mb-2">Nueva Gestión</h3>
                 <p class="text-gray-600 mb-6 flex-grow">Realizamos trámites y diligencias por ti, con eficiencia.</p>
-                <button class="card-btn-solicitar w-full">Solicitar</button>
+                <a href="form-gestion.html" class="card-btn-solicitar w-full text-center">Solicitar</a>
             </div>
 
             <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center
@@ -201,6 +205,19 @@
                 <p class="text-gray-600 mb-6 flex-grow">Compramos y te entregamos justo lo que necesitas.</p>
                 <button class="card-btn-solicitar w-full">Solicitar</button>
             </div>
+        </section>
+
+        <!-- Nueva Sección: Gestiones Solicitadas -->
+        <section id="gestiones-solicitadas-section" class="max-w-6xl mx-auto mb-12 bg-white rounded-lg shadow-md p-6 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center space-x-2">
+                <i class="fas fa-tasks" style="color: #003992;"></i>
+                <span>Mis Gestiones Solicitadas</span>
+            </h2>
+            <div id="lista-gestiones-solicitadas" class="space-y-4">
+                <!-- Las gestiones se cargarán aquí por JavaScript -->
+                <p id="no-gestiones-mensaje" class="text-gray-500">Aún no has solicitado ninguna gestión.</p>
+            </div>
+            <button id="limpiar-gestiones-demo" class="btn-solicitar mt-6 px-6 py-2 text-sm mx-auto block bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Limpiar Gestiones de Demo</button>
         </section>
 
         <section class="max-w-6xl mx-auto mb-12 bg-white rounded-lg shadow-md p-6">
@@ -264,17 +281,110 @@
         // JavaScript para el saludo dinámico
         window.onload = function() {
             const greetingSpan = document.getElementById('dynamic-greeting-time');
-            const hour = new Date().getHours();
-            let greeting = '';
-            if (hour < 12) {
-                greeting = 'Buenos días';
-            } else if (hour < 19) {
-                greeting = 'Buenas tardes';
-            } else {
-                greeting = 'Buenas noches';
+            if (greetingSpan) { // Asegurarse que el elemento existe
+                const hour = new Date().getHours();
+                let greeting = '';
+                if (hour < 12) {
+                    greeting = 'Buenos días';
+                } else if (hour < 19) {
+                    greeting = 'Buenas tardes';
+                } else {
+                    greeting = 'Buenas noches';
+                }
+                greetingSpan.textContent = greeting;
             }
-            greetingSpan.textContent = greeting;
         };
+
+        // --- Cargar Gestiones Solicitadas desde localStorage ---
+        function cargarGestionesSolicitadas() {
+            const gestionesGuardadas = JSON.parse(localStorage.getItem('gestionesDemo')) || [];
+            const listaElement = document.getElementById('lista-gestiones-solicitadas');
+            const seccionGestiones = document.getElementById('gestiones-solicitadas-section');
+            const mensajeNoGestiones = document.getElementById('no-gestiones-mensaje');
+
+            if (!listaElement || !seccionGestiones || !mensajeNoGestiones) return;
+
+            listaElement.innerHTML = ''; // Limpiar lista anterior
+
+            if (gestionesGuardadas.length > 0) {
+                seccionGestiones.classList.remove('hidden');
+                mensajeNoGestiones.classList.add('hidden');
+
+                gestionesGuardadas.slice().reverse().forEach((gestion, index) => { // .slice().reverse() para mostrar la más nueva primero
+                    const itemGestion = document.createElement('div');
+                    itemGestion.classList.add('p-4', 'border', 'border-gray-200', 'rounded-md', 'shadow-sm', 'bg-gray-50');
+                    
+                    let origenHtml = '';
+                    if (gestion.necesitaRetirar === 'Sí') {
+                        origenHtml = `
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <h4 class="font-medium text-sm text-accent1">Origen (Retiro):</h4>
+                                <p class="text-xs text-gray-600"><strong>Nombre:</strong> ${gestion.origenNombre || 'N/A'}</p>
+                                <p class="text-xs text-gray-600"><strong>Dirección:</strong> ${gestion.origenUbicacion || 'N/A'}</p>
+                                <p class="text-xs text-gray-600"><strong>Fecha Retiro:</strong> ${gestion.fechaRetiro || 'N/A'}</p>
+                            </div>
+                        `;
+                    }
+
+                    let entregaHtml = '';
+                    if (gestion.tipoEntrega) { // Solo muestra la sección de entrega si hay un tipo de entrega
+                        entregaHtml = `
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <h4 class="font-medium text-sm text-accent1">Entrega:</h4>
+                                <p class="text-xs text-gray-600"><strong>Tipo:</strong> ${gestion.tipoEntrega || 'N/A'}</p>
+                        `;
+                        // Solo mostrar nombre, dirección y fecha si no es "Al Origen" y "Necesita retirar" era No (o sea, se llenaron esos campos)
+                        // O si es "Otro Lugar"
+                        if (gestion.tipoEntrega === 'Otro Lugar' || (gestion.tipoEntrega === 'Al Origen' && gestion.necesitaRetirar === 'No')) {
+                            entregaHtml += `
+                                <p class="text-xs text-gray-600"><strong>Nombre:</strong> ${gestion.entregaNombre || 'N/A'}</p>
+                                <p class="text-xs text-gray-600"><strong>Dirección:</strong> ${gestion.entregaUbicacion || 'N/A'}</p>
+                            `;
+                        }
+                         entregaHtml += `
+                                <p class="text-xs text-gray-600"><strong>Fecha Entrega:</strong> ${gestion.fechaEntrega || 'N/A'}</p>
+                            </div>
+                        `;
+                    }
+
+
+                    itemGestion.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-primary">${gestion.institucion || 'Gestión sin institución'}</h3>
+                                <p class="text-sm text-gray-700">${gestion.descripcionTramite || 'Sin descripción.'}</p>
+                            </div>
+                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-yellow-200 text-yellow-800">${gestion.estado || 'Solicitado'}</span>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-gray-200">
+                            <p class="text-xs text-gray-600"><strong>Fecha de Realización:</strong> ${gestion.fechaRealizar || 'N/A'}</p>
+                            <p class="text-xs text-gray-600"><strong>Monto a Gestionar:</strong> ${gestion.montoGestionar || 'N/A'}</p>
+                        </div>
+                        ${origenHtml}
+                        ${entregaHtml}
+                        <p class="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-200"><strong>Pago del Servicio:</strong> ${gestion.quienPagaServicio || 'N/A'} (${gestion.formaPagoServicio || 'N/A'})</p>
+                    `;
+                    listaElement.appendChild(itemGestion);
+                });
+            } else {
+                seccionGestiones.classList.add('hidden');
+                mensajeNoGestiones.classList.remove('hidden');
+            }
+        }
+
+        // Llamar a la función cuando se carga el dashboard
+        document.addEventListener('DOMContentLoaded', cargarGestionesSolicitadas);
+
+        // Botón para limpiar gestiones de demo
+        const btnLimpiarGestiones = document.getElementById('limpiar-gestiones-demo');
+        if (btnLimpiarGestiones) {
+            btnLimpiarGestiones.addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que deseas limpiar todas las gestiones de demostración?')) {
+                    localStorage.removeItem('gestionesDemo');
+                    cargarGestionesSolicitadas(); // Recargar la lista (que ahora estará vacía)
+                }
+            });
+        }
     </script>
 
 
