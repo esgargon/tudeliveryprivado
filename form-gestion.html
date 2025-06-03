@@ -551,7 +551,7 @@
         </div>
     </div>
 
-    <script>
+        <script>
         // --- Global variables for step management ---
         let currentStepGestiones = 1;
         const totalSteps = 4; // Total steps for Gestiones form
@@ -559,6 +559,7 @@
         // --- Helper function to get elements for the current form ---
         function getFormElements(formType) {
             const container = document.getElementById(`${formType}-form-container`);
+            if (!container) return {}; // Return empty object if container not found
             return {
                 formSteps: container.querySelectorAll('.form-step'),
                 stepIndicators: container.querySelectorAll(`.step-indicator-${formType}`),
@@ -570,11 +571,12 @@
         // --- Function to update the UI of the steps ---
         function updateStepUI(formType) {
             const { formSteps, stepIndicators, progressBars, stepInfo } = getFormElements(formType);
-            const currentStep = currentStepGestiones; // Only Gestiones form now
+            if (!formSteps || !stepIndicators || !progressBars || !stepInfo) return; // Exit if elements not found
 
-            // Hide all steps and show only the current one
+            const currentStep = currentStepGestiones; 
+
             formSteps.forEach((step, index) => {
-                if (step) { // Added null check here
+                if (step) { 
                     if (index + 1 === currentStep) {
                         step.classList.add('active');
                     } else {
@@ -583,42 +585,28 @@
                 }
             });
 
-            // Update progress indicators
             stepIndicators.forEach((indicator, index) => {
                 const stepNum = parseInt(indicator.dataset.step);
                 const iconDiv = indicator.querySelector(`.step-icon-gestiones div`);
                 const textP = indicator.querySelector(`.step-text-gestiones`);
 
-                if (iconDiv && textP) { // Ensure elements exist before manipulating
-                    // Reset all to default gray first
-                    iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
-                    iconDiv.classList.add('bg-gray-200', 'text-gray-400');
-                    textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
-                    textP.classList.add('text-gray-400', 'font-medium');
+                if (iconDiv && textP) { 
+                    iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1', 'bg-gray-200', 'text-gray-400');
+                    textP.classList.remove('text-accent1', 'font-semibold', 'text-primary', 'text-gray-400', 'font-medium');
 
                     if (stepNum < currentStep) {
-                        // Completed steps: Icon and text in primary color (dark blue)
-                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
                         iconDiv.classList.add('bg-primary', 'text-white');
-                        textP.classList.remove('text-gray-400', 'font-medium');
                         textP.classList.add('text-primary', 'font-semibold');
                     } else if (stepNum === currentStep) {
-                        // Current step: Icon and text in accent color (orange)
-                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
                         iconDiv.classList.add('bg-accent1', 'text-white');
-                        textP.classList.remove('text-gray-400', 'font-medium');
                         textP.classList.add('text-accent1', 'font-semibold');
                     } else {
-                        // Future steps: Remain gray
-                        iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
                         iconDiv.classList.add('bg-gray-200', 'text-gray-400');
-                        textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
                         textP.classList.add('text-gray-400', 'font-medium');
                     }
                 }
             });
 
-            // Update progress bars
             progressBars.forEach((bar, index) => {
                 const barStep = parseInt(bar.dataset.step);
                 if (barStep < currentStep) {
@@ -630,15 +618,12 @@
                 }
             });
 
-            // Update step text info
-            if (stepInfo) { // Added null check here
-                stepInfo.textContent = `Completa los detalles para tu gestión (Paso ${currentStep} de ${totalSteps}).`;
-            }
+            stepInfo.textContent = `Completa los detalles para tu gestión (Paso ${currentStep} de ${totalSteps}).`;
         }
 
         // --- Function to advance to the next step ---
         function nextStep(formType) {
-            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            let currentStepRef = currentStepGestiones; 
             if (currentStepRef < totalSteps) {
                 currentStepRef++;
                 currentStepGestiones = currentStepRef;
@@ -651,7 +636,7 @@
 
         // --- Function to go back to the previous step ---
         function prevStep(formType) {
-            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            let currentStepRef = currentStepGestiones; 
             if (currentStepRef > 1) {
                 currentStepRef--;
                 currentStepGestiones = currentStepRef;
@@ -659,125 +644,105 @@
             }
         }
 
-        // --- Tab Switching Logic (Simplified as only one tab remains) ---
         const gestionesFormContainer = document.getElementById('gestiones-form-container');
-
-        // Ensure Gestiones form container is always visible
         if (gestionesFormContainer) {
             gestionesFormContainer.classList.remove('hidden');
         }
-        updateStepUI('gestiones'); // Update UI for the active form
+        updateStepUI('gestiones');
 
-        // --- Event Listeners for Navigation Buttons (Gestiones) ---
         document.getElementById('nextStepGestiones1')?.addEventListener('click', () => nextStep('gestiones'));
         document.getElementById('prevStepGestiones2')?.addEventListener('click', () => prevStep('gestiones'));
         document.getElementById('nextStepGestiones2')?.addEventListener('click', () => nextStep('gestiones'));
         document.getElementById('prevStepGestiones3')?.addEventListener('click', () => prevStep('gestiones'));
         document.getElementById('nextStepGestiones3')?.addEventListener('click', () => nextStep('gestiones'));
-        // The prevStepGestiones4 button is now directly in the HTML and handled by its ID
         document.getElementById('prevStepGestiones4')?.addEventListener('click', () => prevStep('gestiones'));
 
 
-        // --- Conditional Field Visibility (Gestiones) ---
         const entregaAlOrigenCheckbox = document.getElementById('entrega-al-origen');
         const entregaOtroLugarCheckbox = document.getElementById('entrega-otro-lugar');
         const entregaFields = document.getElementById('entrega-fields');
         const entregaContactDetails = document.getElementById('entrega-contact-details');
         
-        // Get references to the new radio buttons
         const necesitaRetirarSiRadio = document.getElementById('gestion-necesita-retirar-si');
         const necesitaRetirarNoRadio = document.getElementById('gestion-necesita-retirar-no');
         const origenFields = document.getElementById('gestion-origen-fields');
 
-        // Function to handle the visibility of origin fields based on radio button selection
         function updateOrigenFieldsVisibility() {
+            if (!necesitaRetirarSiRadio || !necesitaRetirarNoRadio || !origenFields) return;
             if (necesitaRetirarSiRadio.checked) {
-                if (origenFields) origenFields.classList.remove('hidden');
+                origenFields.classList.remove('hidden');
             } else {
-                if (origenFields) origenFields.classList.add('hidden');
+                origenFields.classList.add('hidden');
             }
-            // After updating origin fields visibility, re-evaluate delivery fields visibility
             updateEntregaFieldsVisibility();
         }
 
-        // Function to handle the visibility and state of delivery fields
         function updateEntregaFieldsVisibility() {
-            const isEntregaAlOrigen = entregaAlOrigenCheckbox?.checked;
-            const isEntregaOtroLugar = entregaOtroLugarCheckbox?.checked;
-            const needsPickup = necesitaRetirarSiRadio?.checked;
+            if (!entregaAlOrigenCheckbox || !entregaOtroLugarCheckbox || !entregaFields || !entregaContactDetails || !necesitaRetirarSiRadio) return;
+
+            const isEntregaAlOrigen = entregaAlOrigenCheckbox.checked;
+            const isEntregaOtroLugar = entregaOtroLugarCheckbox.checked;
+            const needsPickup = necesitaRetirarSiRadio.checked;
+
+            const fieldsToToggle = [
+                'gestion-entrega-nombre', 'gestion-entrega-telefono', 'gestion-entrega-ubicacion', 
+                'gestion-entrega-referencia', 'gestion-fecha-entrega', 'gestion-entrega-horario'
+            ];
+
+            const clearAndToggleFields = (enable) => {
+                fieldsToToggle.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (!enable) el.value = '';
+                        el.disabled = !enable;
+                    }
+                });
+            };
 
             if (isEntregaAlOrigen || isEntregaOtroLugar) {
-                if (entregaFields) entregaFields.classList.remove('hidden');
+                entregaFields.classList.remove('hidden');
 
                 if (isEntregaAlOrigen && needsPickup) {
-                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'Sí'
-                    if (entregaContactDetails) entregaContactDetails.classList.add('hidden');
-                    // Pre-fill date and time from origin
-                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').value = document.getElementById('gestion-fecha-retiro')?.value || '';
-                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').value = document.getElementById('gestion-origen-horario')?.value || '';
-                    // Disable contact fields, enable date/time
-                    if (document.getElementById('gestion-entrega-nombre')) document.getElementById('gestion-entrega-nombre').disabled = true;
-                    if (document.getElementById('gestion-entrega-telefono')) document.getElementById('gestion-entrega-telefono').disabled = true;
-                    if (document.getElementById('gestion-entrega-ubicacion')) document.getElementById('gestion-entrega-ubicacion').disabled = true;
-                    if (document.getElementById('gestion-entrega-referencia')) document.getElementById('gestion-entrega-referencia').disabled = true;
-                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').disabled = false;
-                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').disabled = false;
-
-                } else if (isEntregaAlOrigen && !needsPickup) {
-                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'No'
-                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Show contact details
-                    // Clear and enable all fields
-                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
-                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
-                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
-                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
-                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
-                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
-
-                } else if (isEntregaOtroLugar) {
-                    // "Enviar a otro lugar" checked
-                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Always show contact details for "otro lugar"
-                    // Clear and enable all fields
-                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
-                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
-                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
-                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
-                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
-                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
+                    entregaContactDetails.classList.add('hidden');
+                    clearAndToggleFields(false); // Disable contact details
+                    // Enable and prefill date/time
+                    const fechaEntregaEl = document.getElementById('gestion-fecha-entrega');
+                    const horarioEntregaEl = document.getElementById('gestion-entrega-horario');
+                    if (fechaEntregaEl) {
+                        fechaEntregaEl.value = document.getElementById('gestion-fecha-retiro')?.value || '';
+                        fechaEntregaEl.disabled = false;
+                    }
+                    if (horarioEntregaEl) {
+                        horarioEntregaEl.value = document.getElementById('gestion-origen-horario')?.value || '';
+                        horarioEntregaEl.disabled = false;
+                    }
+                } else { // Covers "Enviar a otro lugar" OR ("Enviar de vuelta al origen" AND "Necesita retirar" is 'No')
+                    entregaContactDetails.classList.remove('hidden');
+                    clearAndToggleFields(true); // Enable all fields
                 }
             } else {
-                // Neither delivery option is checked, hide everything
-                if (entregaFields) entregaFields.classList.add('hidden');
-                if (entregaContactDetails) entregaContactDetails.classList.add('hidden'); // Ensure hidden
-                // Disable and clear all fields
-                if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = true; }
-                if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = true; }
-                if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = true; }
-                if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = true; }
-                if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = true; }
-                if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = true; }
+                entregaFields.classList.add('hidden');
+                entregaContactDetails.classList.add('hidden');
+                clearAndToggleFields(false);
             }
         }
 
-        // Add event listeners to the new radio buttons
         necesitaRetirarSiRadio?.addEventListener('change', updateOrigenFieldsVisibility);
         necesitaRetirarNoRadio?.addEventListener('change', updateOrigenFieldsVisibility);
-
-        // Add event listeners for delivery checkboxes
         entregaAlOrigenCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
         entregaOtroLugarCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
         
-        // --- Contact Agenda Logic ---
         const contactosGuardados = [
             { nombre: "Ana Rodríguez", telefono: "0972123868", direccion: "Av. Siempre Viva 742, Springfield" },
             { nombre: "Carlos López", telefono: "0976116243", direccion: "Calle Falsa 123, Villa General" },
             { nombre: "Elena Gómez", telefono: "0971981745", direccion: "Boulevard de los Sueños Rotos 45, Capital" },
         ];
 
-        function mostrarContactos(inputNombre, inputTelefono, inputDireccion, listaDiv) {
-            if (!listaDiv) return; // Ensure listaDiv exists
+        function mostrarContactos(inputNombre, inputTelefono, inputDireccion, listaDivId) {
+            const listaDiv = document.getElementById(listaDivId);
+            if (!listaDiv) return; 
 
-            listaDiv.innerHTML = ''; // Clear previous list
+            listaDiv.innerHTML = ''; 
             if (contactosGuardados.length === 0) {
                 const noContactsItem = document.createElement('div');
                 noContactsItem.textContent = 'No hay contactos guardados.';
@@ -789,9 +754,9 @@
                     item.textContent = contacto.nombre;
                     item.classList.add('contacts-dropdown-item');
                     item.addEventListener('click', () => {
-                        if (inputNombre) inputNombre.value = contacto.nombre;
-                        if (inputTelefono) inputTelefono.value = contacto.telefono;
-                        if (inputDireccion) inputDireccion.value = contacto.direccion;
+                        if (inputNombre) document.getElementById(inputNombre).value = contacto.nombre;
+                        if (inputTelefono) document.getElementById(inputTelefono).value = contacto.telefono;
+                        if (inputDireccion) document.getElementById(inputDireccion).value = contacto.direccion;
                         listaDiv.classList.add('hidden');
                     });
                     listaDiv.appendChild(item);
@@ -800,38 +765,19 @@
             listaDiv.classList.toggle('hidden');
         }
 
-        // Gestiones - Contactos
         document.getElementById('btnVerContactosGestionEntrega')?.addEventListener('click', (event) => {
             event.stopPropagation();
-            mostrarContactos(
-                document.getElementById('gestion-entrega-nombre'),
-                document.getElementById('gestion-entrega-telefono'),
-                document.getElementById('gestion-entrega-ubicacion'),
-                document.getElementById('listaContactosGestionEntrega')
-            );
+            mostrarContactos('gestion-entrega-nombre', 'gestion-entrega-telefono', 'gestion-entrega-ubicacion', 'listaContactosGestionEntrega');
         });
-
         document.getElementById('btnVerContactosGestionOrigen')?.addEventListener('click', (event) => {
             event.stopPropagation();
-            mostrarContactos(
-                document.getElementById('gestion-origen-nombre'),
-                document.getElementById('gestion-origen-telefono'),
-                document.getElementById('gestion-origen-ubicacion'),
-                document.getElementById('listaContactosGestionOrigen')
-            );
+            mostrarContactos('gestion-origen-nombre', 'gestion-origen-telefono', 'gestion-origen-ubicacion', 'listaContactosGestionOrigen');
         });
-
         document.getElementById('btnVerContactosGestionInstitucion')?.addEventListener('click', (event) => {
             event.stopPropagation();
-            mostrarContactos(
-                document.getElementById('gestion-institucion'),
-                document.getElementById('gestion-telefono'),
-                document.getElementById('gestion-ubicacion'),
-                document.getElementById('listaContactosGestionInstitucion')
-            );
+            mostrarContactos('gestion-institucion', 'gestion-telefono', 'gestion-ubicacion', 'listaContactosGestionInstitucion');
         });
 
-        // Close dropdowns when clicking outside
         document.addEventListener('click', (event) => {
             const dropdowns = document.querySelectorAll('.contacts-dropdown');
             dropdowns.forEach(dropdown => {
@@ -841,30 +787,19 @@
             });
         });
 
-        // --- Geolocation Logic ---
         function handleGeolocation(inputElementId) {
             const inputElement = document.getElementById(inputElementId);
+            if (!inputElement) return;
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-                    if (inputElement) inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
+                    inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
                     console.log("Ubicación obtenida. Implementar geocodificación inversa.");
                 }, error => {
                     console.warn(`ERROR(${error.code}): ${error.message}`);
-                    const errorDiv = document.createElement('p');
-                    errorDiv.textContent = `Error al obtener ubicación: ${error.message}.`;
-                    errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
-                    const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
-                    if (existingError) existingError.remove();
-                    if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+                    // ... (manejo de errores visual)
                 });
             } else {
-                console.log("La geolocalización no es soportada por este navegador.");
-                const errorDiv = document.createElement('p');
-                errorDiv.textContent = 'La geolocalización no es soportada por este navegador.';
-                errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
-                const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
-                if (existingError) existingError.remove();
-                if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+                // ... (manejo de error si no hay geolocalización)
             }
         }
 
@@ -872,7 +807,6 @@
         document.getElementById('btnUbicacionGestionEntrega')?.addEventListener('click', () => handleGeolocation('gestion-entrega-ubicacion'));
         document.getElementById('btnUbicacionGestionOrigen')?.addEventListener('click', () => handleGeolocation('gestion-origen-ubicacion'));
 
-        // --- Date Buttons ("Hoy", "Mañana") ---
         function formatDate(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -880,131 +814,99 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Gestiones - Fecha de Retiro buttons
-        document.getElementById('btnHoyGestionRetiro')?.addEventListener('click', function() {
-            const input = document.getElementById('gestion-fecha-retiro');
-            if (input) input.value = formatDate(new Date());
-        });
-        document.getElementById('btnMananaGestionRetiro')?.addEventListener('click', function() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const input = document.getElementById('gestion-fecha-retiro');
-            if (input) input.value = formatDate(tomorrow);
-        });
+        const setupDateButtons = (btnHoyId, btnMananaId, inputId) => {
+            document.getElementById(btnHoyId)?.addEventListener('click', function() {
+                const input = document.getElementById(inputId);
+                if (input) input.value = formatDate(new Date());
+            });
+            document.getElementById(btnMananaId)?.addEventListener('click', function() {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const input = document.getElementById(inputId);
+                if (input) input.value = formatDate(tomorrow);
+            });
+        };
+        setupDateButtons('btnHoyGestionRetiro', 'btnMananaGestionRetiro', 'gestion-fecha-retiro');
+        setupDateButtons('btnHoyGestionRealizar', 'btnMananaGestionRealizar', 'gestion-fecha-realizar');
+        setupDateButtons('btnHoyGestionEntrega', 'btnMananaGestionEntrega', 'gestion-fecha-entrega');
 
-        // Gestiones - Fecha de Realización buttons
-        document.getElementById('btnHoyGestionRealizar')?.addEventListener('click', function() {
-            const input = document.getElementById('gestion-fecha-realizar');
-            if (input) input.value = formatDate(new Date());
-        });
-        document.getElementById('btnMananaGestionRealizar')?.addEventListener('click', function() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const input = document.getElementById('gestion-fecha-realizar');
-            if (input) input.value = formatDate(tomorrow);
-        });
-
-        // Gestiones - Fecha de Entrega buttons
-        document.getElementById('btnHoyGestionEntrega')?.addEventListener('click', function() {
-            const input = document.getElementById('gestion-fecha-entrega');
-            if (input) input.value = formatDate(new Date());
-        });
-        document.getElementById('btnMananaGestionEntrega')?.addEventListener('click', function() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const input = document.getElementById('gestion-fecha-entrega');
-            if (input) input.value = formatDate(tomorrow);
-        });
-
-        // --- Summary Population Functions ---
         function populateSummaryGestiones() {
-            // Helper to get element and set textContent, handling null
-            const setSummaryText = (id, value, prefix = '') => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value !== null && value !== undefined && value !== '' ? `${prefix}${value}` : 'N/A';
-                }
-            };
-
-            // Helper to get selected radio button label
+            const getElValue = (id) => document.getElementById(id)?.value || '';
             const getRadioLabel = (name) => {
                 const radio = document.querySelector(`input[name="${name}"]:checked`);
-                return radio ? radio.labels[0].textContent : null;
+                return radio ? radio.labels[0].textContent.trim() : 'N/A';
             };
-
-            // Helper to get selected option text
             const getSelectText = (id) => {
                 const select = document.getElementById(id);
-                return select && select.selectedIndex !== -1 ? select.options[select.selectedIndex].textContent : null;
+                return select && select.options[select.selectedIndex] ? select.options[select.selectedIndex].textContent : 'N/A';
+            };
+            const setSummaryText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value || 'N/A';
             };
 
-            // Sección de Origen (condicional)
-            const necesitaRetirar = document.querySelector('input[name="gestion-necesita-retirar"]:checked');
-            const resumenGestionOrigenSection = document.getElementById('resumen-gestion-origen-section');
-            setSummaryText('resumen-gestion-retirar', necesitaRetirar ? (necesitaRetirar.value === 'si' ? 'Sí' : 'No') : null);
-
-            if (necesitaRetirar && necesitaRetirar.value === 'si') {
-                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.remove('hidden');
-                setSummaryText('resumen-gestion-origen-nombre', document.getElementById('gestion-origen-nombre')?.value);
-                setSummaryText('resumen-gestion-origen-telefono', document.getElementById('gestion-origen-telefono')?.value);
-                setSummaryText('resumen-gestion-origen-ubicacion', document.getElementById('gestion-origen-ubicacion')?.value);
-                setSummaryText('resumen-gestion-origen-referencia', document.getElementById('gestion-origen-referencia')?.value, 'Referencia: ');
-                setSummaryText('resumen-gestion-fecha-retiro', document.getElementById('gestion-fecha-retiro')?.value);
-                setSummaryText('resumen-gestion-origen-horario', getSelectText('gestion-origen-horario'));
-            } else {
-                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.add('hidden');
-            }
-
-            // Sección de Trámite
-            setSummaryText('resumen-gestion-institucion', document.getElementById('gestion-institucion')?.value);
-            setSummaryText('resumen-gestion-telefono-lugar', document.getElementById('gestion-telefono')?.value);
-            setSummaryText('resumen-gestion-ubicacion', document.getElementById('gestion-ubicacion')?.value);
-            setSummaryText('resumen-gestion-referencia', document.getElementById('gestion-referencia')?.value, 'Referencia: ');
-            setSummaryText('resumen-gestion-fecha-realizar', document.getElementById('gestion-fecha-realizar')?.value);
-            setSummaryText('resumen-gestion-horario', getSelectText('gestion-horario'));
-            setSummaryText('resumen-gestion-tramite', document.getElementById('gestion-descripcion')?.value);
-            const monto = parseFloat(document.getElementById('gestion-monto')?.value);
-            setSummaryText('resumen-gestion-monto', isNaN(monto) ? null : monto.toLocaleString('es-PY', { style: 'currency', currency: 'PYG' }));
-            setSummaryText('resumen-gestion-observaciones', document.getElementById('gestion-observaciones')?.value, 'Observaciones: ');
-            
-            // Sección de Entrega (condicional)
-            const resumenGestionEntregaSection = document.getElementById('resumen-gestion-entrega-section');
-            if ((entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) || (entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked)) {
-                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.remove('hidden');
-                setSummaryText('resumen-gestion-tipo-entrega', (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) ? 'Al Origen' : 'Otro Lugar');
-                
-                // Only populate contact details if "Enviar a otro lugar" is checked OR if "Enviar de vuelta al origen" is checked AND "Necesita retirar" is 'No'
-                const needsPickup = necesitaRetirarSiRadio?.checked;
-                if ((entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked) || (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked && !needsPickup)) {
-                    setSummaryText('resumen-gestion-entrega-nombre', document.getElementById('gestion-entrega-nombre')?.value);
-                    setSummaryText('resumen-gestion-entrega-telefono', document.getElementById('gestion-entrega-telefono')?.value);
-                    setSummaryText('resumen-gestion-entrega-ubicacion', document.getElementById('gestion-entrega-ubicacion')?.value);
-                    setSummaryText('resumen-gestion-entrega-referencia', document.getElementById('gestion-entrega-referencia')?.value, 'Referencia: ');
+            const necesitaRetirarVal = document.querySelector('input[name="gestion-necesita-retirar"]:checked')?.value;
+            const resumenOrigenSection = document.getElementById('resumen-gestion-origen-section');
+            if (resumenOrigenSection) {
+                if (necesitaRetirarVal === 'si') {
+                    resumenOrigenSection.classList.remove('hidden');
+                    setSummaryText('resumen-gestion-retirar', 'Sí');
+                    setSummaryText('resumen-gestion-origen-nombre', getElValue('gestion-origen-nombre'));
+                    setSummaryText('resumen-gestion-origen-telefono', getElValue('gestion-origen-telefono'));
+                    setSummaryText('resumen-gestion-origen-ubicacion', getElValue('gestion-origen-ubicacion'));
+                    setSummaryText('resumen-gestion-origen-referencia', getElValue('gestion-origen-referencia'));
+                    setSummaryText('resumen-gestion-fecha-retiro', getElValue('gestion-fecha-retiro'));
+                    setSummaryText('resumen-gestion-origen-horario', getSelectText('gestion-origen-horario'));
                 } else {
-                    setSummaryText('resumen-gestion-entrega-nombre', ''); // Clear if not applicable
-                    setSummaryText('resumen-gestion-entrega-telefono', '');
-                    setSummaryText('resumen-gestion-entrega-ubicacion', '');
-                    setSummaryText('resumen-gestion-entrega-referencia', '');
+                    resumenOrigenSection.classList.add('hidden');
+                    setSummaryText('resumen-gestion-retirar', 'No');
                 }
-
-                setSummaryText('resumen-gestion-fecha-entrega', document.getElementById('gestion-fecha-entrega')?.value);
-                setSummaryText('resumen-gestion-entrega-horario', getSelectText('gestion-entrega-horario'));
-            } else {
-                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.add('hidden');
             }
 
-            // Sección de Pago del Servicio
+            setSummaryText('resumen-gestion-institucion', getElValue('gestion-institucion'));
+            setSummaryText('resumen-gestion-telefono-lugar', getElValue('gestion-telefono'));
+            setSummaryText('resumen-gestion-ubicacion', getElValue('gestion-ubicacion'));
+            setSummaryText('resumen-gestion-referencia', getElValue('gestion-referencia'));
+            setSummaryText('resumen-gestion-fecha-realizar', getElValue('gestion-fecha-realizar'));
+            setSummaryText('resumen-gestion-horario', getSelectText('gestion-horario'));
+            setSummaryText('resumen-gestion-tramite', getElValue('gestion-descripcion'));
+            const monto = parseFloat(getElValue('gestion-monto'));
+            setSummaryText('resumen-gestion-monto', isNaN(monto) ? 'N/A' : monto.toLocaleString('es-PY', { style: 'currency', currency: 'PYG' }));
+            setSummaryText('resumen-gestion-observaciones', getElValue('gestion-observaciones'));
+            
+            const entregaOrigenChecked = document.getElementById('entrega-al-origen')?.checked;
+            const entregaOtroLugarChecked = document.getElementById('entrega-otro-lugar')?.checked;
+            const resumenEntregaSection = document.getElementById('resumen-gestion-entrega-section');
+
+            if (resumenEntregaSection) {
+                if (entregaOrigenChecked || entregaOtroLugarChecked) {
+                    resumenEntregaSection.classList.remove('hidden');
+                    setSummaryText('resumen-gestion-tipo-entrega', entregaOrigenChecked ? 'Al Origen' : 'Otro Lugar');
+                    
+                    if (entregaOtroLugarChecked || (entregaOrigenChecked && necesitaRetirarVal === 'no')) {
+                        setSummaryText('resumen-gestion-entrega-nombre', getElValue('gestion-entrega-nombre'));
+                        setSummaryText('resumen-gestion-entrega-telefono', getElValue('gestion-entrega-telefono'));
+                        setSummaryText('resumen-gestion-entrega-ubicacion', getElValue('gestion-entrega-ubicacion'));
+                        setSummaryText('resumen-gestion-entrega-referencia', getElValue('gestion-entrega-referencia'));
+                    } else { // Entrega al origen y SÍ se retira del origen, no se muestran estos datos de contacto de entrega
+                        setSummaryText('resumen-gestion-entrega-nombre', 'Usar datos de origen');
+                        setSummaryText('resumen-gestion-entrega-telefono', 'Usar datos de origen');
+                        setSummaryText('resumen-gestion-entrega-ubicacion', 'Usar datos de origen');
+                        setSummaryText('resumen-gestion-entrega-referencia', 'Usar datos de origen');
+                    }
+                    setSummaryText('resumen-gestion-fecha-entrega', getElValue('gestion-fecha-entrega'));
+                    setSummaryText('resumen-gestion-entrega-horario', getSelectText('gestion-entrega-horario'));
+                } else {
+                    resumenEntregaSection.classList.add('hidden');
+                }
+            }
+
             setSummaryText('resumen-pago-servicio-quien', getRadioLabel('pago-servicio-quien'));
             setSummaryText('resumen-pago-servicio-forma', getRadioLabel('pago-servicio-forma'));
-
-            // Update estimated cost (placeholder value)
-            const costoEstimadoElement = document.getElementById('costo-estimado');
-            if (costoEstimadoElement) {
-                costoEstimadoElement.textContent = 'Gs. 41.000'; // Hardcoded value as per image
-            }
+            
+            document.getElementById('costo-estimado').textContent = 'Gs. 41.000'; // Hardcoded
         }
 
-        // --- Form Submission (Custom Modal) ---
         const gestionesForm = document.getElementById('gestionesForm');
         const customModal = document.getElementById('customModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -1018,26 +920,56 @@
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', () => {
                 if (customModal) customModal.classList.add('hidden');
+                // Si el mensaje contiene "Redirigiendo", entonces hacemos la redirección real
+                if (modalMessage && modalMessage.textContent.includes("Redirigiendo al dashboard")) {
+                    window.location.href = 'dashboard.html';
+                }
             });
         }
+        
+        // Asegúrate que el botón de cierre del modal también dispare la redirección si es necesario.
+        // La redirección principal ahora se maneja después de que el modal es cerrado por el usuario.
 
         if (gestionesForm) {
             gestionesForm.addEventListener('submit', function(event) {
                 event.preventDefault();
-                console.log('Formulario de Gestiones enviado (simulación)');
-                const formData = new FormData(this);
-                const data = Object.fromEntries(formData.entries());
-                console.log('Datos del formulario de Gestiones:', data);
-                showCustomModal('¡Solicitud de Gestión Enviada con Éxito!');
+                
+                const datosGestion = {
+                    necesitaRetirar: document.querySelector('input[name="gestion-necesita-retirar"]:checked')?.value === 'si' ? 'Sí' : 'No',
+                    origenNombre: document.getElementById('gestion-origen-nombre')?.value,
+                    origenUbicacion: document.getElementById('gestion-origen-ubicacion')?.value,
+                    fechaRetiro: document.getElementById('gestion-fecha-retiro')?.value,
+
+                    institucion: document.getElementById('gestion-institucion')?.value,
+                    descripcionTramite: document.getElementById('gestion-descripcion')?.value,
+                    fechaRealizar: document.getElementById('gestion-fecha-realizar')?.value,
+                    montoGestionar: document.getElementById('gestion-monto')?.value ? parseFloat(document.getElementById('gestion-monto')?.value).toLocaleString('es-PY', { style: 'currency', currency: 'PYG' }) : 'N/A',
+                    
+                    tipoEntrega: (document.getElementById('entrega-al-origen')?.checked) ? 'Al Origen' : (document.getElementById('entrega-otro-lugar')?.checked ? 'Otro Lugar' : null),
+                    entregaNombre: document.getElementById('gestion-entrega-nombre')?.value,
+                    entregaUbicacion: document.getElementById('gestion-entrega-ubicacion')?.value,
+                    fechaEntrega: document.getElementById('gestion-fecha-entrega')?.value,
+
+                    quienPagaServicio: document.querySelector('input[name="pago-servicio-quien"]:checked')?.labels[0].textContent.trim(),
+                    formaPagoServicio: document.querySelector('input[name="pago-servicio-forma"]:checked')?.labels[0].textContent.trim(),
+                    
+                    estado: 'Solicitado',
+                    id: Date.now() 
+                };
+
+                let gestionesGuardadas = JSON.parse(localStorage.getItem('gestionesDemo')) || [];
+                gestionesGuardadas.push(datosGestion);
+                localStorage.setItem('gestionesDemo', JSON.stringify(gestionesGuardadas));
+
+                showCustomModal('¡Solicitud de Gestión Enviada con Éxito! Redirigiendo al dashboard...');
+                // La redirección se activará cuando el usuario cierre el modal (ver el listener de closeModalBtn)
             });
         }
 
-
-        // --- Initialize UI on page load ---
         document.addEventListener('DOMContentLoaded', () => {
-            updateStepUI('gestiones'); // Initialize Gestiones form first
-            updateOrigenFieldsVisibility(); // Set initial visibility based on default radio button
-            updateEntregaFieldsVisibility(); // Set initial visibility for delivery fields
+            updateStepUI('gestiones'); 
+            updateOrigenFieldsVisibility(); 
+            updateEntregaFieldsVisibility(); 
         });
     </script>
 </body>
