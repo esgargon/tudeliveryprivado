@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Delivery Privado - Mis Contactos (Mejorado)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Fondo ligeramente gris para la página */
+        }
+        /* Colores corporativos */
+        .bg-primary-blue { background-color: #003992; }
+        .text-primary-blue { color: #003992; }
+        .hover\:bg-primary-blue-dark:hover { background-color: #002e70; /* Un tono más oscuro */ }
+        .bg-secondary-orange { background-color: #FB8313; }
+        .text-secondary-orange { color: #FB8313; }
+        .bg-tertiary-yellow { background-color: #F5A313; }
+        .text-tertiary-yellow { color: #F5A313; }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Permanece en la misma posición incluso al hacer scroll */
+            z-index: 1000; /* Se superpone a todo */
+            left: 0;
+            top: 0;
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Alto completo */
+            overflow: auto; /* Habilitar scroll si es necesario */
+            background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente más oscuro */
+            justify-content: center; /* Centrar horizontalmente */
+            align-items: center; /* Centrar verticalmente */
+            backdrop-filter: blur(2px); /* Efecto de desenfoque */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 550px;
+            position: relative;
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: fadeInScale 0.3s forwards ease-out;
+        }
+
+        @keyframes fadeInScale {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            margin-top: -8px;
+            margin-right: -8px;
+            padding: 8px; /* Área de clic más grande */
+            border-radius: 50%;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            background-color: #eee;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50; /* Verde para éxito */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .toast-notification.error {
+            background-color: #f44336; /* Rojo para error */
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-md p-4 flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+            <span class="text-lg font-bold text-primary-blue">Tu Delivery Privado</span>
+            <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Inicio</a>
+            <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Mis Pedidos</a>
+            <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Contactos</a>
+            <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Reportes</a>
+            <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Perfil</a>
+        </div>
+        <div class="flex items-center">
+            <a href="#" class="text-gray-600 hover:text-primary-blue flex items-center space-x-2 transition duration-200">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-800">Mis Contactos</h1>
+                    <p class="text-gray-500">Administra tus contactos guardados</p>
+                </div>
+                <button id="addContactButton" class="bg-primary-blue text-white px-6 py-3 rounded-lg shadow-md hover:bg-primary-blue-dark transition duration-300 flex items-center space-x-2">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Agregar Contacto</span>
+                </button>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between mb-6 space-y-4 md:space-y-0 md:space-x-4">
+                <div class="relative w-full md:w-2/3">
+                    <input type="text" id="searchContacts" placeholder="Buscar contactos por nombre, teléfono o dirección..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-primary-blue focus:border-primary-blue shadow-sm">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="w-full md:w-1/3 relative">
+                    <select id="sortContacts" class="block w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-primary-blue focus:border-primary-blue shadow-sm appearance-none">
+                        <option value="name-asc">Nombre (A-Z)</option>
+                        <option value="name-desc">Nombre (Z-A)</option>
+                        <option value="type-asc">Tipo (A-Z)</option>
+                        <option value="type-desc">Tipo (Z-A)</option>
+                    </select>
+                    <i class="fas fa-sort-alpha-down-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div id="contactsList" class="space-y-4">
+                </div>
+
+            <div id="emptyState" class="hidden text-center py-10 text-gray-500">
+                <i class="fas fa-users-slash text-6xl mb-4 text-gray-300"></i>
+                <p class="text-lg font-medium">¡No hay contactos para mostrar!</p>
+                <p>Haz clic en "Agregar Contacto" para añadir el primero.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="toastNotification" class="toast-notification" role="alert" aria-live="polite">
+        </div>
+
+    <div id="addEditContactModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+        <div class="modal-content">
+            <button class="close-button" id="closeModalButton" aria-label="Cerrar formulario de contacto">&times;</button>
+            <h2 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800">Agregar Nuevo Contacto</h2>
+            <p id="modalDescription" class="sr-only">Formulario para añadir o modificar la información de un contacto.</p>
+            <form id="contactForm" class="space-y-4">
+                <input type="hidden" id="contactId" name="id">
+                <div>
+                    <label for="contactName" class="block text-sm font-medium text-gray-700">Nombre del Contacto <span class="text-red-500">*</span></label>
+                    <input type="text" id="contactName" name="contactName" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-blue focus:border-primary-blue" placeholder="Ej: Juan Pérez" required aria-required="true">
+                </div>
+                <div>
+                    <label for="contactType" class="block text-sm font-medium text-gray-700">Tipo (Ej: Oficina, Casa, Proveedor)</label>
+                    <input type="text" id="contactType" name="contactType" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-blue focus:border-primary-blue" placeholder="Ej: Oficina">
+                </div>
+                <div>
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Número de Teléfono <span class="text-red-500">*</span></label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-blue focus:border-primary-blue" placeholder="Ej: 0901111222" required aria-required="true">
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Dirección</label>
+                    <input type="text" id="address" name="address" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-blue focus:border-primary-blue" placeholder="Ej: Principal 123 Asunción">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="cancelButton" class="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300" aria-label="Cancelar y cerrar formulario">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 bg-primary-blue text-white rounded-lg hover:bg-primary-blue-dark transition duration-300" aria-label="Guardar contacto">Guardar Contacto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" aria-describedby="deleteModalDescription">
+        <div class="modal-content max-w-sm text-center">
+            <h2 id="deleteModalTitle" class="text-xl font-semibold mb-4 text-gray-800">Confirmar Eliminación</h2>
+            <p id="deleteModalDescription" class="mb-6 text-gray-600">¿Estás seguro de que quieres eliminar a <span id="contactToDeleteName" class="font-bold"></span>?</p>
+            <div class="flex justify-center space-x-4">
+                <button type="button" id="cancelDeleteButton" class="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-300" aria-label="Cancelar eliminación">Cancelar</button>
+                <button type="button" id="confirmDeleteButton" class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300" aria-label="Confirmar eliminación">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <script>
+        // --- Datos de Contactos y localStorage ---
+        const localStorageKeyContacts = 'tuDeliveryPrivado_Contacts';
+        let contacts = [];
+        let nextContactId = 1; 
+
+        function loadContactsFromStorage() {
+            const storedContacts = localStorage.getItem(localStorageKeyContacts);
+            if (storedContacts) {
+                contacts = JSON.parse(storedContacts);
+                if (contacts.length > 0) {
+                    // Asegurar que nextContactId es mayor que cualquier ID existente
+                    nextContactId = Math.max(...contacts.map(c => c.id), 0) + 1;
+                } else {
+                    nextContactId = 1;
+                }
+            } else {
+                // Datos de ejemplo si no hay nada en localStorage
+                contacts = [
+                    { id: 1, name: 'Juan Pérez (Ejemplo)', type: 'Oficina', phone: '0901111222', address: 'Av. Principal 123, Asunción' },
+                    { id: 2, name: 'Maria Gomez (Ejemplo)', type: 'Casa', phone: '0971333444', address: 'Calle Secundaria 450, Lambaré' },
+                ];
+                nextContactId = 3; // Siguiente al último ID de ejemplo
+                saveContactsToStorage(); // Guardar los de ejemplo si es la primera vez
+            }
+        }
+
+        function saveContactsToStorage() {
+            localStorage.setItem(localStorageKeyContacts, JSON.stringify(contacts));
+        }
+
+        // --- Elementos del DOM ---
+        const contactsList = document.getElementById('contactsList');
+        const emptyState = document.getElementById('emptyState');
+        const addContactButton = document.getElementById('addContactButton');
+        const addEditContactModal = document.getElementById('addEditContactModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const contactForm = document.getElementById('contactForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const contactIdField = document.getElementById('contactId');
+        const contactNameField = document.getElementById('contactName');
+        const contactTypeField = document.getElementById('contactType');
+        const phoneNumberField = document.getElementById('phoneNumber');
+        const addressField = document.getElementById('address');
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+        const cancelDeleteButton = document.getElementById('cancelDeleteButton');
+        const contactToDeleteNameSpan = document.getElementById('contactToDeleteName');
+        const searchContactsInput = document.getElementById('searchContacts');
+        const sortContactsSelect = document.getElementById('sortContacts');
+        const toastNotification = document.getElementById('toastNotification');
+        let contactToDeleteId = null;
+
+        function showToast(message, type = 'success') {
+            if (!toastNotification) return;
+            toastNotification.textContent = message;
+            toastNotification.className = `toast-notification show ${type === 'error' ? 'error' : ''}`;
+            setTimeout(() => {
+                toastNotification.className = 'toast-notification';
+            }, 3000);
+        }
+
+        function showModal(modalElement, focusElementId = null) {
+            if (!modalElement) return;
+            modalElement.style.display = 'flex';
+            if (focusElementId && document.getElementById(focusElementId)) {
+                document.getElementById(focusElementId).focus();
+            }
+            document.addEventListener('keydown', handleEscKey);
+        }
+
+        function hideModal(modalElement) {
+            if (!modalElement) return;
+            modalElement.style.display = 'none';
+            document.removeEventListener('keydown', handleEscKey);
+        }
+
+        function handleEscKey(event) {
+            if (event.key === 'Escape') {
+                if (addEditContactModal && addEditContactModal.style.display === 'flex') hideModal(addEditContactModal);
+                if (deleteConfirmModal && deleteConfirmModal.style.display === 'flex') hideModal(deleteConfirmModal);
+            }
+        }
+
+        function renderContacts() {
+            if (!contactsList || !emptyState || !searchContactsInput || !sortContactsSelect) return;
+            contactsList.innerHTML = '';
+            const searchTerm = searchContactsInput.value.toLowerCase();
+            const sortBy = sortContactsSelect.value;
+
+            let filteredContacts = contacts.filter(contact =>
+                contact.name.toLowerCase().includes(searchTerm) ||
+                contact.phone.includes(searchTerm) ||
+                (contact.address && contact.address.toLowerCase().includes(searchTerm)) ||
+                (contact.type && contact.type.toLowerCase().includes(searchTerm))
+            );
+
+            filteredContacts.sort((a, b) => {
+                let valA, valB;
+                switch (sortBy) {
+                    case 'name-asc': valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); return valA.localeCompare(valB);
+                    case 'name-desc': valA = a.name.toLowerCase(); valB = b.name.toLowerCase(); return valB.localeCompare(valA);
+                    case 'type-asc': valA = (a.type || '').toLowerCase(); valB = (b.type || '').toLowerCase(); return valA.localeCompare(valB);
+                    case 'type-desc': valA = (a.type || '').toLowerCase(); valB = (b.type || '').toLowerCase(); return valB.localeCompare(valA);
+                    default: return 0;
+                }
+            });
+
+            emptyState.classList.toggle('hidden', filteredContacts.length > 0);
+
+            filteredContacts.forEach(contact => {
+                const contactCard = document.createElement('div');
+                contactCard.className = 'bg-gray-50 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-100 transition duration-200';
+                contactCard.innerHTML = `
+                    <div class="flex items-start space-x-4 mb-4 sm:mb-0">
+                        <i class="fas fa-user-circle text-primary-blue text-2xl mt-1"></i>
+                        <div>
+                            <p class="font-medium text-gray-800">${contact.name} ${contact.type ? `<span class="text-gray-500 text-sm">(${contact.type})</span>` : ''}</p>
+                            <p class="text-gray-600 text-sm flex items-center space-x-1 mt-1"><i class="fas fa-phone-alt text-xs"></i><span>${contact.phone}</span></p>
+                            <p class="text-gray-600 text-sm flex items-center space-x-1 mt-1"><i class="fas fa-map-marker-alt text-xs"></i><span>${contact.address || 'Sin dirección'}</span></p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3 self-end sm:self-center">
+                        <button class="text-gray-400 hover:text-primary-blue transition duration-200" data-id="${contact.id}" data-action="edit" aria-label="Editar ${contact.name}"><i class="fas fa-edit text-lg"></i></button>
+                        <button class="text-gray-400 hover:text-red-500 transition duration-200" data-id="${contact.id}" data-name="${contact.name}" data-action="delete" aria-label="Eliminar ${contact.name}"><i class="fas fa-trash-alt text-lg"></i></button>
+                    </div>`;
+                contactsList.appendChild(contactCard);
+            });
+        }
+
+        addContactButton?.addEventListener('click', () => {
+            modalTitle.textContent = 'Agregar Nuevo Contacto';
+            contactIdField.value = ''; 
+            contactForm.reset();
+            showModal(addEditContactModal, 'contactName');
+        });
+
+        closeModalButton?.addEventListener('click', () => hideModal(addEditContactModal));
+        cancelButton?.addEventListener('click', () => hideModal(addEditContactModal));
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === addEditContactModal) hideModal(addEditContactModal);
+            if (event.target === deleteConfirmModal) hideModal(deleteConfirmModal);
+        });
+
+        contactForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (!contactNameField.value.trim() || !phoneNumberField.value.trim()) {
+                showToast('Nombre y Número de Teléfono son obligatorios.', 'error');
+                return;
+            }
+            const contactId = contactIdField.value;
+            const newContactData = {
+                id: contactId ? parseInt(contactId) : nextContactId,
+                name: contactNameField.value.trim(),
+                type: contactTypeField.value.trim() || null,
+                phone: phoneNumberField.value.trim(),
+                address: addressField.value.trim() || null
+            };
+
+            if (contactId) {
+                contacts = contacts.map(c => c.id === newContactData.id ? newContactData : c);
+                showToast('Contacto actualizado.', 'success');
+            } else {
+                contacts.push(newContactData);
+                nextContactId++; // Incrementar solo para nuevos contactos
+                showToast('Contacto agregado.', 'success');
+            }
+            saveContactsToStorage();
+            renderContacts();
+            hideModal(addEditContactModal);
+        });
+
+        contactsList?.addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+            const contactId = parseInt(button.dataset.id);
+            const action = button.dataset.action;
+
+            if (action === 'edit') {
+                const contactToEdit = contacts.find(c => c.id === contactId);
+                if (contactToEdit) {
+                    modalTitle.textContent = 'Editar Contacto';
+                    contactIdField.value = contactToEdit.id;
+                    contactNameField.value = contactToEdit.name;
+                    contactTypeField.value = contactToEdit.type || '';
+                    phoneNumberField.value = contactToEdit.phone;
+                    addressField.value = contactToEdit.address || '';
+                    showModal(addEditContactModal, 'contactName');
+                }
+            } else if (action === 'delete') {
+                contactToDeleteId = contactId;
+                contactToDeleteNameSpan.textContent = button.dataset.name;
+                showModal(deleteConfirmModal, 'cancelDeleteButton');
+            }
+        });
+
+        confirmDeleteButton?.addEventListener('click', () => {
+            contacts = contacts.filter(c => c.id !== contactToDeleteId);
+            saveContactsToStorage();
+            showToast('Contacto eliminado.', 'success');
+            renderContacts();
+            hideModal(deleteConfirmModal);
+            contactToDeleteId = null;
+        });
+
+        cancelDeleteButton?.addEventListener('click', () => {
+            hideModal(deleteConfirmModal);
+            contactToDeleteId = null;
+        });
+
+        searchContactsInput?.addEventListener('input', renderContacts);
+        sortContactsSelect?.addEventListener('change', renderContacts);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContactsFromStorage();
+            renderContacts();
+        });
+    </script>
+</body>
+</html>
