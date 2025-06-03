@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios de Gestiones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+        }
+        /* Custom colors from corporate branding */
+        .bg-primary { background-color: #003992; } /* Dark Blue */
+        .text-primary { color: #003992; }
+        .border-primary { border-color: #003992; }
+
+        .bg-accent1 { background-color: #FB8313; } /* Orange */
+        .text-accent1 { color: #FB8313; }
+        .border-accent1 { border-color: #FB8313; }
+
+        .bg-accent2 { background-color: #F5A313; } /* Yellow-Orange */
+        .text-accent2 { color: #F5A313; }
+        .border-accent2 { border-color: #F5A313; }
+
+        /* Custom switch styling (kept for other sections if needed, but changed for "Guardar esta dirección/contacto") */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #FB8313; /* Accent orange */
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #FB8313;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
+
+        /* Multi-step form styling */
+        .form-step {
+            display: none; /* Hide all steps by default */
+        }
+        .form-step.active {
+            display: block; /* Show only the active step */
+        }
+        .contacts-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #e2e8f0; /* gray-300 */
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem; /* rounded-b-md */
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .contacts-dropdown-item {
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            cursor: pointer;
+        }
+        .contacts-dropdown-item:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-primary text-white p-6 rounded-t-xl">
+            <h1 class="text-3xl font-bold text-center">Tu Delivery Privado</h1>
+        </div>
+
+        <div id="gestiones-form-container" class="p-6 space-y-8">
+            <h2 class="text-2xl font-semibold text-primary mb-6 text-center">Formulario de Servicio de Gestiones</h2>
+            <p class="text-gray-600 text-center mb-8">Objetivo: Facilitar la solicitud de trámites diversos (pagos de facturas, radicación de documentos, retiro de resultados, etc.).</p>
+
+            <div class="mb-8 w-full">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 flex flex-col items-center step-indicator-gestiones" data-step="1">
+                        <div class="flex items-center text-accent1 step-icon-gestiones">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-accent1 text-white flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-semibold mt-2 text-accent1 step-text-gestiones">Origen</p>
+                    </div>
+
+                    <div class="flex-1 h-1 bg-gray-200 progress-bar-gestiones" data-step="1"></div>
+
+                    <div class="flex-1 flex flex-col items-center step-indicator-gestiones" data-step="2">
+                        <div class="flex items-center text-gray-400 step-icon-gestiones">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text-gestiones">Lugar</p>
+                    </div>
+
+                    <div class="flex-1 h-1 bg-gray-200 progress-bar-gestiones" data-step="2"></div>
+
+                    <div class="flex-1 flex flex-col items-center step-indicator-gestiones" data-step="3">
+                        <div class="flex items-center text-gray-400 step-icon-gestiones">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm-1 4a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1z" /><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2-1a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1H4z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text-gestiones">Entrega/Detalles</p>
+                    </div>
+
+                    <div class="flex-1 h-1 bg-gray-200 progress-bar-gestiones" data-step="3"></div>
+
+                    <div class="flex-1 flex flex-col items-center step-indicator-gestiones" data-step="4">
+                        <div class="flex items-center text-gray-400 step-icon-gestiones">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text-gestiones">Confirmar</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-4 text-center"><span id="step-info-gestiones">Completa los detalles para tu gestión (Paso 1 de 4).</span></p>
+            </div>
+
+            <form id="gestionesForm">
+                <div id="gestion-step1" class="form-step active">
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                        <div class="mb-4">
+                            <p class="text-xl font-semibold text-accent1 mb-2">¿Se necesita retirar algo del cliente primero?</p>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <input type="radio" id="gestion-necesita-retirar-si" name="gestion-necesita-retirar" value="si" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                    <label for="gestion-necesita-retirar-si" class="text-lg font-medium text-gray-700">Sí</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="gestion-necesita-retirar-no" name="gestion-necesita-retirar" value="no" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2" checked>
+                                    <label for="gestion-necesita-retirar-no" class="text-lg font-medium text-gray-700">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="gestion-origen-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-md shadow-inner">
+                            <h4 class="col-span-full text-md font-semibold text-primary mb-2">Datos de Origen (para recoger documentos/dinero)</h4>
+                            <div class="relative">
+                                <label for="gestion-origen-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
+                                <div class="flex items-center">
+                                    <input type="text" id="gestion-origen-nombre" name="gestion-origen-nombre" placeholder="Quién entrega" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder-gray-400">
+                                    <button type="button" id="btnVerContactosGestionOrigen" class="mt-1 px-3 py-2.5 border border-l-0 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md focus:outline-none focus:ring-1 focus:ring-primary">
+                                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 2H5C3.34578 2 2 3.34578 2 5V19C2 20.6542 3.34578 22 5 22H19C20.6542 22 22 20.6542 22 19V5C22 3.34578 20.6542 2 19 2ZM5 4H19C19.5522 4 20 4.44772 20 5V7H4V5C4 4.44772 4.44772 4 5 4ZM4 9H9V11H4V9ZM4 12H9V14H4V12ZM4 15H9V17H4V15ZM14.5 18C12.8333 18 11 16.8333 11 14.5C11 12.1667 12.8333 11 14.5 11C16.1667 11 18 12.1667 18 14.5C18 16.8333 16.1667 18 14.5 18ZM10 19H5C4.44772 19 4 18.5523 4 18V9H10V19ZM19 20H11.16C11.5683 19.4017 11.8517 18.725 11.9717 18H20V19C20 19.5523 19.5523 20 19 20ZM20 17H12.305C12.1117 16.39 11.7983 15.8433 11.3883 15.3883C11.7983 14.9333 12.1117 14.39 12.305 13.78H20V17ZM20 12H12.835C13.545 11.59 14 10.8283 14 10C14 9.17167 13.545 8.41 12.835 8H20V12Z"/>
+                                            <path d="M14.5 12C13.6716 12 13 12.6716 13 13.5C13 14.3284 13.6716 15 14.5 15C15.3284 15 16 14.3284 16 13.5C16 12.6716 15.3284 12 14.5 12Z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="listaContactosGestionOrigen" class="contacts-dropdown hidden"></div>
+                            </div>
+                            <div>
+                                <label for="gestion-origen-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                <input type="tel" id="gestion-origen-telefono" name="gestion-origen-telefono" placeholder="Contacto en origen" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-origen-ubicacion" class="block text-sm font-medium text-gray-700 mb-1">Dirección de Retiro</label>
+                                <div class="relative">
+                                    <input type="text" id="gestion-origen-ubicacion" name="gestion-origen-ubicacion" placeholder="Calle, número, barrio..." class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-dark-blue focus:outline-none" id="btnUbicacionGestionOrigen">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Integración con Google Maps (funcionalidad no incluida en este HTML)</p>
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-origen-referencia" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
+                                <textarea id="gestion-origen-referencia" name="gestion-origen-referencia" rows="2" placeholder="Ej: Portón negro, preguntar por..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-fecha-retiro" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Retiro</label>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex-grow">
+                                        <input type="date" id="gestion-fecha-retiro" name="gestion-fecha-retiro" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    </div>
+                                    <button type="button" id="btnHoyGestionRetiro" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Hoy</button>
+                                    <button type="button" id="btnMananaGestionRetiro" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Mañana</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="gestion-origen-horario" class="block text-sm font-medium text-gray-700 mb-1">Rango Horario de Retiro</label>
+                                <select id="gestion-origen-horario" name="gestion-origen-horario" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    <option value="">Seleccione un horario</option>
+                                    <option value="9-12">De 9:00 a 12:00</option>
+                                    <option value="12-15">De 12:00 a 15:00</option>
+                                    <option value="15-18">De 15:00 a 18:00</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 flex items-center mt-4">
+                                <input type="checkbox" id="guardar-gestion-origen-contacto" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                <label for="guardar-gestion-origen-contacto" class="text-sm font-medium text-gray-700">Guardar esta dirección/contacto</label>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="flex justify-end mt-6">
+                        <button type="button" id="nextStepGestiones1" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Siguiente
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gestion-step2" class="form-step hidden">
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-accent1 mb-4">¿Dónde realizamos el trámite?</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="relative">
+                                <label for="gestion-institucion" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Institución/Lugar</label>
+                                <div class="flex items-center">
+                                    <input type="text" id="gestion-institucion" name="gestion-institucion" placeholder="Ej: ANDE, Municipalidad, Laboratorio" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder-gray-400">
+                                    <button type="button" id="btnVerContactosGestionInstitucion" class="mt-1 px-3 py-2.5 border border-l-0 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md focus:outline-none focus:ring-1 focus:ring-primary">
+                                        <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19 2H5C3.34578 2 2 3.34578 2 5V19C2 20.6542 3.34578 22 5 22H19C20.6542 22 22 20.6542 22 19V5C22 3.34578 20.6542 2 19 2ZM5 4H19C19.5522 4 20 4.44772 20 5V7H4V5C4 4.44772 4.44772 4 5 4ZM4 9H9V11H4V9ZM4 12H9V14H4V12ZM4 15H9V17H4V15ZM14.5 18C12.8333 18 11 16.8333 11 14.5C11 12.1667 12.8333 11 14.5 11C16.1667 11 18 12.1667 18 14.5C18 16.8333 16.1667 18 14.5 18ZM10 19H5C4.44772 19 4 18.5523 4 18V9H10V19ZM19 20H11.16C11.5683 19.4017 11.8517 18.725 11.9717 18H20V19C20 19.5523 19.5523 20 19 20ZM20 17H12.305C12.1117 16.39 11.7983 15.8433 11.3883 15.3883C11.7983 14.9333 12.1117 14.39 12.305 13.78H20V17ZM20 12H12.835C13.545 11.59 14 10.8283 14 10C14 9.17167 13.545 8.41 12.835 8H20V12Z"/>
+                                            <path d="M14.5 12C13.6716 12 13 12.6716 13 13.5C13 14.3284 13.6716 15 14.5 15C15.3284 15 16 14.3284 16 13.5C16 12.6716 15.3284 12 14.5 12Z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="listaContactosGestionInstitucion" class="contacts-dropdown hidden"></div>
+                            </div>
+                            <div>
+                                <label for="gestion-telefono" class="block text-sm font-medium text-gray-700 mb-1">Número de Teléfono (Opcional)</label>
+                                <input type="tel" id="gestion-telefono" name="gestion-telefono" placeholder="Número de teléfono del lugar o contacto" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-ubicacion" class="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
+                                <div class="relative">
+                                    <input type="text" id="gestion-ubicacion" name="gestion-ubicacion" placeholder="Calle, número, barrio..." class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-dark-blue focus:outline-none" id="btnUbicacionGestion">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Integración con Google Maps (funcionalidad no incluida en este HTML)</p>
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-referencia" class="block text-sm font-medium text-gray-700 mb-1">Referencia</label>
+                                <textarea id="gestion-referencia" name="gestion-referencia" rows="2" placeholder="Ej: Ventanilla de pagos, Oficina de Archivos" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-fecha-realizar" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Realización</label>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex-grow">
+                                        <input type="date" id="gestion-fecha-realizar" name="gestion-fecha-realizar" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    </div>
+                                    <button type="button" id="btnHoyGestionRealizar" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Hoy</button>
+                                    <button type="button" id="btnMananaGestionRealizar" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Mañana</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="gestion-horario" class="block text-sm font-medium text-gray-700 mb-1">Rango Horario para Realizar la Gestión</label>
+                                <select id="gestion-horario" name="gestion-horario" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    <option value="">Seleccione un horario</option>
+                                    <option value="9-12">De 9:00 a 12:00</option>
+                                    <option value="12-15">De 12:00 a 15:00</option>
+                                    <option value="15-18">De 15:00 a 18:00</option>
+                                    <option value="other">Otras opciones según horarios típicos de oficinas</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 flex items-center mt-4">
+                                <input type="checkbox" id="guardar-gestion-ubicacion" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                <label for="guardar-gestion-ubicacion" class="text-sm font-medium text-gray-700">Guardar esta dirección/contacto</label>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="prevStepGestiones2" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Anterior
+                        </button>
+                        <button type="button" id="nextStepGestiones2" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Siguiente
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gestion-step3" class="form-step hidden">
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                        <h3 class="text-xl font-semibold text-accent1 mb-4">¿Qué trámite realizamos?</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Gestión</label>
+                                <textarea id="gestion-descripcion" name="gestion-descripcion" rows="4" placeholder="Detalle el trámite a realizar..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label for="gestion-monto" class="block text-sm font-medium text-gray-700 mb-1">Monto a Pagar/Gestionar (si aplica)</label>
+                                <input type="number" id="gestion-monto" name="gestion-monto" placeholder="0.00" step="0.01" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                            </div>
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-observaciones" class="block text-sm font-medium text-gray-700 mb-1">Observaciones (Opcional)</label>
+                                <textarea id="gestion-observaciones" name="gestion-observaciones" rows="3" placeholder="Cualquier detalle adicional..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                        <h3 class="text-xl font-semibold text-accent1 mb-4">¿Dónde entregamos el resultado/comprobante?</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="entrega-al-origen" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                <label for="entrega-al-origen" class="text-lg font-medium text-gray-700">Enviar de vuelta al origen</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="entrega-otro-lugar" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                <label for="entrega-otro-lugar" class="text-lg font-medium text-gray-700">Enviar a otro lugar</label>
+                            </div>
+                        </div>
+
+                        <div id="entrega-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 p-4 bg-white rounded-md shadow-inner">
+                            <h4 class="col-span-full text-md font-semibold text-primary mb-2">Datos de Entrega</h4>
+                            <div id="entrega-contact-details" class="contents"> <div class="relative">
+                                    <label for="gestion-entrega-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
+                                    <div class="flex items-center">
+                                        <input type="text" id="gestion-entrega-nombre" name="gestion-entrega-nombre" placeholder="Nombre completo del cliente" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder-gray-400">
+                                        <button type="button" id="btnVerContactosGestionEntrega" class="mt-1 px-3 py-2.5 border border-l-0 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md focus:outline-none focus:ring-1 focus:ring-primary">
+                                            <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M19 2H5C3.34578 2 2 3.34578 2 5V19C2 20.6542 3.34578 22 5 22H19C20.6542 22 22 20.6542 22 19V5C22 3.34578 20.6542 2 19 2ZM5 4H19C19.5522 4 20 4.44772 20 5V7H4V5C4 4.44772 4.44772 4 5 4ZM4 9H9V11H4V9ZM4 12H9V14H4V12ZM4 15H9V17H4V15ZM14.5 18C12.8333 18 11 16.8333 11 14.5C11 12.1667 12.8333 11 14.5 11C16.1667 11 18 12.1667 18 14.5C18 16.8333 16.1667 18 14.5 18ZM10 19H5C4.44772 19 4 18.5523 4 18V9H10V19ZM19 20H11.16C11.5683 19.4017 11.8517 18.725 11.9717 18H20V19C20 19.5523 19.5523 20 19 20ZM20 17H12.305C12.1117 16.39 11.7983 15.8433 11.3883 15.3883C11.7983 14.9333 12.1117 14.39 12.305 13.78H20V17ZM20 12H12.835C13.545 11.59 14 10.8283 14 10C14 9.17167 13.545 8.41 12.835 8H20V12Z"/>
+                                            <path d="M14.5 12C13.6716 12 13 12.6716 13 13.5C13 14.3284 13.6716 15 14.5 15C15.3284 15 16 14.3284 16 13.5C16 12.6716 15.3284 12 14.5 12Z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="listaContactosGestionEntrega" class="contacts-dropdown hidden"></div>
+                                </div>
+                                <div>
+                                    <label for="gestion-entrega-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                    <input type="tel" id="gestion-entrega-telefono" name="gestion-entrega-telefono" placeholder="Número de teléfono del cliente" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                    <label for="gestion-entrega-ubicacion" class="block text-sm font-medium text-gray-700 mb-1">Dirección de Entrega</label>
+                                    <div class="relative">
+                                        <input type="text" id="gestion-entrega-ubicacion" name="gestion-entrega-ubicacion" placeholder="Calle, número, barrio..." class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-dark-blue focus:outline-none" id="btnUbicacionGestionEntrega">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Integración con Google Maps (funcionalidad no incluida en este HTML)</p>
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                    <label for="gestion-entrega-referencia" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
+                                    <textarea id="gestion-entrega-referencia" name="gestion-entrega-referencia" rows="2" placeholder="Ej: Casa con portón verde, Preguntar por..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
+                                </div>
+                            </div> <div class="col-span-1 md:col-span-2">
+                                <label for="gestion-fecha-entrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega</label>
+                                <div class="flex items-center space-x-2">
+                                    <div class="relative flex-grow">
+                                        <input type="date" id="gestion-fecha-entrega" name="gestion-fecha-entrega" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    </div>
+                                    <button type="button" id="btnHoyGestionEntrega" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Hoy</button>
+                                    <button type="button" id="btnMananaGestionEntrega" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm">Mañana</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="gestion-entrega-horario" class="block text-sm font-medium text-gray-700 mb-1">Rango Horario para Entrega</label>
+                                <select id="gestion-entrega-horario" name="gestion-entrega-horario" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm">
+                                    <option value="">Seleccione un horario</option>
+                                    <option value="9-12">De 9:00 a 12:00</option>
+                                    <option value="12-15">De 12:00 a 15:00</option>
+                                    <option value="15-18">De 15:00 a 18:00</option>
+                                    <option value="18-21">De 18:00 a 21:00</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 flex items-center mt-4">
+                                <input type="checkbox" id="guardar-gestion-entrega-contacto" class="h-4 w-4 text-accent1 focus:ring-accent1 border-gray-300 rounded mr-2">
+                                <label for="guardar-gestion-entrega-contacto" class="text-sm font-medium text-gray-700">Guardar esta dirección/contacto</label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-accent1 mb-4">Pago del Servicio</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">¿Quién paga por el servicio?</label>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex items-center">
+                                        <input id="pago-servicio-solicitante" name="pago-servicio-quien" type="radio" value="solicitante" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="pago-servicio-solicitante" class="ml-2 block text-sm font-medium text-gray-700">Yo, el Solicitante</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="pago-servicio-origen" name="pago-servicio-quien" type="radio" value="origen" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="pago-servicio-origen" class="ml-2 block text-sm font-medium text-gray-700">En Origen</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="pago-servicio-destino" name="pago-servicio-quien" type="radio" value="destino" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="pago-servicio-destino" class="ml-2 block text-sm font-medium text-gray-700">En Destino</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Forma de Pago Aceptada</label>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex items-center">
+                                        <input id="forma-pago-efectivo" name="pago-servicio-forma" type="radio" value="efectivo" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="forma-pago-efectivo" class="ml-2 block text-sm font-medium text-gray-700">Efectivo</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="forma-pago-transferencia" name="pago-servicio-forma" type="radio" value="transferencia" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="forma-pago-transferencia" class="ml-2 block text-sm font-medium text-gray-700">Transferencia</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="forma-pago-tarjeta" name="pago-servicio-forma" type="radio" value="tarjeta" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="forma-pago-tarjeta" class="ml-2 block text-sm font-medium text-gray-700">Tarjeta</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="forma-pago-qr" name="pago-servicio-forma" type="radio" value="qr" class="focus:ring-accent1 h-4 w-4 text-accent1 border-gray-300">
+                                        <label for="forma-pago-qr" class="ml-2 block text-sm font-medium text-gray-700">QR</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="prevStepGestiones3" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Anterior
+                        </button>
+                        <button type="button" id="nextStepGestiones3" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            Siguiente
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gestion-step4" class="form-step hidden">
+                    <section class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-accent1 mb-4">Confirmación de la Solicitud de Gestion</h3>
+                        <div id="resumen-gestiones" class="bg-white p-4 rounded-md shadow-inner mb-6 text-sm text-gray-800">
+                            <h4 class="font-bold text-primary text-lg mb-4">Resumen de la Solicitud de Gestión</h4>
+
+                            <div id="resumen-gestion-origen-section" class="mb-6 border-b pb-4 hidden">
+                                <h5 class="font-semibold text-accent1 text-base mb-2">1. Datos de Origen (Retiro)</h5>
+                                <div class="space-y-1">
+                                    <div><span class="font-medium">Necesita Retirar del Cliente:</span> <span id="resumen-gestion-retirar" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Nombre y Apellido:</span> <span id="resumen-gestion-origen-nombre" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Teléfono:</span> <span id="resumen-gestion-origen-telefono" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Dirección de Retiro:</span> <span id="resumen-gestion-origen-ubicacion" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Referencia:</span> <span id="resumen-gestion-origen-referencia" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Fecha de Retiro:</span> <span id="resumen-gestion-fecha-retiro" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Horario de Retiro:</span> <span id="resumen-gestion-origen-horario" class="text-gray-700"></span></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6 border-b pb-4">
+                                <h5 class="font-semibold text-accent1 text-base mb-2">2. Detalles del Trámite</h5>
+                                <div class="space-y-1">
+                                    <div><span class="font-medium">Institución/Lugar:</span> <span id="resumen-gestion-institucion" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Teléfono del Lugar:</span> <span id="resumen-gestion-telefono-lugar" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Ubicación del Trámite:</span> <span id="resumen-gestion-ubicacion" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Referencia:</span> <span id="resumen-gestion-referencia" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Fecha de Realización:</span> <span id="resumen-gestion-fecha-realizar" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Horario de Realización:</span> <span id="resumen-gestion-horario" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Descripción del Trámite:</span> <span id="resumen-gestion-tramite" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Monto a Pagar/Gestionar:</span> <span id="resumen-gestion-monto" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Observaciones Adicionales:</span> <span id="resumen-gestion-observaciones" class="text-gray-700"></span></div>
+                                </div>
+                            </div>
+
+                            <div id="resumen-gestion-entrega-section" class="mb-6 border-b pb-4 hidden">
+                                <h5 class="font-semibold text-accent1 text-base mb-2">3. Datos de Entrega (Resultado/Comprobante)</h5>
+                                <div class="space-y-1">
+                                    <div><span class="font-medium">Tipo de Entrega:</span> <span id="resumen-gestion-tipo-entrega" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Nombre y Apellido:</span> <span id="resumen-gestion-entrega-nombre" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Teléfono:</span> <span id="resumen-gestion-entrega-telefono" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Dirección de Entrega:</span> <span id="resumen-gestion-entrega-ubicacion" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Referencia:</span> <span id="resumen-gestion-entrega-referencia" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Fecha de Entrega:</span> <span id="resumen-gestion-fecha-entrega" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Horario de Entrega:</span> <span id="resumen-gestion-entrega-horario" class="text-gray-700"></span></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <h5 class="font-semibold text-accent1 text-base mb-2">4. Detalles de Pago del Servicio</h5>
+                                <div class="space-y-1">
+                                    <div><span class="font-medium">Quién Paga el Servicio:</span> <span id="resumen-pago-servicio-quien" class="text-gray-700"></span></div>
+                                    <div><span class="font-medium">Forma de Pago Aceptada:</span> <span id="resumen-pago-servicio-forma" class="text-gray-700"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-100 p-4 rounded-md text-center mb-6 shadow-inner">
+                            <p class="text-lg font-semibold text-gray-700 mb-2">Costo Estimado del Servicio:</p>
+                            <p class="text-4xl font-bold text-primary mb-1" id="costo-estimado">Gs. 41.000</p>
+                            <p class="text-sm text-gray-500">(El costo final puede variar)</p>
+                        </div>
+
+                        <div class="flex justify-between mt-6">
+                            <button type="button" id="prevStepGestiones4" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Anterior
+                            </button>
+                            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Confirmar y Enviar Gestion
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div id="customModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full">
+            <p class="text-lg font-medium mb-4" id="modalMessage">¡Solicitud Enviada con Éxito!</p>
+            <button id="closeModalBtn" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Global variables for step management ---
+        let currentStepGestiones = 1;
+        const totalSteps = 4; // Total steps for Gestiones form
+
+        // --- Helper function to get elements for the current form ---
+        function getFormElements(formType) {
+            const container = document.getElementById(`${formType}-form-container`);
+            return {
+                formSteps: container.querySelectorAll('.form-step'),
+                stepIndicators: container.querySelectorAll(`.step-indicator-${formType}`),
+                progressBars: container.querySelectorAll(`.progress-bar-${formType}`),
+                stepInfo: document.getElementById(`step-info-${formType}`)
+            };
+        }
+
+        // --- Function to update the UI of the steps ---
+        function updateStepUI(formType) {
+            const { formSteps, stepIndicators, progressBars, stepInfo } = getFormElements(formType);
+            const currentStep = currentStepGestiones; // Only Gestiones form now
+
+            // Hide all steps and show only the current one
+            formSteps.forEach((step, index) => {
+                if (step) { // Added null check here
+                    if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                }
+            });
+
+            // Update progress indicators
+            stepIndicators.forEach((indicator, index) => {
+                const stepNum = parseInt(indicator.dataset.step);
+                const iconDiv = indicator.querySelector(`.step-icon-gestiones div`);
+                const textP = indicator.querySelector(`.step-text-gestiones`);
+
+                if (iconDiv && textP) { // Ensure elements exist before manipulating
+                    // Reset all to default gray first
+                    iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
+                    iconDiv.classList.add('bg-gray-200', 'text-gray-400');
+                    textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
+                    textP.classList.add('text-gray-400', 'font-medium');
+
+                    if (stepNum < currentStep) {
+                        // Completed steps: Icon and text in primary color (dark blue)
+                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
+                        iconDiv.classList.add('bg-primary', 'text-white');
+                        textP.classList.remove('text-gray-400', 'font-medium');
+                        textP.classList.add('text-primary', 'font-semibold');
+                    } else if (stepNum === currentStep) {
+                        // Current step: Icon and text in accent color (orange)
+                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
+                        iconDiv.classList.add('bg-accent1', 'text-white');
+                        textP.classList.remove('text-gray-400', 'font-medium');
+                        textP.classList.add('text-accent1', 'font-semibold');
+                    } else {
+                        // Future steps: Remain gray
+                        iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
+                        iconDiv.classList.add('bg-gray-200', 'text-gray-400');
+                        textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
+                        textP.classList.add('text-gray-400', 'font-medium');
+                    }
+                }
+            });
+
+            // Update progress bars
+            progressBars.forEach((bar, index) => {
+                const barStep = parseInt(bar.dataset.step);
+                if (barStep < currentStep) {
+                    bar.classList.remove('bg-gray-200');
+                    bar.classList.add('bg-primary');
+                } else {
+                    bar.classList.remove('bg-primary');
+                    bar.classList.add('bg-gray-200');
+                }
+            });
+
+            // Update step text info
+            if (stepInfo) { // Added null check here
+                stepInfo.textContent = `Completa los detalles para tu gestión (Paso ${currentStep} de ${totalSteps}).`;
+            }
+        }
+
+        // --- Function to advance to the next step ---
+        function nextStep(formType) {
+            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            if (currentStepRef < totalSteps) {
+                currentStepRef++;
+                currentStepGestiones = currentStepRef;
+                updateStepUI(formType);
+                if (currentStepRef === totalSteps) {
+                    populateSummaryGestiones();
+                }
+            }
+        }
+
+        // --- Function to go back to the previous step ---
+        function prevStep(formType) {
+            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            if (currentStepRef > 1) {
+                currentStepRef--;
+                currentStepGestiones = currentStepRef;
+                updateStepUI(formType);
+            }
+        }
+
+        // --- Tab Switching Logic (Simplified as only one tab remains) ---
+        const gestionesFormContainer = document.getElementById('gestiones-form-container');
+
+        // Ensure Gestiones form container is always visible
+        if (gestionesFormContainer) {
+            gestionesFormContainer.classList.remove('hidden');
+        }
+        updateStepUI('gestiones'); // Update UI for the active form
+
+        // --- Event Listeners for Navigation Buttons (Gestiones) ---
+        document.getElementById('nextStepGestiones1')?.addEventListener('click', () => nextStep('gestiones'));
+        document.getElementById('prevStepGestiones2')?.addEventListener('click', () => prevStep('gestiones'));
+        document.getElementById('nextStepGestiones2')?.addEventListener('click', () => nextStep('gestiones'));
+        document.getElementById('prevStepGestiones3')?.addEventListener('click', () => prevStep('gestiones'));
+        document.getElementById('nextStepGestiones3')?.addEventListener('click', () => nextStep('gestiones'));
+        // The prevStepGestiones4 button is now directly in the HTML and handled by its ID
+        document.getElementById('prevStepGestiones4')?.addEventListener('click', () => prevStep('gestiones'));
+
+
+        // --- Conditional Field Visibility (Gestiones) ---
+        const entregaAlOrigenCheckbox = document.getElementById('entrega-al-origen');
+        const entregaOtroLugarCheckbox = document.getElementById('entrega-otro-lugar');
+        const entregaFields = document.getElementById('entrega-fields');
+        const entregaContactDetails = document.getElementById('entrega-contact-details');
+        
+        // Get references to the new radio buttons
+        const necesitaRetirarSiRadio = document.getElementById('gestion-necesita-retirar-si');
+        const necesitaRetirarNoRadio = document.getElementById('gestion-necesita-retirar-no');
+        const origenFields = document.getElementById('gestion-origen-fields');
+
+        // Function to handle the visibility of origin fields based on radio button selection
+        function updateOrigenFieldsVisibility() {
+            if (necesitaRetirarSiRadio.checked) {
+                if (origenFields) origenFields.classList.remove('hidden');
+            } else {
+                if (origenFields) origenFields.classList.add('hidden');
+            }
+            // After updating origin fields visibility, re-evaluate delivery fields visibility
+            updateEntregaFieldsVisibility();
+        }
+
+        // Function to handle the visibility and state of delivery fields
+        function updateEntregaFieldsVisibility() {
+            const isEntregaAlOrigen = entregaAlOrigenCheckbox?.checked;
+            const isEntregaOtroLugar = entregaOtroLugarCheckbox?.checked;
+            const needsPickup = necesitaRetirarSiRadio?.checked;
+
+            if (isEntregaAlOrigen || isEntregaOtroLugar) {
+                if (entregaFields) entregaFields.classList.remove('hidden');
+
+                if (isEntregaAlOrigen && needsPickup) {
+                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'Sí'
+                    if (entregaContactDetails) entregaContactDetails.classList.add('hidden');
+                    // Pre-fill date and time from origin
+                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').value = document.getElementById('gestion-fecha-retiro')?.value || '';
+                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').value = document.getElementById('gestion-origen-horario')?.value || '';
+                    // Disable contact fields, enable date/time
+                    if (document.getElementById('gestion-entrega-nombre')) document.getElementById('gestion-entrega-nombre').disabled = true;
+                    if (document.getElementById('gestion-entrega-telefono')) document.getElementById('gestion-entrega-telefono').disabled = true;
+                    if (document.getElementById('gestion-entrega-ubicacion')) document.getElementById('gestion-entrega-ubicacion').disabled = true;
+                    if (document.getElementById('gestion-entrega-referencia')) document.getElementById('gestion-entrega-referencia').disabled = true;
+                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').disabled = false;
+                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').disabled = false;
+
+                } else if (isEntregaAlOrigen && !needsPickup) {
+                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'No'
+                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Show contact details
+                    // Clear and enable all fields
+                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
+                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
+                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
+                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
+                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
+                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
+
+                } else if (isEntregaOtroLugar) {
+                    // "Enviar a otro lugar" checked
+                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Always show contact details for "otro lugar"
+                    // Clear and enable all fields
+                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
+                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
+                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
+                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
+                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
+                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
+                }
+            } else {
+                // Neither delivery option is checked, hide everything
+                if (entregaFields) entregaFields.classList.add('hidden');
+                if (entregaContactDetails) entregaContactDetails.classList.add('hidden'); // Ensure hidden
+                // Disable and clear all fields
+                if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = true; }
+                if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = true; }
+                if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = true; }
+                if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = true; }
+                if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = true; }
+                if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = true; }
+            }
+        }
+
+        // Add event listeners to the new radio buttons
+        necesitaRetirarSiRadio?.addEventListener('change', updateOrigenFieldsVisibility);
+        necesitaRetirarNoRadio?.addEventListener('change', updateOrigenFieldsVisibility);
+
+        // Add event listeners for delivery checkboxes
+        entregaAlOrigenCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
+        entregaOtroLugarCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
+        
+        // --- Contact Agenda Logic ---
+        const contactosGuardados = [
+            { nombre: "Ana Rodríguez", telefono: "0972123868", direccion: "Av. Siempre Viva 742, Springfield" },
+            { nombre: "Carlos López", telefono: "0976116243", direccion: "Calle Falsa 123, Villa General" },
+            { nombre: "Elena Gómez", telefono: "0971981745", direccion: "Boulevard de los Sueños Rotos 45, Capital" },
+        ];
+
+        function mostrarContactos(inputNombre, inputTelefono, inputDireccion, listaDiv) {
+            if (!listaDiv) return; // Ensure listaDiv exists
+
+            listaDiv.innerHTML = ''; // Clear previous list
+            if (contactosGuardados.length === 0) {
+                const noContactsItem = document.createElement('div');
+                noContactsItem.textContent = 'No hay contactos guardados.';
+                noContactsItem.classList.add('contacts-dropdown-item', 'text-gray-500');
+                listaDiv.appendChild(noContactsItem);
+            } else {
+                contactosGuardados.forEach(contacto => {
+                    const item = document.createElement('div');
+                    item.textContent = contacto.nombre;
+                    item.classList.add('contacts-dropdown-item');
+                    item.addEventListener('click', () => {
+                        if (inputNombre) inputNombre.value = contacto.nombre;
+                        if (inputTelefono) inputTelefono.value = contacto.telefono;
+                        if (inputDireccion) inputDireccion.value = contacto.direccion;
+                        listaDiv.classList.add('hidden');
+                    });
+                    listaDiv.appendChild(item);
+                });
+            }
+            listaDiv.classList.toggle('hidden');
+        }
+
+        // Gestiones - Contactos
+        document.getElementById('btnVerContactosGestionEntrega')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            mostrarContactos(
+                document.getElementById('gestion-entrega-nombre'),
+                document.getElementById('gestion-entrega-telefono'),
+                document.getElementById('gestion-entrega-ubicacion'),
+                document.getElementById('listaContactosGestionEntrega')
+            );
+        });
+
+        document.getElementById('btnVerContactosGestionOrigen')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            mostrarContactos(
+                document.getElementById('gestion-origen-nombre'),
+                document.getElementById('gestion-origen-telefono'),
+                document.getElementById('gestion-origen-ubicacion'),
+                document.getElementById('listaContactosGestionOrigen')
+            );
+        });
+
+        document.getElementById('btnVerContactosGestionInstitucion')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            mostrarContactos(
+                document.getElementById('gestion-institucion'),
+                document.getElementById('gestion-telefono'),
+                document.getElementById('gestion-ubicacion'),
+                document.getElementById('listaContactosGestionInstitucion')
+            );
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (event) => {
+            const dropdowns = document.querySelectorAll('.contacts-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && !event.target.closest('button[id^="btnVerContactos"]')) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        // --- Geolocation Logic ---
+        function handleGeolocation(inputElementId) {
+            const inputElement = document.getElementById(inputElementId);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    if (inputElement) inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
+                    console.log("Ubicación obtenida. Implementar geocodificación inversa.");
+                }, error => {
+                    console.warn(`ERROR(${error.code}): ${error.message}`);
+                    const errorDiv = document.createElement('p');
+                    errorDiv.textContent = `Error al obtener ubicación: ${error.message}.`;
+                    errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
+                    const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
+                    if (existingError) existingError.remove();
+                    if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+                });
+            } else {
+                console.log("La geolocalización no es soportada por este navegador.");
+                const errorDiv = document.createElement('p');
+                errorDiv.textContent = 'La geolocalización no es soportada por este navegador.';
+                errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
+                const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
+                if (existingError) existingError.remove();
+                if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+            }
+        }
+
+        document.getElementById('btnUbicacionGestion')?.addEventListener('click', () => handleGeolocation('gestion-ubicacion'));
+        document.getElementById('btnUbicacionGestionEntrega')?.addEventListener('click', () => handleGeolocation('gestion-entrega-ubicacion'));
+        document.getElementById('btnUbicacionGestionOrigen')?.addEventListener('click', () => handleGeolocation('gestion-origen-ubicacion'));
+
+        // --- Date Buttons ("Hoy", "Mañana") ---
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Gestiones - Fecha de Retiro buttons
+        document.getElementById('btnHoyGestionRetiro')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-retiro');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionRetiro')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-retiro');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // Gestiones - Fecha de Realización buttons
+        document.getElementById('btnHoyGestionRealizar')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-realizar');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionRealizar')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-realizar');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // Gestiones - Fecha de Entrega buttons
+        document.getElementById('btnHoyGestionEntrega')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-entrega');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionEntrega')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-entrega');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // --- Summary Population Functions ---
+        function populateSummaryGestiones() {
+            // Helper to get element and set textContent, handling null
+            const setSummaryText = (id, value, prefix = '') => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value !== null && value !== undefined && value !== '' ? `${prefix}${value}` : 'N/A';
+                }
+            };
+
+            // Helper to get selected radio button label
+            const getRadioLabel = (name) => {
+                const radio = document.querySelector(`input[name="${name}"]:checked`);
+                return radio ? radio.labels[0].textContent : null;
+            };
+
+            // Helper to get selected option text
+            const getSelectText = (id) => {
+                const select = document.getElementById(id);
+                return select && select.selectedIndex !== -1 ? select.options[select.selectedIndex].textContent : null;
+            };
+
+            // Sección de Origen (condicional)
+            const necesitaRetirar = document.querySelector('input[name="gestion-necesita-retirar"]:checked');
+            const resumenGestionOrigenSection = document.getElementById('resumen-gestion-origen-section');
+            setSummaryText('resumen-gestion-retirar', necesitaRetirar ? (necesitaRetirar.value === 'si' ? 'Sí' : 'No') : null);
+
+            if (necesitaRetirar && necesitaRetirar.value === 'si') {
+                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.remove('hidden');
+                setSummaryText('resumen-gestion-origen-nombre', document.getElementById('gestion-origen-nombre')?.value);
+                setSummaryText('resumen-gestion-origen-telefono', document.getElementById('gestion-origen-telefono')?.value);
+                setSummaryText('resumen-gestion-origen-ubicacion', document.getElementById('gestion-origen-ubicacion')?.value);
+                setSummaryText('resumen-gestion-origen-referencia', document.getElementById('gestion-origen-referencia')?.value, 'Referencia: ');
+                setSummaryText('resumen-gestion-fecha-retiro', document.getElementById('gestion-fecha-retiro')?.value);
+                setSummaryText('resumen-gestion-origen-horario', getSelectText('gestion-origen-horario'));
+            } else {
+                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.add('hidden');
+            }
+
+            // Sección de Trámite
+            setSummaryText('resumen-gestion-institucion', document.getElementById('gestion-institucion')?.value);
+            setSummaryText('resumen-gestion-telefono-lugar', document.getElementById('gestion-telefono')?.value);
+            setSummaryText('resumen-gestion-ubicacion', document.getElementById('gestion-ubicacion')?.value);
+            setSummaryText('resumen-gestion-referencia', document.getElementById('gestion-referencia')?.value, 'Referencia: ');
+            setSummaryText('resumen-gestion-fecha-realizar', document.getElementById('gestion-fecha-realizar')?.value);
+            setSummaryText('resumen-gestion-horario', getSelectText('gestion-horario'));
+            setSummaryText('resumen-gestion-tramite', document.getElementById('gestion-descripcion')?.value);
+            const monto = parseFloat(document.getElementById('gestion-monto')?.value);
+            setSummaryText('resumen-gestion-monto', isNaN(monto) ? null : monto.toLocaleString('es-PY', { style: 'currency', currency: 'PYG' }));
+            setSummaryText('resumen-gestion-observaciones', document.getElementById('gestion-observaciones')?.value, 'Observaciones: ');
+            
+            // Sección de Entrega (condicional)
+            const resumenGestionEntregaSection = document.getElementById('resumen-gestion-entrega-section');
+            if ((entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) || (entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked)) {
+                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.remove('hidden');
+                setSummaryText('resumen-gestion-tipo-entrega', (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) ? 'Al Origen' : 'Otro Lugar');
+                
+                // Only populate contact details if "Enviar a otro lugar" is checked OR if "Enviar de vuelta al origen" is checked AND "Necesita retirar" is 'No'
+                const needsPickup = necesitaRetirarSiRadio?.checked;
+                if ((entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked) || (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked && !needsPickup)) {
+                    setSummaryText('resumen-gestion-entrega-nombre', document.getElementById('gestion-entrega-nombre')?.value);
+                    setSummaryText('resumen-gestion-entrega-telefono', document.getElementById('gestion-entrega-telefono')?.value);
+                    setSummaryText('resumen-gestion-entrega-ubicacion', document.getElementById('gestion-entrega-ubicacion')?.value);
+                    setSummaryText('resumen-gestion-entrega-referencia', document.getElementById('gestion-entrega-referencia')?.value, 'Referencia: ');
+                } else {
+                    setSummaryText('resumen-gestion-entrega-nombre', ''); // Clear if not applicable
+                    setSummaryText('resumen-gestion-entrega-telefono', '');
+                    setSummaryText('resumen-gestion-entrega-ubicacion', '');
+                    setSummaryText('resumen-gestion-entrega-referencia', '');
+                }
+
+                setSummaryText('resumen-gestion-fecha-entrega', document.getElementById('gestion-fecha-entrega')?.value);
+                setSummaryText('resumen-gestion-entrega-horario', getSelectText('gestion-entrega-horario'));
+            } else {
+                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.add('hidden');
+            }
+
+            // Sección de Pago del Servicio
+            setSummaryText('resumen-pago-servicio-quien', getRadioLabel('pago-servicio-quien'));
+            setSummaryText('resumen-pago-servicio-forma', getRadioLabel('pago-servicio-forma'));
+
+            // Update estimated cost (placeholder value)
+            const costoEstimadoElement = document.getElementById('costo-estimado');
+            if (costoEstimadoElement) {
+                costoEstimadoElement.textContent = 'Gs. 41.000'; // Hardcoded value as per image
+            }
+        }
+
+        // --- Form Submission (Custom Modal) ---
+        const gestionesForm = document.getElementById('gestionesForm');
+        const customModal = document.getElementById('customModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalMessage = document.getElementById('modalMessage');
+
+        function showCustomModal(message) {
+            if (modalMessage) modalMessage.textContent = message;
+            if (customModal) customModal.classList.remove('hidden');
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                if (customModal) customModal.classList.add('hidden');
+            });
+        }
+
+        if (gestionesForm) {
+            gestionesForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                console.log('Formulario de Gestiones enviado (simulación)');
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+                console.log('Datos del formulario de Gestiones:', data);
+                showCustomModal('¡Solicitud de Gestión Enviada con Éxito!');
+            });
+        }
+
+
+        // --- Initialize UI on page load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStepUI('gestiones'); // Initialize Gestiones form first
+            updateOrigenFieldsVisibility(); // Set initial visibility based on default radio button
+            updateEntregaFieldsVisibility(); // Set initial visibility for delivery fields
+        });
+    </script>
+</body>
+</html>
