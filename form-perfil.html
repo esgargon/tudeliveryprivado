@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - Mejorado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Un gris claro para el fondo */
+        }
+        /* Colores corporativos */
+        .bg-primary-blue { background-color: #003992; }
+        .text-primary-blue { color: #003992; }
+        .bg-secondary-orange { background-color: #FB8313; }
+        .text-secondary-orange { color: #FB8313; }
+        .bg-tertiary-yellow { background-color: #F5A313; }
+        .text-tertiary-yellow { color: #F5A313; }
+
+        /* Fondo sutil con color corporativo para la sección de puntos */
+        .bg-subtle-blue { background-color: rgba(0, 57, 146, 0.05); /* 5% de opacidad del azul primario */ }
+
+        /* Estilos para el spinner de carga (simple) */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <nav class="bg-white shadow-md p-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-semibold text-primary-blue">Tu Delivery Privado</h1>
+                <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Inicio</a>
+                <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Mis Pedidos</a>
+                <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Contactos</a>
+                <a href="#" class="text-gray-600 hover:text-primary-blue transition duration-200">Reportes</a>
+                <a href="#" class="text-primary-blue font-semibold">Perfil</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="text-gray-600 hover:text-primary-blue flex items-center transition duration-200">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H5a3 3 0 01-3-3V7a3 3 0 013-3h5a3 3 0 013 3v1"></path></svg>
+                    Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <main class="flex-grow p-6 md:p-8 lg:p-10">
+            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-6 md:p-8">
+
+                <div id="feedback-message" class="hidden p-4 mb-6 rounded-md text-sm font-medium" role="alert"></div>
+
+                <section class="mb-8 pb-8 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-primary-blue mb-2">Perfil de Usuario</h2>
+                    <p class="text-gray-600 mb-6">Visualiza y edita tu información personal y de contacto.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 text-sm font-semibold mb-2">Foto de Perfil</label>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-300">
+                                    <img id="profile-img-preview" src="https://placehold.co/96x96/e2e8f0/64748b?text=Foto" alt="Foto de Perfil actual" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex flex-col">
+                                    <input type="file" id="profile-picture" class="hidden" accept=".jpg,.png,.gif" aria-label="Seleccionar archivo de foto de perfil">
+                                    <label for="profile-picture" class="cursor-pointer bg-primary-blue text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-primary-blue focus:ring-offset-2">
+                                        Seleccionar archivo
+                                    </label>
+                                    <span class="text-gray-500 text-sm mt-2" id="profile-picture-name">Ningún archivo seleccionado. Sube una nueva foto de perfil (JPG, PNG, GIF).</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="name" class="block text-gray-700 text-sm font-semibold mb-2">Nombre</label>
+                            <input type="text" id="name" value="Raphael" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label for="lastname" class="block text-gray-700 text-sm font-semibold mb-2">Apellido</label>
+                            <input type="text" id="lastname" value="Usuario" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="email" class="block text-gray-700 text-sm font-semibold mb-2">Correo Electrónico</label>
+                            <input type="email" id="email" value="raphael@ejemplo.com" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 bg-gray-100 cursor-not-allowed leading-tight focus:outline-none" readonly aria-describedby="email-help-text">
+                            <p id="email-help-text" class="text-gray-500 text-sm mt-2">El correo electrónico no se puede cambiar directamente. Contacte soporte si es necesario.</p>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="phone" class="block text-gray-700 text-sm font-semibold mb-2">Número de Teléfono</label>
+                            <input type="tel" id="phone" value="0981123456" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent" placeholder="Ej: 0971 123456" aria-describedby="phone-help-text">
+                            <p id="phone-help-text" class="text-gray-500 text-sm mt-2">Formato paraguayo (ej: 0971 123456).</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8 pb-8 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-primary-blue mb-2">Información de Negocio <span class="text-gray-500 text-lg font-normal">(Opcional)</span></h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 mb-6">
+                        <div>
+                            <label for="business-name" class="block text-gray-700 text-sm font-semibold mb-2">Nombre del Negocio</label>
+                            <input type="text" id="business-name" value="Mi Negocio" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label for="business-sector" class="block text-gray-700 text-sm font-semibold mb-2">Rubro</label>
+                            <input type="text" id="business-sector" value="Tecnología" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="require-invoice" class="form-checkbox h-5 w-5 text-primary-blue rounded-md focus:ring-primary-blue focus:ring-offset-2" checked>
+                            <span class="ml-2 text-gray-700">Requiero factura para mis servicios</span>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                        <div class="md:col-span-2">
+                            <label for="social-reason" class="block text-gray-700 text-sm font-semibold mb-2">Razón Social</label>
+                            <input type="text" id="social-reason" value="Raphael Tech S.A." class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="ruc" class="block text-gray-700 text-sm font-semibold mb-2">RUC</label>
+                            <input type="text" id="ruc" value="1234567-8" class="shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent" placeholder="Ej: 1234567-8" aria-describedby="ruc-format-help ruc-validation-message">
+                            <p id="ruc-format-help" class="text-gray-500 text-sm mt-2">Formato: XXXXXXX-X</p>
+                            <p id="ruc-validation-message" class="text-sm mt-1"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button id="save-changes-btn" class="bg-primary-blue text-white py-2 px-6 rounded-md hover:bg-blue-700 transition duration-300 shadow-lg flex items-center justify-center" aria-live="polite">
+                            <span id="save-changes-text">Guardar Cambios</span>
+                            <div id="save-changes-spinner" class="spinner ml-2 hidden"></div>
+                        </button>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-bold text-primary-blue mb-2">Sistema de Puntos</h2>
+                    <p class="text-gray-600 mb-4">Consulta tu saldo de puntos de lealtad.</p>
+
+                    <div class="mb-6 p-4 bg-subtle-blue rounded-md border border-primary-blue/10">
+                        <p class="text-xl font-bold text-secondary-orange mb-1">120 Puntos</p>
+                        <p class="text-gray-600 text-sm">Acumulados por tus pedidos completados.</p>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-primary-blue mb-2 mt-8">Cambiar Contraseña</h2>
+                    <p class="text-gray-600 mb-6">Actualiza tu contraseña de acceso.</p>
+
+                    <div class="grid grid-cols-1 gap-y-6">
+                        <div>
+                            <label for="current-password" class="block text-gray-700 text-sm font-semibold mb-2">Contraseña Actual</label>
+                            <div class="relative">
+                                <input type="password" id="current-password" class="password-input shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent pr-10">
+                                <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer password-toggle" data-target="current-password" aria-label="Mostrar/ocultar contraseña actual">
+                                    <svg class="h-5 w-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.549 0 3.008.386 4.354 1.04A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7zm0 0a9.95 9.95 0 01-1.375.175M12 15a3 3 0 100-6 3 3 0 000 6zm-1.5-1.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825L5.75 10.707M11.25 11.25L5.75 16.75"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="new-password" class="block text-gray-700 text-sm font-semibold mb-2">Nueva Contraseña</label>
+                            <div class="relative">
+                                <input type="password" id="new-password" class="password-input shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent pr-10" aria-describedby="new-password-validation-message">
+                                <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer password-toggle" data-target="new-password" aria-label="Mostrar/ocultar nueva contraseña">
+                                    <svg class="h-5 w-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.549 0 3.008.386 4.354 1.04A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7zm0 0a9.95 9.95 0 01-1.375.175M12 15a3 3 0 100-6 3 3 0 000 6zm-1.5-1.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825L5.75 10.707M11.25 11.25L5.75 16.75"></path></svg>
+                                </span>
+                            </div>
+                            <p id="new-password-validation-message" class="text-sm mt-1"></p>
+                            <p class="text-gray-500 text-sm mt-2">Mín. 8 caracteres, 1 mayúscula, 1 número.</p>
+                        </div>
+
+                        <div>
+                            <label for="confirm-password" class="block text-gray-700 text-sm font-semibold mb-2">Confirmar Nueva Contraseña</label>
+                            <div class="relative">
+                                <input type="password" id="confirm-password" class="password-input shadow-sm appearance-none border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-transparent pr-10" aria-describedby="confirm-password-validation-message">
+                                <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer password-toggle" data-target="confirm-password" aria-label="Mostrar/ocultar confirmación de nueva contraseña">
+                                    <svg class="h-5 w-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.549 0 3.008.386 4.354 1.04A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7zm0 0a9.95 9.95 0 01-1.375.175M12 15a3 3 0 100-6 3 3 0 000 6zm-1.5-1.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825L5.75 10.707M11.25 11.25L5.75 16.75"></path></svg>
+                                </span>
+                            </div>
+                            <p id="confirm-password-validation-message" class="text-sm mt-1"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button id="change-password-btn" class="bg-primary-blue text-white py-2 px-6 rounded-md hover:bg-blue-700 transition duration-300 shadow-lg flex items-center justify-center" aria-live="polite">
+                            <span id="change-password-text">Cambiar Contraseña</span>
+                            <div id="change-password-spinner" class="spinner ml-2 hidden"></div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+        <script>
+        function showFeedbackMessage(message, type = 'success') {
+            const feedbackDiv = document.getElementById('feedback-message');
+            if (!feedbackDiv) return;
+            feedbackDiv.textContent = message;
+            feedbackDiv.className = 'p-4 mb-6 rounded-md text-sm font-medium'; // Reset classes
+            if (type === 'success') {
+                feedbackDiv.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'error') {
+                feedbackDiv.classList.add('bg-red-100', 'text-red-800');
+            }
+            feedbackDiv.classList.remove('hidden');
+            setTimeout(() => { feedbackDiv.classList.add('hidden'); }, 5000);
+        }
+
+        function setLoadingState(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            const textSpan = button.querySelector('span');
+            const spinner = button.querySelector('.spinner');
+            if (!textSpan || !spinner) return;
+
+            button.disabled = isLoading;
+            textSpan.style.display = isLoading ? 'none' : ''; // More robust way to hide/show
+            spinner.classList.toggle('hidden', !isLoading);
+            
+            // Restore original text
+            if (!isLoading) {
+                 if (buttonId === 'save-changes-btn') textSpan.textContent = 'Guardar Cambios';
+                 if (buttonId === 'change-password-btn') textSpan.textContent = 'Cambiar Contraseña';
+            } else {
+                textSpan.textContent = ''; // Clear text when loading
+            }
+        }
+
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const input = document.getElementById(targetId);
+                const icon = this.querySelector('.eye-icon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                } else {
+                    input.type = 'password';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.549 0 3.008.386 4.354 1.04A9.954 9.954 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7zm0 0a9.95 9.95 0 01-1.375.175M12 15a3 3 0 100-6 3 3 0 000 6zm-1.5-1.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825L5.75 10.707M11.25 11.25L5.75 16.75"></path>';
+                }
+            });
+        });
+
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const newPasswordValidationMessage = document.getElementById('new-password-validation-message');
+        const confirmPasswordValidationMessage = document.getElementById('confirm-password-validation-message');
+
+        function validatePassword() {
+            // ... (mantener la lógica de validación de contraseña como estaba)
+            const password = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            let isValid = true;
+            let messages = [];
+            if (password.length < 8) messages.push("Mínimo 8 caracteres.");
+            if (!/[A-Z]/.test(password)) messages.push("Al menos 1 mayúscula.");
+            if (!/[0-9]/.test(password)) messages.push("Al menos 1 número.");
+
+            newPasswordInput.classList.toggle('border-red-500', messages.length > 0);
+            if (messages.length > 0) {
+                newPasswordValidationMessage.textContent = messages.join(' ');
+                newPasswordValidationMessage.className = 'text-sm mt-1 text-red-600';
+                isValid = false;
+            } else {
+                newPasswordValidationMessage.textContent = password.length > 0 ? "Contraseña fuerte." : "";
+                newPasswordValidationMessage.className = password.length > 0 ? 'text-sm mt-1 text-green-600': 'text-sm mt-1';
+            }
+
+            confirmPasswordInput.classList.toggle('border-red-500', confirmPassword && password !== confirmPassword);
+            if (confirmPassword && password !== confirmPassword) {
+                confirmPasswordValidationMessage.textContent = "Las contraseñas no coinciden.";
+                confirmPasswordValidationMessage.className = 'text-sm mt-1 text-red-600';
+                isValid = false;
+            } else {
+                confirmPasswordValidationMessage.textContent = confirmPassword ? "Las contraseñas coinciden." : "";
+                confirmPasswordValidationMessage.className = confirmPassword ? 'text-sm mt-1 text-green-600' : 'text-sm mt-1';
+            }
+            return isValid;
+        }
+
+        if(newPasswordInput) newPasswordInput.addEventListener('input', validatePassword);
+        if(confirmPasswordInput) confirmPasswordInput.addEventListener('input', validatePassword);
+
+        const rucInput = document.getElementById('ruc');
+        const rucValidationMessage = document.getElementById('ruc-validation-message');
+        if(rucInput) rucInput.addEventListener('input', function() {
+            // ... (mantener la lógica de validación de RUC)
+            const ruc = this.value.trim();
+            const rucPattern = /^\d{7,8}-\d$/;
+            if (ruc === "") {
+                rucValidationMessage.textContent = "";
+                this.classList.remove('border-red-500', 'border-green-500');
+            } else if (!rucPattern.test(ruc)) {
+                rucValidationMessage.textContent = "Formato de RUC incorrecto. Ej: 1234567-8";
+                rucValidationMessage.className = 'text-sm mt-1 text-red-600';
+                this.classList.add('border-red-500'); this.classList.remove('border-green-500');
+            } else {
+                rucValidationMessage.textContent = "Formato de RUC válido.";
+                rucValidationMessage.className = 'text-sm mt-1 text-green-600';
+                this.classList.add('border-green-500'); this.classList.remove('border-red-500');
+            }
+        });
+
+        const profilePictureInput = document.getElementById('profile-picture');
+        const profileImgPreview = document.getElementById('profile-img-preview');
+        const profilePictureName = document.getElementById('profile-picture-name');
+        let profilePicDataUrl = null; // Variable para guardar el Data URL de la imagen
+
+        if(profilePictureInput) profilePictureInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImgPreview.src = e.target.result;
+                    profilePicDataUrl = e.target.result; // Guardar Data URL
+                };
+                reader.readAsDataURL(this.files[0]);
+                profilePictureName.textContent = this.files[0].name;
+                profilePictureName.className = 'text-sm mt-2 text-primary-blue';
+            } else {
+                // ... (resetear placeholder si no hay archivo)
+                profileImgPreview.src = "https://placehold.co/96x96/e2e8f0/64748b?text=Foto";
+                profilePictureName.textContent = "Ningún archivo seleccionado. Sube una nueva foto de perfil (JPG, PNG, GIF).";
+                profilePictureName.className = 'text-gray-500 text-sm mt-2';
+                profilePicDataUrl = null;
+            }
+        });
+
+        document.getElementById('save-changes-btn')?.addEventListener('click', function() {
+            setLoadingState('save-changes-btn', true);
+            
+            const nombre = document.getElementById('name')?.value;
+            const apellido = document.getElementById('lastname')?.value;
+            // Aquí podrías guardar más datos si lo deseas
+
+            localStorage.setItem('userProfileName', `${nombre} ${apellido}`);
+            if (profilePicDataUrl) {
+                localStorage.setItem('userProfilePic', profilePicDataUrl);
+            }
+            // No guardamos otros datos en localStorage para esta demo, solo nombre y foto.
+
+            setTimeout(() => {
+                setLoadingState('save-changes-btn', false);
+                showFeedbackMessage('¡Cambios guardados con éxito!', 'success');
+                // Opcional: redirigir al dashboard
+                // window.location.href = 'dashboard.html'; 
+            }, 1500);
+        });
+
+        document.getElementById('change-password-btn')?.addEventListener('click', function() {
+            if (validatePassword()) {
+                setLoadingState('change-password-btn', true);
+                setTimeout(() => {
+                    setLoadingState('change-password-btn', false);
+                    showFeedbackMessage('¡Contraseña cambiada con éxito!', 'success');
+                    document.getElementById('current-password').value = '';
+                    newPasswordInput.value = '';
+                    confirmPasswordInput.value = '';
+                    newPasswordValidationMessage.textContent = ''; 
+                    confirmPasswordValidationMessage.textContent = '';
+                    newPasswordInput.classList.remove('border-green-500', 'border-red-500');
+                    confirmPasswordInput.classList.remove('border-green-500', 'border-red-500');
+                }, 1500);
+            } else {
+                showFeedbackMessage('Por favor, corrige los errores en la contraseña.', 'error');
+            }
+        });
+
+        // Cargar datos del perfil desde localStorage si existen
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('userProfileName');
+            if (savedName) {
+                const nameParts = savedName.split(' ');
+                if (document.getElementById('name') && nameParts[0]) document.getElementById('name').value = nameParts[0];
+                if (document.getElementById('lastname') && nameParts.slice(1).join(' ')) document.getElementById('lastname').value = nameParts.slice(1).join(' ');
+            }
+            const savedPic = localStorage.getItem('userProfilePic');
+            if (savedPic && profileImgPreview) {
+                profileImgPreview.src = savedPic;
+                profilePicDataUrl = savedPic; // Para que no se pierda si no se vuelve a cargar
+                profilePictureName.textContent = "Foto de perfil guardada.";
+                profilePictureName.className = 'text-sm mt-2 text-primary-blue';
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Nuevo Envío</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark-blue': '#003992',
+                        'accent-orange': '#FB8313',
+                        'accent-yellow-orange': '#F5A313',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .contacts-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .contacts-dropdown-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+        }
+        .contacts-dropdown-item:hover {
+            background-color: #f3f4f6;
+        }
+        .hidden {
+            display: none;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-2xl">
+        <div class="mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Solicitar Nuevo Envío</h1>
+            <p class="text-sm text-gray-500 mt-1"><span id="step-info">Completa los detalles para tu envío (Paso 1 de 4).</span></p>
+        </div>
+
+        <div class="mb-8 w-full">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 flex flex-col items-center step-indicator" data-step="1">
+                     <div class="flex items-center text-accent-orange step-icon">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-accent-orange text-white flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm font-semibold mt-2 text-accent-orange step-text">Origen</p>
+                </div>
+
+                <div class="flex-1 h-1 bg-gray-200 progress-bar" data-step="1"></div>
+
+                <div class="flex-1 flex flex-col items-center step-indicator" data-step="2">
+                    <div class="flex items-center text-gray-400 step-icon">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                        </div>
+                    </div>
+                     <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text">Destino</p>
+                </div>
+
+                <div class="flex-1 h-1 bg-gray-200 progress-bar" data-step="2"></div>
+
+                <div class="flex-1 flex flex-col items-center step-indicator" data-step="3">
+                    <div class="flex items-center text-gray-400 step-icon">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm-1 4a1 1 0 011-1h2a1 1 0 110 2H5a1 1 0 01-1-1z" /><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm2-1a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1H4z" clip-rule="evenodd" /></svg>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text">Pedido</p>
+                </div>
+
+                <div class="flex-1 h-1 bg-gray-200 progress-bar" data-step="3"></div>
+
+                <div class="flex-1 flex flex-col items-center step-indicator" data-step="4">
+                    <div class="flex items-center text-gray-400 step-icon">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                        </div>
+                    </div>
+                     <p class="text-xs sm:text-sm font-medium mt-2 text-gray-400 step-text">Confirmar</p>
+                </div>
+            </div>
+        </div>
+
+        <form id="envioForm">
+            <div id="step1" class="form-step active">
+                <div class="mt-12">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent-orange mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-700">¿Donde Recogemos?</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="relative">
+                            <label for="nombre_origen" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
+                            <div class="flex items-center">
+                                <input type="text" name="nombre_origen" id="nombre_origen" placeholder="Quién entrega" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                                <button type="button" id="btnVerContactos" class="mt-1 px-3 py-2.5 border border-l-0 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md focus:outline-none focus:ring-1 focus:ring-primary-dark-blue">
+                                    <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 2H5C3.34578 2 2 3.34578 2 5V19C2 20.6542 3.34578 22 5 22H19C20.6542 22 22 20.6542 22 19V5C22 3.34578 20.6542 2 19 2ZM5 4H19C19.5522 4 20 4.44772 20 5V7H4V5C4 4.44772 4.44772 4 5 4ZM4 9H9V11H4V9ZM4 12H9V14H4V12ZM4 15H9V17H4V15ZM14.5 18C12.8333 18 11 16.8333 11 14.5C11 12.1667 12.8333 11 14.5 11C16.1667 11 18 12.1667 18 14.5C18 16.8333 16.1667 18 14.5 18ZM10 19H5C4.44772 19 4 18.5523 4 18V9H10V19ZM19 20H11.16C11.5683 19.4017 11.8517 18.725 11.9717 18H20V19C20 19.5523 19.5523 20 19 20ZM20 17H12.305C12.1117 16.39 11.7983 15.8433 11.3883 15.3883C11.7983 14.9333 12.1117 14.39 12.305 13.78H20V17ZM20 12H12.835C13.545 11.59 14 10.8283 14 10C14 9.17167 13.545 8.41 12.835 8H20V12Z"/>
+                                        <path d="M14.5 12C13.6716 12 13 12.6716 13 13.5C13 14.3284 13.6716 15 14.5 15C15.3284 15 16 14.3284 16 13.5C16 12.6716 15.3284 12 14.5 12Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="listaContactos" class="contacts-dropdown hidden"></div>
+                        </div>
+                        <div>
+                            <label for="telefono_origen" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                            <input type="tel" name="telefono_origen" id="telefono_origen" placeholder="Contacto en origen" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="direccion_retiro" class="block text-sm font-medium text-gray-700 mb-1">Dirección de Retiro</label>
+                        <div class="relative">
+                            <input type="text" name="direccion_retiro" id="direccion_retiro" placeholder="Calle, número, barrio..." class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400 pr-12">
+                            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-dark-blue focus:outline-none" id="btnUbicacion">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="referencia_origen" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
+                        <textarea name="referencia_origen" id="referencia_origen" rows="3" placeholder="Ej: Portón negro, preguntar por..." class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400"></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="fecha_retiro" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Retiro</label>
+                        <div class="flex space-x-2">
+                            <input type="date" name="fecha_retiro" id="fecha_retiro" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm">
+                            <button type="button" id="btnHoy" class="mt-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue text-sm font-medium">Hoy</button>
+                            <button type="button" id="btnManana" class="mt-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue text-sm font-medium">Mañana</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="rango_horario" class="block text-sm font-medium text-gray-700 mb-1">Rango Horario de Retiro</label>
+                        <select id="rango_horario" name="rango_horario" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm text-gray-500">
+                            <option selected disabled value="">Selecciona un horario</option>
+                            <option value="9-12">09:00 - 12:00</option>
+                            <option value="12-15">12:00 - 15:00</option>
+                            <option value="15-18">15:00 - 18:00</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center mb-8">
+                        <input id="guardar_direccion_origen" name="guardar_direccion_origen" type="checkbox" class="h-4 w-4 text-primary-dark-blue border-gray-300 rounded focus:ring-primary-dark-blue">
+                        <label for="guardar_direccion_origen" class="ml-2 block text-sm text-gray-900">Guardar esta dirección/contacto</label>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="nextStep1" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-dark-blue hover:bg-primary-dark-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+
+            <div id="step2" class="form-step">
+                <div class="mt-12">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent-orange mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.707A7.95 7.95 0 0112 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8a7.95 7.95 0 01-2.343 5.707z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11a2 2 0 100-4 2 2 0 000 4z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-700">¿Donde Entregamos?</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="relative">
+                            <label for="nombre_destino" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
+                            <div class="flex items-center">
+                                <input type="text" name="nombre_destino" id="nombre_destino" placeholder="Quién recibe" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                                <button type="button" id="btnVerContactosDestino" class="mt-1 px-3 py-2.5 border border-l-0 border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-r-md focus:outline-none focus:ring-1 focus:ring-primary-dark-blue">
+                                     <svg class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 2H5C3.34578 2 2 3.34578 2 5V19C2 20.6542 3.34578 22 5 22H19C20.6542 22 22 20.6542 22 19V5C22 3.34578 20.6542 2 19 2ZM5 4H19C19.5522 4 20 4.44772 20 5V7H4V5C4 4.44772 4.44772 4 5 4ZM4 9H9V11H4V9ZM4 12H9V14H4V12ZM4 15H9V17H4V15ZM14.5 18C12.8333 18 11 16.8333 11 14.5C11 12.1667 12.8333 11 14.5 11C16.1667 11 18 12.1667 18 14.5C18 16.8333 16.1667 18 14.5 18ZM10 19H5C4.44772 19 4 18.5523 4 18V9H10V19ZM19 20H11.16C11.5683 19.4017 11.8517 18.725 11.9717 18H20V19C20 19.5523 19.5523 20 19 20ZM20 17H12.305C12.1117 16.39 11.7983 15.8433 11.3883 15.3883C11.7983 14.9333 12.1117 14.39 12.305 13.78H20V17ZM20 12H12.835C13.545 11.59 14 10.8283 14 10C14 9.17167 13.545 8.41 12.835 8H20V12Z"/>
+                                        <path d="M14.5 12C13.6716 12 13 12.6716 13 13.5C13 14.3284 13.6716 15 14.5 15C15.3284 15 16 14.3284 16 13.5C16 12.6716 15.3284 12 14.5 12Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="listaContactosDestino" class="contacts-dropdown hidden"></div>
+                        </div>
+                        <div>
+                            <label for="telefono_destino" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                            <input type="tel" name="telefono_destino" id="telefono_destino" placeholder="Contacto en destino" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="direccion_entrega" class="block text-sm font-medium text-gray-700 mb-1">Dirección de Entrega</label>
+                        <div class="relative">
+                            <input type="text" name="direccion_entrega" id="direccion_entrega" placeholder="Calle, número, barrio..." class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400 pr-12">
+                            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-dark-blue focus:outline-none" id="btnUbicacionDestino">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="referencia_destino" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
+                        <textarea name="referencia_destino" id="referencia_destino" rows="3" placeholder="Ej: Dejar en recepción, llamar al llegar..." class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400"></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="fecha_entrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega</label>
+                        <div class="flex space-x-2">
+                            <input type="date" name="fecha_entrega" id="fecha_entrega" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm">
+                            <button type="button" id="btnHoyDestino" class="mt-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue text-sm font-medium">Hoy</button>
+                            <button type="button" id="btnMananaDestino" class="mt-1 px-4 py-2.5 bg-gray-200 text-gray-700 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue text-sm font-medium">Mañana</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="rango_horario_entrega" class="block text-sm font-medium text-gray-700 mb-1">Rango Horario de Entrega</label>
+                        <select id="rango_horario_entrega" name="rango_horario_entrega" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm text-gray-500">
+                            <option selected disabled value="">Selecciona un horario</option>
+                            <option value="9-12">09:00 - 12:00</option>
+                            <option value="12-15">12:00 - 15:00</option>
+                            <option value="15-18">15:00 - 18:00</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center mb-8">
+                        <input id="guardar_direccion_destino" name="guardar_direccion_destino" type="checkbox" class="h-4 w-4 text-primary-dark-blue border-gray-300 rounded focus:ring-primary-dark-blue">
+                        <label for="guardar_direccion_destino" class="ml-2 block text-sm text-gray-900">Guardar esta dirección/contacto</label>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="prevStep2" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Anterior
+                    </button>
+                    <button type="button" id="nextStep2" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-dark-blue hover:bg-primary-dark-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+
+            <div id="step3" class="form-step">
+                <div class="mt-12">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent-orange mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-700">Detalles del Envío</h2>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="descripcion_mercaderia" class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Mercadería</label>
+                        <textarea name="descripcion_mercaderia" id="descripcion_mercaderia" rows="3" placeholder="Ej: Paquere Chico, Mediano, Grande" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label for="valor_declarado" class="block text-sm font-medium text-gray-700 mb-1">Monto / Valor (Gs.)</label>
+                            <input type="number" name="valor_declarado" id="valor_declarado" placeholder="0" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                            <p class="text-xs text-gray-500 mt-1">Agregar valor solo en caso de que se deba Pagar o Cobrar por el pedido.</p>
+                        </div>
+                        <div>
+                            <label for="peso_aprox" class="block text-sm font-medium text-gray-700 mb-1">Peso Aprox. (Kg)</label>
+                            <input type="number" step="0.1" name="peso_aprox" id="peso_aprox" placeholder="0.0" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                            <p class="text-xs text-gray-500 mt-1">Opcional.</p>
+                        </div>
+                        <div>
+                            <label for="dimensiones_aprox" class="block text-sm font-medium text-gray-700 mb-1">Dimensiones Aprox. (cm)</label>
+                            <input type="text" name="dimensiones_aprox" id="dimensiones_aprox" placeholder="Ej: 30x20x10" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400">
+                            <p class="text-xs text-gray-500 mt-1">Largo x Ancho x Alto.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center mb-6">
+                        <input id="marcar_fragil" name="marcar_fragil" type="checkbox" class="h-4 w-4 text-primary-dark-blue border-gray-300 rounded focus:ring-primary-dark-blue">
+                        <label for="marcar_fragil" class="ml-2 block text-sm text-gray-900">Marcar como Frágil</label>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="observaciones_generales" class="block text-sm font-medium text-gray-700 mb-1">Observaciones Generales (Opcional)</label>
+                        <textarea name="observaciones_generales" id="observaciones_generales" rows="3" placeholder="Cualquier otra indicación importante." class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400"></textarea>
+                    </div>
+
+                    <div class="flex items-center mb-4">
+                        <input id="servicio_ida_vuelta" name="servicio_ida_vuelta" type="checkbox" class="h-4 w-4 text-primary-dark-blue border-gray-300 rounded focus:ring-primary-dark-blue">
+                        <label for="servicio_ida_vuelta" class="ml-2 block text-sm text-gray-900">Servicio de Ida y Vuelta</label>
+                    </div>
+                    <div id="motivo_retorno_container" class="mb-8 hidden">
+                        <label for="motivo_instrucciones_retorno" class="block text-sm font-medium text-gray-700 mb-1">Motivo/Instrucciones Retorno</label>
+                        <textarea name="motivo_instrucciones_retorno" id="motivo_instrucciones_retorno" rows="3" placeholder="¿Qué se debe hacer en el retorno?" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary-dark-blue focus:border-primary-dark-blue sm:text-sm placeholder-gray-400"></textarea>
+                    </div>
+
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent-orange mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold text-gray-700">Pago del Servicio</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <p class="block text-sm font-medium text-gray-700 mb-2">¿Quién paga por el servicio?</p>
+                            <div class="mt-2 space-y-2">
+                                <div class="flex items-center">
+                                    <input id="paga_solicitante" name="quien_paga" type="radio" value="solicitante" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300" checked>
+                                    <label for="paga_solicitante" class="ml-3 block text-sm font-medium text-gray-700">Yo, el Solicitante</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="paga_origen" name="quien_paga" type="radio" value="origen" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300">
+                                    <label for="paga_origen" class="ml-3 block text-sm font-medium text-gray-700">En Origen</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="paga_destino" name="quien_paga" type="radio" value="destino" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300">
+                                    <label for="paga_destino" class="ml-3 block text-sm font-medium text-gray-700">En Destino</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="block text-sm font-medium text-gray-700 mb-2">Forma de Pago Aceptada</p>
+                            <div class="mt-2 space-y-2">
+                                <div class="flex items-center">
+                                    <input id="forma_pago_efectivo" name="forma_pago" type="radio" value="efectivo" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300" checked>
+                                    <label for="forma_pago_efectivo" class="ml-3 block text-sm font-medium text-gray-700">Efectivo</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="forma_pago_transferencia" name="forma_pago" type="radio" value="transferencia" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300">
+                                    <label for="forma_pago_transferencia" class="ml-3 block text-sm font-medium text-gray-700">Transferencia</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="forma_pago_tarjeta" name="forma_pago" type="radio" value="tarjeta" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300">
+                                    <label for="forma_pago_tarjeta" class="ml-3 block text-sm font-medium text-gray-700">Tarjeta</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="forma_pago_qr" name="forma_pago" type="radio" value="qr" class="focus:ring-primary-dark-blue h-4 w-4 text-primary-dark-blue border-gray-300">
+                                    <label for="forma_pago_qr" class="ml-3 block text-sm font-medium text-gray-700">QR</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="prevStep3" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Anterior
+                    </button>
+                    <button type="button" id="nextStep3" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-dark-blue hover:bg-primary-dark-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+
+            <div id="step4" class="form-step">
+                <div class="mt-12">
+                    <div class="mb-8 p-4 border border-gray-200 rounded-md bg-gray-50">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Confirmación del Pedido</h2>
+                        <div class="space-y-4 text-gray-700 text-sm">
+                            <div class="border-b border-gray-200 pb-3">
+                                <p class="font-semibold text-base mb-1 text-accent-orange">Datos de Origen:</p>
+                                <p><strong>Nombre:</strong> <span id="summary_nombre_origen"></span></p>
+                                <p><strong>Teléfono:</strong> <span id="summary_telefono_origen"></span></p>
+                                <p><strong>Dirección:</strong> <span id="summary_direccion_retiro"></span></p>
+                                <p><strong>Referencia:</strong> <span id="summary_referencia_origen"></span></p>
+                                <p><strong>Fecha de Retiro:</strong> <span id="summary_fecha_retiro"></span></p>
+                                <p><strong>Rango Horario:</strong> <span id="summary_rango_horario_retiro"></span></p>
+                            </div>
+
+                            <div class="border-b border-gray-200 pb-3 pt-3">
+                                <p class="font-semibold text-base mb-1 text-accent-orange">Datos de Destino:</p>
+                                <p><strong>Nombre:</strong> <span id="summary_nombre_destino"></span></p>
+                                <p><strong>Teléfono:</strong> <span id="summary_telefono_destino"></span></p>
+                                <p><strong>Dirección:</strong> <span id="summary_direccion_entrega"></span></p>
+                                <p><strong>Referencia:</strong> <span id="summary_referencia_destino"></span></p>
+                                <p><strong>Fecha de Entrega:</strong> <span id="summary_fecha_entrega"></span></p>
+                                <p><strong>Rango Horario:</strong> <span id="summary_rango_horario_entrega"></span></p>
+                            </div>
+
+                            <div class="border-b border-gray-200 pb-3 pt-3">
+                                <p class="font-semibold text-base mb-1 text-accent-orange">Detalles del Envío:</p>
+                                <p><strong>Descripción:</strong> <span id="summary_descripcion_mercaderia"></span></p>
+                                <p><strong>Valor Declarado:</strong> <span id="summary_valor_declarado"></span></p>
+                                <p><strong>Peso Aprox.:</strong> <span id="summary_peso_aprox"></span></p>
+                                <p><strong>Dimensiones:</strong> <span id="summary_dimensiones_aprox"></span></p>
+                                <p><strong>Frágil:</strong> <span id="summary_fragil"></span></p>
+                                <p><strong>Observaciones Generales:</strong> <span id="summary_observaciones_generales"></span></p>
+                                <p><strong>Servicio Ida y Vuelta:</strong> <span id="summary_ida_vuelta"></span></p>
+                            </div>
+
+                            <div class="pt-3">
+                                <p class="font-semibold text-base mb-1 text-accent-orange">Detalles de Pago:</p>
+                                <p><strong>Quién Paga:</strong> <span id="summary_quien_paga"></span></p>
+                                <p><strong>Forma de Pago:</strong> <span id="summary_forma_pago"></span></p>
+                            </div>
+                        </div>
+                        <div class="text-right mt-6">
+                            <p class="text-sm text-gray-500">Costo Estimado del Servicio:</p>
+                            <p class="text-2xl font-bold text-primary-dark-blue">Gs. 41.000</p>
+                            <p class="text-xs text-gray-500">(El costo final puede variar)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" id="prevStep4" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Anterior
+                    </button>
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-dark-blue hover:bg-primary-dark-blue/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark-blue">
+                        Confirmar y Enviar Pedido
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const formSteps = document.querySelectorAll('.form-step');
+        const stepIndicators = document.querySelectorAll('.step-indicator');
+        const progressBars = document.querySelectorAll('.progress-bar');
+        const stepInfo = document.getElementById('step-info');
+
+        function updateStepUI() {
+            formSteps.forEach((step, index) => {
+                step.classList.toggle('active', index + 1 === currentStep);
+            });
+            stepIndicators.forEach((indicator) => {
+                const stepNum = parseInt(indicator.dataset.step);
+                const iconDiv = indicator.querySelector('.step-icon div');
+                const textP = indicator.querySelector('.step-text');
+                iconDiv.classList.remove('bg-primary-dark-blue', 'text-white', 'bg-accent-orange', 'bg-gray-200', 'text-gray-400');
+                textP.classList.remove('text-accent-orange', 'font-semibold', 'text-primary-dark-blue', 'text-gray-400', 'font-medium');
+                if (stepNum < currentStep) {
+                    iconDiv.classList.add('bg-primary-dark-blue', 'text-white');
+                    textP.classList.add('text-primary-dark-blue', 'font-semibold');
+                } else if (stepNum === currentStep) {
+                    iconDiv.classList.add('bg-accent-orange', 'text-white');
+                    textP.classList.add('text-accent-orange', 'font-semibold');
+                } else {
+                    iconDiv.classList.add('bg-gray-200', 'text-gray-400');
+                    textP.classList.add('text-gray-400', 'font-medium');
+                }
+            });
+            progressBars.forEach((bar) => {
+                const barStep = parseInt(bar.dataset.step);
+                bar.classList.toggle('bg-primary-dark-blue', barStep < currentStep);
+                bar.classList.toggle('bg-gray-200', barStep >= currentStep);
+            });
+            if(stepInfo) stepInfo.textContent = `Completa los detalles para tu envío (Paso ${currentStep} de ${totalSteps}).`;
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepUI();
+                if (currentStep === totalSteps) populateSummary();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepUI();
+            }
+        }
+
+        document.getElementById('nextStep1')?.addEventListener('click', nextStep);
+        document.getElementById('prevStep2')?.addEventListener('click', prevStep);
+        document.getElementById('nextStep2')?.addEventListener('click', nextStep);
+        document.getElementById('prevStep3')?.addEventListener('click', prevStep);
+        document.getElementById('nextStep3')?.addEventListener('click', nextStep);
+        document.getElementById('prevStep4')?.addEventListener('click', prevStep);
+
+        const contactosGuardados = [
+            { nombre: "Ana Rodríguez", telefono: "0972123868", direccion: "Av. Siempre Viva 742, Springfield" },
+            { nombre: "Carlos López", telefono: "0976116243", direccion: "Calle Falsa 123, Villa General" },
+            { nombre: "Elena Gómez", telefono: "0971981745", direccion: "Boulevard de los Sueños Rotos 45, Capital" },
+        ];
+
+        function setupContactDropdown(btnId, listId, nameInputId, phoneInputId, addressInputId) {
+            const btn = document.getElementById(btnId);
+            const listDiv = document.getElementById(listId);
+            const nameInput = document.getElementById(nameInputId);
+            const phoneInput = document.getElementById(phoneInputId);
+            const addressInput = document.getElementById(addressInputId);
+
+            if (!btn || !listDiv || !nameInput || !phoneInput || !addressInput) return;
+
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                listDiv.innerHTML = '';
+                contactosGuardados.forEach(contacto => {
+                    const item = document.createElement('div');
+                    item.textContent = contacto.nombre;
+                    item.classList.add('contacts-dropdown-item');
+                    item.addEventListener('click', () => {
+                        nameInput.value = contacto.nombre;
+                        phoneInput.value = contacto.telefono;
+                        addressInput.value = contacto.direccion;
+                        listDiv.classList.add('hidden');
+                    });
+                    listDiv.appendChild(item);
+                });
+                listDiv.classList.toggle('hidden');
+            });
+        }
+        setupContactDropdown('btnVerContactos', 'listaContactos', 'nombre_origen', 'telefono_origen', 'direccion_retiro');
+        setupContactDropdown('btnVerContactosDestino', 'listaContactosDestino', 'nombre_destino', 'telefono_destino', 'direccion_entrega');
+        
+        document.addEventListener('click', (event) => {
+            document.querySelectorAll('.contacts-dropdown').forEach(dropdown => {
+                if (!dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && !event.target.closest('button[id^="btnVerContactos"]')) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        function handleGeolocation(inputElementId) {
+            const inputElement = document.getElementById(inputElementId);
+            if (!inputElement) return;
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
+                }, error => alert(`Error de geolocalización: ${error.message}. Asegúrate de haber concedido permisos.`));
+            } else {
+                alert("La geolocalización no es soportada por este navegador.");
+            }
+        }
+        document.getElementById('btnUbicacion')?.addEventListener('click', () => handleGeolocation('direccion_retiro'));
+        document.getElementById('btnUbicacionDestino')?.addEventListener('click', () => handleGeolocation('direccion_entrega'));
+        
+        function formatDate(date) { return date.toISOString().split('T')[0]; }
+        
+        function setupDateButtons(btnHoyId, btnMananaId, inputId) {
+            const inputEl = document.getElementById(inputId);
+            if (!inputEl) return;
+            inputEl.value = formatDate(new Date());
+            document.getElementById(btnHoyId)?.addEventListener('click', () => inputEl.value = formatDate(new Date()));
+            document.getElementById(btnMananaId)?.addEventListener('click', () => {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                inputEl.value = formatDate(tomorrow);
+            });
+        }
+        setupDateButtons('btnHoy', 'btnManana', 'fecha_retiro');
+        setupDateButtons('btnHoyDestino', 'btnMananaDestino', 'fecha_entrega');
+
+        const servicioIdaVueltaCheckbox = document.getElementById('servicio_ida_vuelta');
+        const motivoRetornoContainer = document.getElementById('motivo_retorno_container');
+        servicioIdaVueltaCheckbox?.addEventListener('change', () => {
+            motivoRetornoContainer?.classList.toggle('hidden', !servicioIdaVueltaCheckbox.checked);
+        });
+
+        function populateSummary() {
+            const getElValue = id => document.getElementById(id)?.value || 'N/A';
+            const getRadioLabel = name => document.querySelector(`input[name="${name}"]:checked`)?.labels[0].textContent.trim() || 'N/A';
+            const getSelectText = id => document.getElementById(id)?.options[document.getElementById(id)?.selectedIndex]?.text || 'N/A';
+            const setSummaryText = (id, value) => { if(document.getElementById(id)) document.getElementById(id).textContent = value || 'N/A';};
+
+            setSummaryText('summary_nombre_origen', getElValue('nombre_origen'));
+            setSummaryText('summary_telefono_origen', getElValue('telefono_origen'));
+            setSummaryText('summary_direccion_retiro', getElValue('direccion_retiro'));
+            setSummaryText('summary_referencia_origen', getElValue('referencia_origen') || 'Ninguna');
+            setSummaryText('summary_fecha_retiro', getElValue('fecha_retiro'));
+            setSummaryText('summary_rango_horario_retiro', getSelectText('rango_horario'));
+            setSummaryText('summary_nombre_destino', getElValue('nombre_destino'));
+            setSummaryText('summary_telefono_destino', getElValue('telefono_destino'));
+            setSummaryText('summary_direccion_entrega', getElValue('direccion_entrega'));
+            setSummaryText('summary_referencia_destino', getElValue('referencia_destino') || 'Ninguna');
+            setSummaryText('summary_fecha_entrega', getElValue('fecha_entrega'));
+            setSummaryText('summary_rango_horario_entrega', getSelectText('rango_horario_entrega'));
+            setSummaryText('summary_descripcion_mercaderia', getElValue('descripcion_mercaderia'));
+            const valor = parseFloat(getElValue('valor_declarado'));
+            setSummaryText('summary_valor_declarado', isNaN(valor) ? 'N/A' : `Gs. ${valor.toLocaleString('es-PY')}`);
+            const peso = parseFloat(getElValue('peso_aprox'));
+            setSummaryText('summary_peso_aprox', isNaN(peso) ? 'N/A' : `${peso} Kg`);
+            setSummaryText('summary_dimensiones_aprox', getElValue('dimensiones_aprox'));
+            setSummaryText('summary_fragil', document.getElementById('marcar_fragil')?.checked ? 'Sí' : 'No');
+            setSummaryText('summary_observaciones_generales', getElValue('observaciones_generales') || 'Ninguna');
+            setSummaryText('summary_ida_vuelta', document.getElementById('servicio_ida_vuelta')?.checked ? `Sí (${getElValue('motivo_instrucciones_retorno') || 'Sin motivo específico'})` : 'No');
+            setSummaryText('summary_quien_paga', getRadioLabel('quien_paga'));
+            setSummaryText('summary_forma_pago', getRadioLabel('forma_pago'));
+        }
+
+        const envioForm = document.getElementById('envioForm');
+        if (envioForm) {
+            envioForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const datosEnvio = {
+                    tipo: 'Envío',
+                    nombreOrigen: document.getElementById('nombre_origen')?.value,
+                    direccionOrigen: document.getElementById('direccion_retiro')?.value,
+                    fechaRetiro: document.getElementById('fecha_retiro')?.value,
+                    rangoHorarioRetiro: document.getElementById('rango_horario')?.options[document.getElementById('rango_horario')?.selectedIndex]?.text,
+                    nombreDestino: document.getElementById('nombre_destino')?.value,
+                    direccionDestino: document.getElementById('direccion_entrega')?.value,
+                    fechaEntrega: document.getElementById('fecha_entrega')?.value,
+                    rangoHorarioEntrega: document.getElementById('rango_horario_entrega')?.options[document.getElementById('rango_horario_entrega')?.selectedIndex]?.text,
+                    descripcionMercaderia: document.getElementById('descripcion_mercaderia')?.value,
+                    valorDeclarado: document.getElementById('valor_declarado')?.value ? `Gs. ${parseFloat(document.getElementById('valor_declarado')?.value).toLocaleString('es-PY')}` : 'N/A',
+                    idaVuelta: document.getElementById('servicio_ida_vuelta')?.checked ? 'Sí' : 'No',
+                    quienPaga: document.querySelector('input[name="quien_paga"]:checked')?.labels[0].textContent.trim(),
+                    formaPago: document.querySelector('input[name="forma_pago"]:checked')?.labels[0].textContent.trim(),
+                    estado: 'Solicitado',
+                    id: Date.now()
+                };
+
+                let enviosGuardados = JSON.parse(localStorage.getItem('enviosDemo')) || [];
+                enviosGuardados.push(datosEnvio);
+                localStorage.setItem('enviosDemo', JSON.stringify(enviosGuardados));
+
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position:fixed; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;';
+                modal.id = 'genericModal';
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = 'background-color:white; padding:20px; border-radius:8px; text-align:center;';
+                modalContent.innerHTML = `
+                    <p class="text-lg font-medium mb-4" id="genericModalMessage">¡Pedido Enviado con Éxito! Redirigiendo al dashboard...</p>
+                    <button id="closeGenericModalBtn" class="px-4 py-2 bg-primary-dark-blue text-white rounded hover:bg-opacity-90">Entendido</button>
+                `;
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                document.getElementById('closeGenericModalBtn').addEventListener('click', () => {
+                    const modalToRemove = document.getElementById('genericModal');
+                    if (modalToRemove) document.body.removeChild(modalToRemove);
+                    window.location.href = 'dashboard.html';
+                });
+            });
+        }
+        updateStepUI(); // Inicializar UI
+    </script>
+</body>
+</html>
