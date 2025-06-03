@@ -24,6 +24,60 @@
         .text-accent2 { color: #F5A313; }
         .border-accent2 { border-color: #F5A313; }
 
+        /* Custom switch styling (kept for other sections if needed, but changed for "Guardar esta dirección/contacto") */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #FB8313; /* Accent orange */
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #FB8313;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
+
         /* Multi-step form styling */
         .form-step {
             display: none; /* Hide all steps by default */
@@ -299,8 +353,7 @@
 
                         <div id="entrega-fields" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 p-4 bg-white rounded-md shadow-inner">
                             <h4 class="col-span-full text-md font-semibold text-primary mb-2">Datos de Entrega</h4>
-                            <div id="entrega-contact-details" class="contents"> 
-                                <div class="relative">
+                            <div id="entrega-contact-details" class="contents"> <div class="relative">
                                     <label for="gestion-entrega-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre y Apellido</label>
                                     <div class="flex items-center">
                                         <input type="text" id="gestion-entrega-nombre" name="gestion-entrega-nombre" placeholder="Nombre completo del cliente" class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-l-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm placeholder-gray-400">
@@ -333,8 +386,7 @@
                                     <label for="gestion-entrega-referencia" class="block text-sm font-medium text-gray-700 mb-1">Referencia (Opcional)</label>
                                     <textarea id="gestion-entrega-referencia" name="gestion-entrega-referencia" rows="2" placeholder="Ej: Casa con portón verde, Preguntar por..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-accent1 focus:border-accent1 sm:text-sm"></textarea>
                                 </div>
-                            </div> 
-                            <div class="col-span-1 md:col-span-2">
+                            </div> <div class="col-span-1 md:col-span-2">
                                 <label for="gestion-fecha-entrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Entrega</label>
                                 <div class="flex items-center space-x-2">
                                     <div class="relative flex-grow">
@@ -499,31 +551,14 @@
         </div>
     </div>
 
-        <script>
+    <script>
         // --- Global variables for step management ---
         let currentStepGestiones = 1;
-        const totalSteps = 4;
-
-        // --- Contactos (Cargados desde localStorage) ---
-        const localStorageKeyContacts = 'tuDeliveryPrivado_Contacts';
-        let contactosGuardadosGlobal = []; // Se poblará desde localStorage
-
-        function loadContactsFromStorageGlobal() {
-            const storedContacts = localStorage.getItem(localStorageKeyContacts);
-            if (storedContacts) {
-                contactosGuardadosGlobal = JSON.parse(storedContacts);
-            } else {
-                // Si no hay nada, puedes dejarlo vacío o con ejemplos iniciales
-                contactosGuardadosGlobal = [
-                    { id: 1, name: 'Ejemplo Contacto Gestión 1', phone: '0981000111', address: 'Dirección Ejemplo Gestión 1' },
-                ]; 
-            }
-        }
+        const totalSteps = 4; // Total steps for Gestiones form
 
         // --- Helper function to get elements for the current form ---
         function getFormElements(formType) {
             const container = document.getElementById(`${formType}-form-container`);
-            if (!container) return {};
             return {
                 formSteps: container.querySelectorAll('.form-step'),
                 stepIndicators: container.querySelectorAll(`.step-indicator-${formType}`),
@@ -532,101 +567,231 @@
             };
         }
 
+        // --- Function to update the UI of the steps ---
         function updateStepUI(formType) {
             const { formSteps, stepIndicators, progressBars, stepInfo } = getFormElements(formType);
-            if (!formSteps || !stepIndicators || !progressBars || !stepInfo) return;
-            const currentStep = currentStepGestiones;
+            const currentStep = currentStepGestiones; // Only Gestiones form now
+
+            // Hide all steps and show only the current one
             formSteps.forEach((step, index) => {
-                step.classList.toggle('active', index + 1 === currentStep);
+                if (step) { // Added null check here
+                    if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                }
             });
-            stepIndicators.forEach((indicator) => {
+
+            // Update progress indicators
+            stepIndicators.forEach((indicator, index) => {
                 const stepNum = parseInt(indicator.dataset.step);
                 const iconDiv = indicator.querySelector(`.step-icon-gestiones div`);
                 const textP = indicator.querySelector(`.step-text-gestiones`);
-                if (iconDiv && textP) {
-                    iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1', 'bg-gray-200', 'text-gray-400');
-                    textP.classList.remove('text-accent1', 'font-semibold', 'text-primary', 'text-gray-400', 'font-medium');
+
+                if (iconDiv && textP) { // Ensure elements exist before manipulating
+                    // Reset all to default gray first
+                    iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
+                    iconDiv.classList.add('bg-gray-200', 'text-gray-400');
+                    textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
+                    textP.classList.add('text-gray-400', 'font-medium');
+
                     if (stepNum < currentStep) {
+                        // Completed steps: Icon and text in primary color (dark blue)
+                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
                         iconDiv.classList.add('bg-primary', 'text-white');
+                        textP.classList.remove('text-gray-400', 'font-medium');
                         textP.classList.add('text-primary', 'font-semibold');
                     } else if (stepNum === currentStep) {
+                        // Current step: Icon and text in accent color (orange)
+                        iconDiv.classList.remove('bg-gray-200', 'text-gray-400');
                         iconDiv.classList.add('bg-accent1', 'text-white');
+                        textP.classList.remove('text-gray-400', 'font-medium');
                         textP.classList.add('text-accent1', 'font-semibold');
                     } else {
+                        // Future steps: Remain gray
+                        iconDiv.classList.remove('bg-primary', 'text-white', 'bg-accent1');
                         iconDiv.classList.add('bg-gray-200', 'text-gray-400');
+                        textP.classList.remove('text-accent1', 'font-semibold', 'text-primary');
                         textP.classList.add('text-gray-400', 'font-medium');
                     }
                 }
             });
-            progressBars.forEach((bar) => {
+
+            // Update progress bars
+            progressBars.forEach((bar, index) => {
                 const barStep = parseInt(bar.dataset.step);
-                bar.classList.toggle('bg-primary', barStep < currentStep);
-                bar.classList.toggle('bg-gray-200', barStep >= currentStep);
+                if (barStep < currentStep) {
+                    bar.classList.remove('bg-gray-200');
+                    bar.classList.add('bg-primary');
+                } else {
+                    bar.classList.remove('bg-primary');
+                    bar.classList.add('bg-gray-200');
+                }
             });
-            stepInfo.textContent = `Completa los detalles para tu gestión (Paso ${currentStep} de ${totalSteps}).`;
+
+            // Update step text info
+            if (stepInfo) { // Added null check here
+                stepInfo.textContent = `Completa los detalles para tu gestión (Paso ${currentStep} de ${totalSteps}).`;
+            }
         }
 
+        // --- Function to advance to the next step ---
         function nextStep(formType) {
-            if (currentStepGestiones < totalSteps) {
-                currentStepGestiones++;
+            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            if (currentStepRef < totalSteps) {
+                currentStepRef++;
+                currentStepGestiones = currentStepRef;
                 updateStepUI(formType);
-                if (currentStepGestiones === totalSteps) populateSummaryGestiones();
+                if (currentStepRef === totalSteps) {
+                    populateSummaryGestiones();
+                }
             }
         }
 
+        // --- Function to go back to the previous step ---
         function prevStep(formType) {
-            if (currentStepGestiones > 1) {
-                currentStepGestiones--;
+            let currentStepRef = currentStepGestiones; // Only Gestiones form now
+            if (currentStepRef > 1) {
+                currentStepRef--;
+                currentStepGestiones = currentStepRef;
                 updateStepUI(formType);
             }
         }
 
+        // --- Tab Switching Logic (Simplified as only one tab remains) ---
+        const gestionesFormContainer = document.getElementById('gestiones-form-container');
+
+        // Ensure Gestiones form container is always visible
+        if (gestionesFormContainer) {
+            gestionesFormContainer.classList.remove('hidden');
+        }
+        updateStepUI('gestiones'); // Update UI for the active form
+
+        // --- Event Listeners for Navigation Buttons (Gestiones) ---
         document.getElementById('nextStepGestiones1')?.addEventListener('click', () => nextStep('gestiones'));
         document.getElementById('prevStepGestiones2')?.addEventListener('click', () => prevStep('gestiones'));
         document.getElementById('nextStepGestiones2')?.addEventListener('click', () => nextStep('gestiones'));
         document.getElementById('prevStepGestiones3')?.addEventListener('click', () => prevStep('gestiones'));
         document.getElementById('nextStepGestiones3')?.addEventListener('click', () => nextStep('gestiones'));
+        // The prevStepGestiones4 button is now directly in the HTML and handled by its ID
         document.getElementById('prevStepGestiones4')?.addEventListener('click', () => prevStep('gestiones'));
 
+
+        // --- Conditional Field Visibility (Gestiones) ---
         const entregaAlOrigenCheckbox = document.getElementById('entrega-al-origen');
         const entregaOtroLugarCheckbox = document.getElementById('entrega-otro-lugar');
         const entregaFields = document.getElementById('entrega-fields');
         const entregaContactDetails = document.getElementById('entrega-contact-details');
+        
+        // Get references to the new radio buttons
         const necesitaRetirarSiRadio = document.getElementById('gestion-necesita-retirar-si');
         const necesitaRetirarNoRadio = document.getElementById('gestion-necesita-retirar-no');
         const origenFields = document.getElementById('gestion-origen-fields');
 
-        function updateOrigenFieldsVisibility() { /* ... (sin cambios) ... */ }
-        function updateEntregaFieldsVisibility() { /* ... (sin cambios, la lógica interna debe ser revisada si se autocompleta) ... */ }
-        
+        // Function to handle the visibility of origin fields based on radio button selection
+        function updateOrigenFieldsVisibility() {
+            if (necesitaRetirarSiRadio.checked) {
+                if (origenFields) origenFields.classList.remove('hidden');
+            } else {
+                if (origenFields) origenFields.classList.add('hidden');
+            }
+            // After updating origin fields visibility, re-evaluate delivery fields visibility
+            updateEntregaFieldsVisibility();
+        }
+
+        // Function to handle the visibility and state of delivery fields
+        function updateEntregaFieldsVisibility() {
+            const isEntregaAlOrigen = entregaAlOrigenCheckbox?.checked;
+            const isEntregaOtroLugar = entregaOtroLugarCheckbox?.checked;
+            const needsPickup = necesitaRetirarSiRadio?.checked;
+
+            if (isEntregaAlOrigen || isEntregaOtroLugar) {
+                if (entregaFields) entregaFields.classList.remove('hidden');
+
+                if (isEntregaAlOrigen && needsPickup) {
+                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'Sí'
+                    if (entregaContactDetails) entregaContactDetails.classList.add('hidden');
+                    // Pre-fill date and time from origin
+                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').value = document.getElementById('gestion-fecha-retiro')?.value || '';
+                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').value = document.getElementById('gestion-origen-horario')?.value || '';
+                    // Disable contact fields, enable date/time
+                    if (document.getElementById('gestion-entrega-nombre')) document.getElementById('gestion-entrega-nombre').disabled = true;
+                    if (document.getElementById('gestion-entrega-telefono')) document.getElementById('gestion-entrega-telefono').disabled = true;
+                    if (document.getElementById('gestion-entrega-ubicacion')) document.getElementById('gestion-entrega-ubicacion').disabled = true;
+                    if (document.getElementById('gestion-entrega-referencia')) document.getElementById('gestion-entrega-referencia').disabled = true;
+                    if (document.getElementById('gestion-fecha-entrega')) document.getElementById('gestion-fecha-entrega').disabled = false;
+                    if (document.getElementById('gestion-entrega-horario')) document.getElementById('gestion-entrega-horario').disabled = false;
+
+                } else if (isEntregaAlOrigen && !needsPickup) {
+                    // "Enviar de vuelta al origen" checked AND "Necesita retirar" is 'No'
+                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Show contact details
+                    // Clear and enable all fields
+                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
+                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
+                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
+                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
+                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
+                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
+
+                } else if (isEntregaOtroLugar) {
+                    // "Enviar a otro lugar" checked
+                    if (entregaContactDetails) entregaContactDetails.classList.remove('hidden'); // Always show contact details for "otro lugar"
+                    // Clear and enable all fields
+                    if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = false; }
+                    if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = false; }
+                    if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = false; }
+                    if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = false; }
+                    if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = false; }
+                    if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = false; }
+                }
+            } else {
+                // Neither delivery option is checked, hide everything
+                if (entregaFields) entregaFields.classList.add('hidden');
+                if (entregaContactDetails) entregaContactDetails.classList.add('hidden'); // Ensure hidden
+                // Disable and clear all fields
+                if (document.getElementById('gestion-entrega-nombre')) { document.getElementById('gestion-entrega-nombre').value = ''; document.getElementById('gestion-entrega-nombre').disabled = true; }
+                if (document.getElementById('gestion-entrega-telefono')) { document.getElementById('gestion-entrega-telefono').value = ''; document.getElementById('gestion-entrega-telefono').disabled = true; }
+                if (document.getElementById('gestion-entrega-ubicacion')) { document.getElementById('gestion-entrega-ubicacion').value = ''; document.getElementById('gestion-entrega-ubicacion').disabled = true; }
+                if (document.getElementById('gestion-entrega-referencia')) { document.getElementById('gestion-entrega-referencia').value = ''; document.getElementById('gestion-entrega-referencia').disabled = true; }
+                if (document.getElementById('gestion-fecha-entrega')) { document.getElementById('gestion-fecha-entrega').value = ''; document.getElementById('gestion-fecha-entrega').disabled = true; }
+                if (document.getElementById('gestion-entrega-horario')) { document.getElementById('gestion-entrega-horario').value = ''; document.getElementById('gestion-entrega-horario').disabled = true; }
+            }
+        }
+
+        // Add event listeners to the new radio buttons
         necesitaRetirarSiRadio?.addEventListener('change', updateOrigenFieldsVisibility);
         necesitaRetirarNoRadio?.addEventListener('change', updateOrigenFieldsVisibility);
+
+        // Add event listeners for delivery checkboxes
         entregaAlOrigenCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
         entregaOtroLugarCheckbox?.addEventListener('change', updateEntregaFieldsVisibility);
         
-        function mostrarContactos(inputNombreId, inputTelefonoId, inputDireccionId, listaDivId) {
-            const listaDiv = document.getElementById(listaDivId);
-            const inputNombre = document.getElementById(inputNombreId);
-            const inputTelefono = document.getElementById(inputTelefonoId);
-            const inputDireccion = document.getElementById(inputDireccionId);
+        // --- Contact Agenda Logic ---
+        const contactosGuardados = [
+            { nombre: "Ana Rodríguez", telefono: "0972123868", direccion: "Av. Siempre Viva 742, Springfield" },
+            { nombre: "Carlos López", telefono: "0976116243", direccion: "Calle Falsa 123, Villa General" },
+            { nombre: "Elena Gómez", telefono: "0971981745", direccion: "Boulevard de los Sueños Rotos 45, Capital" },
+        ];
 
-            if (!listaDiv) return;
-            listaDiv.innerHTML = ''; 
+        function mostrarContactos(inputNombre, inputTelefono, inputDireccion, listaDiv) {
+            if (!listaDiv) return; // Ensure listaDiv exists
 
-            if (contactosGuardadosGlobal.length === 0) {
+            listaDiv.innerHTML = ''; // Clear previous list
+            if (contactosGuardados.length === 0) {
                 const noContactsItem = document.createElement('div');
-                noContactsItem.textContent = 'No hay contactos guardados en "Mis Contactos".';
+                noContactsItem.textContent = 'No hay contactos guardados.';
                 noContactsItem.classList.add('contacts-dropdown-item', 'text-gray-500');
                 listaDiv.appendChild(noContactsItem);
             } else {
-                contactosGuardadosGlobal.forEach(contacto => {
+                contactosGuardados.forEach(contacto => {
                     const item = document.createElement('div');
-                    item.textContent = `${contacto.name} ${contacto.type ? '('+contacto.type+')' : ''}`;
+                    item.textContent = contacto.nombre;
                     item.classList.add('contacts-dropdown-item');
                     item.addEventListener('click', () => {
-                        if (inputNombre) inputNombre.value = contacto.name;
-                        if (inputTelefono) inputTelefono.value = contacto.phone;
-                        if (inputDireccion) inputDireccion.value = contacto.address || ''; // Usar '' si la dirección no existe
+                        if (inputNombre) inputNombre.value = contacto.nombre;
+                        if (inputTelefono) inputTelefono.value = contacto.telefono;
+                        if (inputDireccion) inputDireccion.value = contacto.direccion;
                         listaDiv.classList.add('hidden');
                     });
                     listaDiv.appendChild(item);
@@ -635,40 +800,211 @@
             listaDiv.classList.toggle('hidden');
         }
 
-        document.getElementById('btnVerContactosGestionOrigen')?.addEventListener('click', (event) => {
-            event.stopPropagation();
-            mostrarContactos('gestion-origen-nombre', 'gestion-origen-telefono', 'gestion-origen-ubicacion', 'listaContactosGestionOrigen');
-        });
-        document.getElementById('btnVerContactosGestionInstitucion')?.addEventListener('click', (event) => {
-            event.stopPropagation(); // Para instituciones, el "nombre" es el nombre de la institución
-            mostrarContactos('gestion-institucion', 'gestion-telefono', 'gestion-ubicacion', 'listaContactosGestionInstitucion');
-        });
+        // Gestiones - Contactos
         document.getElementById('btnVerContactosGestionEntrega')?.addEventListener('click', (event) => {
             event.stopPropagation();
-            mostrarContactos('gestion-entrega-nombre', 'gestion-entrega-telefono', 'gestion-entrega-ubicacion', 'listaContactosGestionEntrega');
+            mostrarContactos(
+                document.getElementById('gestion-entrega-nombre'),
+                document.getElementById('gestion-entrega-telefono'),
+                document.getElementById('gestion-entrega-ubicacion'),
+                document.getElementById('listaContactosGestionEntrega')
+            );
         });
 
+        document.getElementById('btnVerContactosGestionOrigen')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            mostrarContactos(
+                document.getElementById('gestion-origen-nombre'),
+                document.getElementById('gestion-origen-telefono'),
+                document.getElementById('gestion-origen-ubicacion'),
+                document.getElementById('listaContactosGestionOrigen')
+            );
+        });
+
+        document.getElementById('btnVerContactosGestionInstitucion')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            mostrarContactos(
+                document.getElementById('gestion-institucion'),
+                document.getElementById('gestion-telefono'),
+                document.getElementById('gestion-ubicacion'),
+                document.getElementById('listaContactosGestionInstitucion')
+            );
+        });
+
+        // Close dropdowns when clicking outside
         document.addEventListener('click', (event) => {
-            document.querySelectorAll('.contacts-dropdown').forEach(dropdown => {
+            const dropdowns = document.querySelectorAll('.contacts-dropdown');
+            dropdowns.forEach(dropdown => {
                 if (!dropdown.classList.contains('hidden') && !dropdown.contains(event.target) && !event.target.closest('button[id^="btnVerContactos"]')) {
                     dropdown.classList.add('hidden');
                 }
             });
         });
 
-        function handleGeolocation(inputElementId) { /* ... (sin cambios) ... */ }
+        // --- Geolocation Logic ---
+        function handleGeolocation(inputElementId) {
+            const inputElement = document.getElementById(inputElementId);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    if (inputElement) inputElement.value = `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`;
+                    console.log("Ubicación obtenida. Implementar geocodificación inversa.");
+                }, error => {
+                    console.warn(`ERROR(${error.code}): ${error.message}`);
+                    const errorDiv = document.createElement('p');
+                    errorDiv.textContent = `Error al obtener ubicación: ${error.message}.`;
+                    errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
+                    const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
+                    if (existingError) existingError.remove();
+                    if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+                });
+            } else {
+                console.log("La geolocalización no es soportada por este navegador.");
+                const errorDiv = document.createElement('p');
+                errorDiv.textContent = 'La geolocalización no es soportada por este navegador.';
+                errorDiv.classList.add('text-red-500', 'text-xs', 'mt-1');
+                const existingError = inputElement?.parentElement?.querySelector('.text-red-500');
+                if (existingError) existingError.remove();
+                if (inputElement?.parentElement) inputElement.parentElement.appendChild(errorDiv);
+            }
+        }
+
         document.getElementById('btnUbicacionGestion')?.addEventListener('click', () => handleGeolocation('gestion-ubicacion'));
         document.getElementById('btnUbicacionGestionEntrega')?.addEventListener('click', () => handleGeolocation('gestion-entrega-ubicacion'));
         document.getElementById('btnUbicacionGestionOrigen')?.addEventListener('click', () => handleGeolocation('gestion-origen-ubicacion'));
 
-        function formatDate(date) { return date.toISOString().split('T')[0]; }
-        const setupDateButtons = (btnHoyId, btnMananaId, inputId) => { /* ... (sin cambios) ... */ };
-        setupDateButtons('btnHoyGestionRetiro', 'btnMananaGestionRetiro', 'gestion-fecha-retiro');
-        setupDateButtons('btnHoyGestionRealizar', 'btnMananaGestionRealizar', 'gestion-fecha-realizar');
-        setupDateButtons('btnHoyGestionEntrega', 'btnMananaGestionEntrega', 'gestion-fecha-entrega');
-        
-        function populateSummaryGestiones() { /* ... (sin cambios en su lógica interna por ahora) ... */ }
+        // --- Date Buttons ("Hoy", "Mañana") ---
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
+        // Gestiones - Fecha de Retiro buttons
+        document.getElementById('btnHoyGestionRetiro')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-retiro');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionRetiro')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-retiro');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // Gestiones - Fecha de Realización buttons
+        document.getElementById('btnHoyGestionRealizar')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-realizar');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionRealizar')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-realizar');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // Gestiones - Fecha de Entrega buttons
+        document.getElementById('btnHoyGestionEntrega')?.addEventListener('click', function() {
+            const input = document.getElementById('gestion-fecha-entrega');
+            if (input) input.value = formatDate(new Date());
+        });
+        document.getElementById('btnMananaGestionEntrega')?.addEventListener('click', function() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const input = document.getElementById('gestion-fecha-entrega');
+            if (input) input.value = formatDate(tomorrow);
+        });
+
+        // --- Summary Population Functions ---
+        function populateSummaryGestiones() {
+            // Helper to get element and set textContent, handling null
+            const setSummaryText = (id, value, prefix = '') => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value !== null && value !== undefined && value !== '' ? `${prefix}${value}` : 'N/A';
+                }
+            };
+
+            // Helper to get selected radio button label
+            const getRadioLabel = (name) => {
+                const radio = document.querySelector(`input[name="${name}"]:checked`);
+                return radio ? radio.labels[0].textContent : null;
+            };
+
+            // Helper to get selected option text
+            const getSelectText = (id) => {
+                const select = document.getElementById(id);
+                return select && select.selectedIndex !== -1 ? select.options[select.selectedIndex].textContent : null;
+            };
+
+            // Sección de Origen (condicional)
+            const necesitaRetirar = document.querySelector('input[name="gestion-necesita-retirar"]:checked');
+            const resumenGestionOrigenSection = document.getElementById('resumen-gestion-origen-section');
+            setSummaryText('resumen-gestion-retirar', necesitaRetirar ? (necesitaRetirar.value === 'si' ? 'Sí' : 'No') : null);
+
+            if (necesitaRetirar && necesitaRetirar.value === 'si') {
+                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.remove('hidden');
+                setSummaryText('resumen-gestion-origen-nombre', document.getElementById('gestion-origen-nombre')?.value);
+                setSummaryText('resumen-gestion-origen-telefono', document.getElementById('gestion-origen-telefono')?.value);
+                setSummaryText('resumen-gestion-origen-ubicacion', document.getElementById('gestion-origen-ubicacion')?.value);
+                setSummaryText('resumen-gestion-origen-referencia', document.getElementById('gestion-origen-referencia')?.value, 'Referencia: ');
+                setSummaryText('resumen-gestion-fecha-retiro', document.getElementById('gestion-fecha-retiro')?.value);
+                setSummaryText('resumen-gestion-origen-horario', getSelectText('gestion-origen-horario'));
+            } else {
+                if (resumenGestionOrigenSection) resumenGestionOrigenSection.classList.add('hidden');
+            }
+
+            // Sección de Trámite
+            setSummaryText('resumen-gestion-institucion', document.getElementById('gestion-institucion')?.value);
+            setSummaryText('resumen-gestion-telefono-lugar', document.getElementById('gestion-telefono')?.value);
+            setSummaryText('resumen-gestion-ubicacion', document.getElementById('gestion-ubicacion')?.value);
+            setSummaryText('resumen-gestion-referencia', document.getElementById('gestion-referencia')?.value, 'Referencia: ');
+            setSummaryText('resumen-gestion-fecha-realizar', document.getElementById('gestion-fecha-realizar')?.value);
+            setSummaryText('resumen-gestion-horario', getSelectText('gestion-horario'));
+            setSummaryText('resumen-gestion-tramite', document.getElementById('gestion-descripcion')?.value);
+            const monto = parseFloat(document.getElementById('gestion-monto')?.value);
+            setSummaryText('resumen-gestion-monto', isNaN(monto) ? null : monto.toLocaleString('es-PY', { style: 'currency', currency: 'PYG' }));
+            setSummaryText('resumen-gestion-observaciones', document.getElementById('gestion-observaciones')?.value, 'Observaciones: ');
+            
+            // Sección de Entrega (condicional)
+            const resumenGestionEntregaSection = document.getElementById('resumen-gestion-entrega-section');
+            if ((entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) || (entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked)) {
+                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.remove('hidden');
+                setSummaryText('resumen-gestion-tipo-entrega', (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked) ? 'Al Origen' : 'Otro Lugar');
+                
+                // Only populate contact details if "Enviar a otro lugar" is checked OR if "Enviar de vuelta al origen" is checked AND "Necesita retirar" is 'No'
+                const needsPickup = necesitaRetirarSiRadio?.checked;
+                if ((entregaOtroLugarCheckbox && entregaOtroLugarCheckbox.checked) || (entregaAlOrigenCheckbox && entregaAlOrigenCheckbox.checked && !needsPickup)) {
+                    setSummaryText('resumen-gestion-entrega-nombre', document.getElementById('gestion-entrega-nombre')?.value);
+                    setSummaryText('resumen-gestion-entrega-telefono', document.getElementById('gestion-entrega-telefono')?.value);
+                    setSummaryText('resumen-gestion-entrega-ubicacion', document.getElementById('gestion-entrega-ubicacion')?.value);
+                    setSummaryText('resumen-gestion-entrega-referencia', document.getElementById('gestion-entrega-referencia')?.value, 'Referencia: ');
+                } else {
+                    setSummaryText('resumen-gestion-entrega-nombre', ''); // Clear if not applicable
+                    setSummaryText('resumen-gestion-entrega-telefono', '');
+                    setSummaryText('resumen-gestion-entrega-ubicacion', '');
+                    setSummaryText('resumen-gestion-entrega-referencia', '');
+                }
+
+                setSummaryText('resumen-gestion-fecha-entrega', document.getElementById('gestion-fecha-entrega')?.value);
+                setSummaryText('resumen-gestion-entrega-horario', getSelectText('gestion-entrega-horario'));
+            } else {
+                if (resumenGestionEntregaSection) resumenGestionEntregaSection.classList.add('hidden');
+            }
+
+            // Sección de Pago del Servicio
+            setSummaryText('resumen-pago-servicio-quien', getRadioLabel('pago-servicio-quien'));
+            setSummaryText('resumen-pago-servicio-forma', getRadioLabel('pago-servicio-forma'));
+
+            // Update estimated cost (placeholder value)
+            const costoEstimadoElement = document.getElementById('costo-estimado');
+            if (costoEstimadoElement) {
+                costoEstimadoElement.textContent = 'Gs. 41.000'; // Hardcoded value as per image
+            }
+        }
+
+        // --- Form Submission (Custom Modal) ---
         const gestionesForm = document.getElementById('gestionesForm');
         const customModal = document.getElementById('customModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -682,28 +1018,26 @@
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', () => {
                 if (customModal) customModal.classList.add('hidden');
-                if (modalMessage && modalMessage.textContent.includes("Redirigiendo al dashboard")) {
-                    window.location.href = 'dashboard.html';
-                }
-            });
-        }
-        
-        if (gestionesForm) {
-            gestionesForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const datosGestion = { /* ... (recolección de datos como estaba) ... */ };
-                let gestionesGuardadas = JSON.parse(localStorage.getItem('gestionesDemo')) || [];
-                gestionesGuardadas.push(datosGestion);
-                localStorage.setItem('gestionesDemo', JSON.stringify(gestionesGuardadas));
-                showCustomModal('¡Solicitud de Gestión Enviada con Éxito! Redirigiendo al dashboard...');
             });
         }
 
+        if (gestionesForm) {
+            gestionesForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                console.log('Formulario de Gestiones enviado (simulación)');
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+                console.log('Datos del formulario de Gestiones:', data);
+                showCustomModal('¡Solicitud de Gestión Enviada con Éxito!');
+            });
+        }
+
+
+        // --- Initialize UI on page load ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadContactsFromStorageGlobal(); // Cargar contactos globales al inicio
-            updateStepUI('gestiones'); 
-            updateOrigenFieldsVisibility(); 
-            updateEntregaFieldsVisibility(); 
+            updateStepUI('gestiones'); // Initialize Gestiones form first
+            updateOrigenFieldsVisibility(); // Set initial visibility based on default radio button
+            updateEntregaFieldsVisibility(); // Set initial visibility for delivery fields
         });
     </script>
 </body>
