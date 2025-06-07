@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Planificador de Rutas</title>
+    <style>
+        /* CSS General */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        h1, h2, h3 {
+            color: #1A237E; /* Azul oscuro para títulos */
+        }
+
+        /* App Bar / Header */
+        .app-bar {
+            background-color: #1A237E; /* Azul oscuro */
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .app-bar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .app-bar .user-info {
+            font-size: 0.9em;
+        }
+
+        /* Vista Principal */
+        #main-view {
+            padding: 20px;
+        }
+
+        /* Lista de Rutas */
+        .route-list-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+        .route-list-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .route-list-item h3 {
+            margin-top: 0;
+            color: #1A237E;
+        }
+
+        /* Detalle de Ruta (Inspirado en input_file_0.png) */
+        .route-detail-header {
+            background-color: #1A237E; /* Azul oscuro */
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .route-detail-header .driver-info {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .route-detail-header .vehicle-info {
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+        }
+         .route-detail-header .vehicle-info svg {
+            margin-right: 5px;
+            fill: white;
+        }
+
+        .stops-list {
+            list-style: none;
+            padding: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            margin-top:0;
+        }
+        .stop-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .stop-item:last-child {
+            border-bottom: none;
+        }
+        .stop-number {
+            font-weight: bold;
+            color: #1A237E;
+            margin-right: 15px;
+            font-size: 1.2em;
+            width:30px;
+        }
+        .stop-info {
+            flex-grow: 1;
+        }
+        .stop-address {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .stop-sub-address {
+            color: #555;
+            font-size: 0.9em;
+        }
+        .stop-eta-window {
+            text-align: right;
+            min-width: 120px;
+        }
+        .stop-eta {
+            font-weight: bold;
+            color: #4CAF50; /* Verde para ETA */
+            display: block;
+        }
+        .stop-window {
+            font-size: 0.8em;
+            color: #777;
+        }
+        .start-route-button-container {
+            padding: 20px;
+            background-color: white;
+            text-align: center;
+             border: 1px solid #ddd;
+             border-top: none;
+        }
+        .start-route-button {
+            background-color: #4CAF50; /* Verde */
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 80%;
+            max-width:300px;
+        }
+        .start-route-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Placeholder de Mapa (Inspirado en input_file_1.png) */
+        .map-placeholder {
+            background-color: #e0e0e0;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #777;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 5 C40 5 35 15 35 20 S40 35 50 35 S65 30 65 20 S60 5 50 5 Z M50 25 C47.25 25 45 22.75 45 20 S47.25 15 50 15 S55 17.25 55 20 S52.75 25 50 25 Z" fill="%23999"/><path d="M10 80 L30 60 L45 70 L70 40 L90 60 L90 90 L10 90 Z" fill="%23bbb"/></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Modales (Genérico y específicos) */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            padding-top: 50px;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            padding-bottom:10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom:20px;
+        }
+        .modal-header h2 {
+            margin-top:0;
+            color: #1A237E;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+        }
+
+        /* Modal Actualizar Estado (input_file_3.png) */
+        .status-options label {
+            display: block;
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+        }
+        .status-options label:hover {
+            background-color: #f0f0f0;
+        }
+        .status-options input[type="radio"] {
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .status-options textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-height: 80px;
+            box-sizing: border-box; /* Ensures padding doesn't add to width */
+        }
+        .modal-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left:10px;
+        }
+        .cancel-btn {
+            background-color: #F44336; /* Rojo */
+            color: white;
+        }
+        .accept-btn {
+            background-color: #4CAF50; /* Verde */
+            color: white;
+        }
+
+
+        /* Modal Prueba de Entrega (input_file_2.png) */
+        .pod-form-group {
+            margin-bottom: 15px;
+        }
+        .pod-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .pod-form-group input[type="text"],
+        .pod-form-group input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+             box-sizing: border-box; /* Ensures padding doesn't add to width */
+        }
+        .signature-pad-container {
+            border: 1px dashed #ccc;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        #signature-canvas {
+            width: 100%;
+            height: 150px;
+            background-color: #f8f8f8;
+            cursor: crosshair;
+            display: block; /* Important for canvas dimensions */
+        }
+        .signature-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+         .pod-modal-actions {
+            margin-top: 20px;
+            display:flex;
+            justify-content: space-between;
+        }
+
+        .pod-modal-actions .delete-btn {
+            background-color: #F44336; /* Rojo */
+            color:white;
+             padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+         .pod-modal-actions .accept-pod-btn {
+            background-color: #4CAF50; /* Verde */
+            color:white;
+             padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size:0.9em;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        /* Iconos simples */
+        .icon-box::before { content: "📦"; margin-right: 5px; }
+        .icon-check::before { content: "✔️"; margin-right: 5px; }
+        .icon-cross::before { content: "❌"; margin-right: 5px; }
+        .icon-pending::before { content: "⏳"; margin-right: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-bar">
+        <div class="logo">INRoute Demo</div>
+        <div class="user-info">Usuario: DemoUser</div>
+    </div>
+
+    <div class="container">
+        <div id="main-view">
+            <!-- El contenido se cargará aquí por JS -->
+        </div>
+    </div>
+
+    <!-- Modal para Actualizar Estado -->
+    <div id="updateStatusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" onclick="closeModal('updateStatusModal')">×</span>
+                <h2>Actualizar Estado del Pedido</h2>
+            </div>
+            <p>Pedido ID: <span id="statusPedidoId"></span></p>
+            <div class="status-options">
+                <label><input type="radio" name="status" value="Accepted"> <span class="icon-box"></span>Aceptado</label>
+                <label><input type="radio" name="status" value="Partially"> <span class="icon-box"></span>Parcialmente</label> <!-- Podríamos necesitar otro icono -->
+                <label><input type="radio" name="status" value="Rejected"> <span class="icon-cross"></span>Rechazado</label>
+                <label><input type="radio" name="status" value="Pending"> <span class="icon-pending"></span>Pendiente</label>
+            </div>
+            <textarea id="statusReason" placeholder="Elige una razón... (opcional)"></textarea>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal('updateStatusModal')">Cancelar</button>
+                <button class="accept-btn" onclick="submitStatusUpdate()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Prueba de Entrega (POD) -->
+    <div id="podModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-button" onclick="closeModal('podModal')">×</span>
+                <h2>Prueba de Entrega</h2>
+            </div>
+            <p>Pedido ID: <span id="podPedidoId"></span></p>
+            <div class="pod-form">
+                <div class="pod-form-group">
+                    <label for="signedBy">Firmado por:</label>
+                    <input type="text" id="signedBy" name="signedBy">
+                </div>
+                <div class="pod-form-group">
+                    <label for="rut">RUT:</label>
+                    <input type="text" id="rut" name="rut">
+                </div>
+                <div class="pod-form-group">
+                    <label for="photoTest">Foto (simulado):</label>
+                    <input type="file" id="photoTest" name="photoTest">
+                </div>
+                <div class="pod-form-group">
+                    <label>Firma:</label>
+                    <div class="signature-pad-container">
+                        <canvas id="signature-canvas"></canvas>
+                    </div>
+                     <button onclick="clearSignature()" style="font-size:0.8em; padding:5px 10px; background-color:#777; color:white; border:none; border-radius:3px;">Limpiar Firma</button>
+                </div>
+
+                <div class="pod-modal-actions">
+                    <button class="delete-btn" onclick="closeModal('podModal')">Eliminar</button> <!-- Asumiendo que "Delete" cierra sin guardar -->
+                    <button class="accept-pod-btn" onclick="submitPOD()">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATOS DE EJEMPLO ---
+        const sampleRoutes = [
+            {
+                id: "RUTA001",
+                driver: "Conductor 01",
+                vehicle: "VEH01",
+                stops: [
+                    { id: "S1-1", address: "Félix de Amesti 157", subAddress: "Las Condes", eta: "07:02", window: "07:00 - 16:00", status: "Pendiente" },
+                    { id: "S1-2", address: "Rosario Norte 400", subAddress: "depto 63, Las Condes", eta: "07:17", window: "07:00 - 16:00", status: "Pendiente" },
+                    { id: "S1-3", address: "Av. Las Condes 7026", subAddress: "Depto 707, Las Condes", eta: "07:32", window: "07:00 - 16:00", status: "Pendiente" },
+                    { id: "S1-4", address: "San Carlos de Apoquindo 994", subAddress: "Las Condes", eta: "07:56", window: "07:00 - 16:00", status: "Pendiente" },
+                    { id: "S1-5", address: "El Tatio 1550", subAddress: "Las Condes", eta: "08:20", window: "07:00 - 16:00", status: "Pendiente" }
+                ]
+            },
+            {
+                id: "RUTA002",
+                driver: "Conductor 02",
+                vehicle: "VEH02",
+                stops: [
+                    { id: "S2-1", address: "Av. Providencia 1100", subAddress: "Providencia", eta: "09:00", window: "09:00 - 17:00", status: "Pendiente" },
+                    { id: "S2-2", address: "Merced 350", subAddress: "Santiago Centro", eta: "09:25", window: "09:00 - 17:00", status: "Pendiente" }
+                ]
+            }
+        ];
+
+        let currentRouteIdForModal = null; // Para saber qué parada se está actualizando
+
+        // --- MANEJO DE VISTAS ---
+        const mainView = document.getElementById('main-view');
+
+        function showRouteList() {
+            mainView.innerHTML = `
+                <h2>Rutas Disponibles</h2>
+                <div id="route-list-container"></div>
+                <div class="map-placeholder">
+                    Vista de Águila de Rutas (Simulada)<br>
+                    Aquí iría un mapa interactivo global.
+                </div>
+            `;
+            const routeListContainer = document.getElementById('route-list-container');
+            sampleRoutes.forEach(route => {
+                const routeElement = document.createElement('div');
+                routeElement.className = 'route-list-item';
+                routeElement.innerHTML = `
+                    <h3>${route.id}</h3>
+                    <p>Conductor: ${route.driver} | Vehículo: ${route.vehicle}</p>
+                    <p>Paradas: ${route.stops.length}</p>
+                `;
+                routeElement.onclick = () => showRouteDetail(route.id);
+                routeListContainer.appendChild(routeElement);
+            });
+        }
+
+        function showRouteDetail(routeId) {
+            const route = sampleRoutes.find(r => r.id === routeId);
+            if (!route) {
+                showRouteList(); // Volver a la lista si no se encuentra
+                return;
+            }
+
+            let stopsHtml = route.stops.map((stop, index) => `
+                <li class="stop-item">
+                    <span class="stop-number">${index + 1}</span>
+                    <div class="stop-info">
+                        <div class="stop-address">${stop.address}</div>
+                        <div class="stop-sub-address">${stop.subAddress}</div>
+                        <div>
+                            <small>
+                                <a href="#" onclick="openUpdateStatusModal('${stop.id}')" style="color: #1A237E; text-decoration: none;">Actualizar Estado</a> |
+                                <a href="#" onclick="openPodModal('${stop.id}')" style="color: #4CAF50; text-decoration: none;">Prueba de Entrega</a>
+                            </small>
+                        </div>
+                    </div>
+                    <div class="stop-eta-window">
+                        <span class="stop-eta">ETA ${stop.eta}</span>
+                        <span class="stop-window">${stop.window}</span>
+                        <div id="status-${stop.id}" style="font-size:0.8em; color: #888; margin-top:5px;">${stop.status}</div>
+                    </div>
+                </li>
+            `).join('');
+
+            mainView.innerHTML = `
+                <a href="#" onclick="showRouteList()" class="back-button">← Volver a Rutas</a>
+                <div class="route-detail-card">
+                    <div class="route-detail-header">
+                        <div class="driver-info">${route.driver}</div>
+                        <div class="vehicle-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h40L40-880h80l200 160h320q33 0 56.5 23.5T720-640v360q0 33-23.5 56.5T640-200H240L160-120Zm0-80h480v-360H160v360Zm190-80q21 0 35.5-14.5T400-330q0-21-14.5-35.5T350-380q-21 0-35.5 14.5T300-330q0 21 14.5 35.5T350-280Zm220 0q21 0 35.5-14.5T620-330q0-21-14.5-35.5T570-380q-21 0-35.5 14.5T520-330q0 21 14.5 35.5T570-280ZM160-200v-360 360Z"/></svg>
+                            ${route.vehicle}
+                        </div>
+                    </div>
+                    <ul class="stops-list">${stopsHtml}</ul>
+                    <div class="start-route-button-container">
+                       <button class="start-route-button">Iniciar Ruta</button>
+                    </div>
+                </div>
+                <br>
+                <div class="map-placeholder">
+                   Mapa de Ruta Específica (Simulado) para ${route.id}<br/>
+                   Aquí se mostraría el trazado de la ruta actual.
+                </div>
+            `;
+        }
+
+
+        // --- LÓGICA DE MODALES ---
+        function openUpdateStatusModal(stopId) {
+            currentRouteIdForModal = stopId;
+            document.getElementById('statusPedidoId').textContent = stopId;
+            // Reset form
+            document.querySelectorAll('#updateStatusModal input[name="status"]').forEach(rb => rb.checked = false);
+            document.getElementById('statusReason').value = '';
+            document.getElementById('updateStatusModal').style.display = 'block';
+        }
+
+        function openPodModal(stopId) {
+            currentRouteIdForModal = stopId;
+            document.getElementById('podPedidoId').textContent = stopId;
+            // Reset form
+            document.getElementById('signedBy').value = '';
+            document.getElementById('rut').value = '';
+            document.getElementById('photoTest').value = ''; // Reset file input
+            clearSignature();
+            document.getElementById('podModal').style.display = 'block';
+            initSignatureCanvas(); // Initialize or re-initialize canvas
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function submitStatusUpdate() {
+            const selectedStatus = document.querySelector('#updateStatusModal input[name="status"]:checked');
+            const reason = document.getElementById('statusReason').value;
+            if (selectedStatus) {
+                console.log(`Estado actualizado para ${currentRouteIdForModal}: ${selectedStatus.value}, Razón: ${reason}`);
+                // Actualizar UI (simulado)
+                const statusElement = document.getElementById(`status-${currentRouteIdForModal}`);
+                if (statusElement) {
+                   let icon = "";
+                   if (selectedStatus.value === "Accepted") icon = "✔️ ";
+                   else if (selectedStatus.value === "Rejected") icon = "❌ ";
+                   else if (selectedStatus.value === "Pending") icon = "⏳ ";
+                   else if (selectedStatus.value === "Partially") icon = "📦 "; // (Reusando ícono por simplicidad)
+                   statusElement.textContent = icon + selectedStatus.value;
+                }
+                 // Encontrar la parada y actualizar su estado en los datos de ejemplo (para persistencia en la sesión)
+                sampleRoutes.forEach(route => {
+                    const stop = route.stops.find(s => s.id === currentRouteIdForModal);
+                    if (stop) {
+                        stop.status = selectedStatus.value;
+                    }
+                });
+
+            } else {
+                alert("Por favor, selecciona un estado.");
+                return;
+            }
+            closeModal('updateStatusModal');
+        }
+
+        function submitPOD() {
+            const signedBy = document.getElementById('signedBy').value;
+            const rut = document.getElementById('rut').value;
+            // La foto y la firma son más complejas de "enviar" en esta demo.
+            // Para la firma, podríamos obtener el dataURL del canvas.
+            const signatureData = signatureCanvas.toDataURL(); // Esto se puede enviar/guardar
+
+            console.log(`POD para ${currentRouteIdForModal}: Firmado por ${signedBy}, RUT ${rut}. Foto (simulada). Firma guardada.`);
+            // Aquí se podría mostrar la firma o una miniatura de la foto.
+
+            alert(`Prueba de Entrega para ${currentRouteIdForModal} registrada (simulado).`);
+             // Actualizar UI (simulado)
+            const statusElement = document.getElementById(`status-${currentRouteIdForModal}`);
+            if (statusElement) {
+                statusElement.textContent = "✔️ Entregado (POD)";
+                statusElement.style.color = "green";
+            }
+            sampleRoutes.forEach(route => {
+                const stop = route.stops.find(s => s.id === currentRouteIdForModal);
+                if (stop) {
+                    stop.status = "Entregado (POD)";
+                }
+            });
+            closeModal('podModal');
+        }
+
+        // --- LÓGICA DE FIRMA EN CANVAS ---
+        let signatureCanvas, signatureCtx, drawing = false, lastPos;
+
+        function initSignatureCanvas() {
+            signatureCanvas = document.getElementById('signature-canvas');
+            if (!signatureCanvas) return;
+            signatureCtx = signatureCanvas.getContext('2d');
+
+            // Set display size (css pixels).
+            const style = getComputedStyle(signatureCanvas);
+            signatureCanvas.width = parseInt(style.width);
+            signatureCanvas.height = parseInt(style.height);
+
+            // Set actual size in memory (scaled to account for HDPI screens).
+            // This prevents blurry lines.
+            const dpr = window.devicePixelRatio || 1;
+            signatureCanvas.width = signatureCanvas.offsetWidth * dpr;
+            signatureCanvas.height = signatureCanvas.offsetHeight * dpr;
+            signatureCtx.scale(dpr, dpr);
+
+
+            signatureCtx.lineWidth = 2;
+            signatureCtx.lineCap = 'round';
+            signatureCtx.strokeStyle = '#333';
+
+            signatureCanvas.addEventListener('mousedown', startDrawing);
+            signatureCanvas.addEventListener('mouseup', stopDrawing);
+            signatureCanvas.addEventListener('mouseout', stopDrawing); // Stop if mouse leaves canvas
+            signatureCanvas.addEventListener('mousemove', draw);
+
+            // Touch events
+            signatureCanvas.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // prevent scrolling
+                const touch = e.touches[0];
+                startDrawing(getMouseEvent(touch, signatureCanvas));
+            }, { passive: false });
+            signatureCanvas.addEventListener('touchend', (e) => {
+                 e.preventDefault();
+                 stopDrawing();
+            }, { passive: false });
+            signatureCanvas.addEventListener('touchmove', (e) => {
+                 e.preventDefault();
+                const touch = e.touches[0];
+                draw(getMouseEvent(touch, signatureCanvas));
+            }, { passive: false });
+        }
+
+        function getMouseEvent(touchEvent, canvasElement) {
+             const rect = canvasElement.getBoundingClientRect();
+             return { // Simular un evento de mouse
+                offsetX: touchEvent.clientX - rect.left,
+                offsetY: touchEvent.clientY - rect.top,
+                button: 0 // Asumir botón izquierdo para touch
+            };
+        }
+
+
+        function startDrawing(e) {
+            if (e.button !== 0) return; // Solo dibujar con click izquierdo
+            drawing = true;
+            lastPos = { x: e.offsetX, y: e.offsetY };
+            // signatureCtx.beginPath(); // No necesitas beginPath aquí para cada punto si quieres una linea continua
+        }
+
+        function stopDrawing() {
+            if (!drawing) return;
+            drawing = false;
+            signatureCtx.beginPath(); // Finaliza la ruta actual
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            signatureCtx.beginPath(); // Inicia una nueva sub-ruta para cada segmento
+            signatureCtx.moveTo(lastPos.x, lastPos.y);
+            signatureCtx.lineTo(e.offsetX, e.offsetY);
+            signatureCtx.stroke();
+            lastPos = { x: e.offsetX, y: e.offsetY };
+        }
+
+        function clearSignature() {
+            if (signatureCtx && signatureCanvas) {
+                signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+            }
+        }
+        
+        // Cargar vista inicial
+        window.onload = () => {
+            showRouteList();
+            // Cerrar modales si se hace clic fuera del contenido
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    closeModal(event.target.id);
+                }
+            }
+        };
+
+    </script>
+</body>
+</html>
