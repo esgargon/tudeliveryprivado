@@ -3,28 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo Planificador de Rutas</title>
+    <title>Planificador de Rutas Pro (Demo)</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIYwNloW9oAIipGTqtZTnH))$eodaxxuvxnM="
+     crossorigin=""/>
     <style>
-        /* CSS General */
+        /* --- CSS GENERAL --- */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             background-color: #f0f2f5;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 0;
+            padding: 0 15px; /* Padding horizontal */
+            flex-grow: 1;
         }
 
-        h1, h2, h3 {
-            color: #1A237E; /* Azul oscuro para títulos */
-        }
+        h1, h2, h3 { color: #1A237E; }
+        button { cursor: pointer; font-family: inherit; }
+        input, textarea, select { font-family: inherit; box-sizing: border-box; padding:10px; border:1px solid #ccc; border-radius:4px; width:100%; margin-bottom:10px;}
+        textarea { min-height: 80px; }
 
-        /* App Bar / Header */
+        /* --- LOGIN VIEW --- */
+        #login-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh; /* Para centrar verticalmente en la vista inicial */
+            padding: 20px;
+        }
+        .login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+        }
+        .login-box h2 { text-align:center; margin-top:0; }
+        .login-box button {
+            background-color: #1A237E;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            width: 100%;
+        }
+        .login-box button:hover { background-color: #283593; }
+        .error-message { color: #D32F2F; font-size:0.9em; margin-bottom:10px; text-align:center;}
+
+
+        /* --- APP BAR / HEADER --- */
         .app-bar {
             background-color: #1A237E; /* Azul oscuro */
             color: white;
@@ -34,679 +74,1039 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .app-bar .logo {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .app-bar .user-info {
-            font-size: 0.9em;
-        }
-
-        /* Vista Principal */
-        #main-view {
-            padding: 20px;
-        }
-
-        /* Lista de Rutas */
-        .route-list-item {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: box-shadow 0.3s ease;
-        }
-        .route-list-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .route-list-item h3 {
-            margin-top: 0;
-            color: #1A237E;
-        }
-
-        /* Detalle de Ruta (Inspirado en input_file_0.png) */
-        .route-detail-header {
-            background-color: #1A237E; /* Azul oscuro */
-            color: white;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .route-detail-header .driver-info {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .route-detail-header .vehicle-info {
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-        }
-         .route-detail-header .vehicle-info svg {
-            margin-right: 5px;
-            fill: white;
-        }
-
-        .stops-list {
-            list-style: none;
-            padding: 0;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            margin-top:0;
-        }
-        .stop-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-        .stop-item:last-child {
-            border-bottom: none;
-        }
-        .stop-number {
-            font-weight: bold;
-            color: #1A237E;
-            margin-right: 15px;
-            font-size: 1.2em;
-            width:30px;
-        }
-        .stop-info {
-            flex-grow: 1;
-        }
-        .stop-address {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .stop-sub-address {
-            color: #555;
-            font-size: 0.9em;
-        }
-        .stop-eta-window {
-            text-align: right;
-            min-width: 120px;
-        }
-        .stop-eta {
-            font-weight: bold;
-            color: #4CAF50; /* Verde para ETA */
-            display: block;
-        }
-        .stop-window {
-            font-size: 0.8em;
-            color: #777;
-        }
-        .start-route-button-container {
-            padding: 20px;
-            background-color: white;
-            text-align: center;
-             border: 1px solid #ddd;
-             border-top: none;
-        }
-        .start-route-button {
-            background-color: #4CAF50; /* Verde */
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 80%;
-            max-width:300px;
-        }
-        .start-route-button:hover {
-            background-color: #45a049;
-        }
-
-        /* Placeholder de Mapa (Inspirado en input_file_1.png) */
-        .map-placeholder {
-            background-color: #e0e0e0;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #777;
-            border-radius: 8px;
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 5 C40 5 35 15 35 20 S40 35 50 35 S65 30 65 20 S60 5 50 5 Z M50 25 C47.25 25 45 22.75 45 20 S47.25 15 50 15 S55 17.25 55 20 S52.75 25 50 25 Z" fill="%23999"/><path d="M10 80 L30 60 L45 70 L70 40 L90 60 L90 90 L10 90 Z" fill="%23bbb"/></svg>');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        /* Modales (Genérico y específicos) */
-        .modal {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            padding-top: 50px;
-        }
-        .modal-content {
-            background-color: #fff;
-            margin: 5% auto;
-            padding: 25px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .modal-header {
-            padding-bottom:10px;
-            border-bottom: 1px solid #eee;
-            margin-bottom:20px;
-        }
-        .modal-header h2 {
-            margin-top:0;
-            color: #1A237E;
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-button:hover,
-        .close-button:focus {
+        .app-bar .logo { font-size: 1.5em; font-weight: bold; }
+        .app-bar .user-actions button {
+            background-color: #FFC107; /* Amarillo para logout */
             color: #333;
-        }
-
-        /* Modal Actualizar Estado (input_file_3.png) */
-        .status-options label {
-            display: block;
-            margin-bottom: 12px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #f9f9f9;
-        }
-        .status-options label:hover {
-            background-color: #f0f0f0;
-        }
-        .status-options input[type="radio"] {
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        .status-options textarea {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            min-height: 80px;
-            box-sizing: border-box; /* Ensures padding doesn't add to width */
-        }
-        .modal-actions {
-            margin-top: 20px;
-            text-align: right;
-        }
-        .modal-actions button {
-            padding: 10px 20px;
-            border-radius: 5px;
             border: none;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left:10px;
-        }
-        .cancel-btn {
-            background-color: #F44336; /* Rojo */
-            color: white;
-        }
-        .accept-btn {
-            background-color: #4CAF50; /* Verde */
-            color: white;
-        }
-
-
-        /* Modal Prueba de Entrega (input_file_2.png) */
-        .pod-form-group {
-            margin-bottom: 15px;
-        }
-        .pod-form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .pod-form-group input[type="text"],
-        .pod-form-group input[type="file"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-             box-sizing: border-box; /* Ensures padding doesn't add to width */
-        }
-        .signature-pad-container {
-            border: 1px dashed #ccc;
-            margin-bottom: 15px;
-            position: relative;
-        }
-        #signature-canvas {
-            width: 100%;
-            height: 150px;
-            background-color: #f8f8f8;
-            cursor: crosshair;
-            display: block; /* Important for canvas dimensions */
-        }
-        .signature-buttons {
-            display: flex;
-            justify-content: space-between;
-        }
-         .pod-modal-actions {
-            margin-top: 20px;
-            display:flex;
-            justify-content: space-between;
-        }
-
-        .pod-modal-actions .delete-btn {
-            background-color: #F44336; /* Rojo */
-            color:white;
-             padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-         .pod-modal-actions .accept-pod-btn {
-            background-color: #4CAF50; /* Verde */
-            color:white;
-             padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
             padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
             border-radius: 4px;
             font-size:0.9em;
         }
-        .back-button:hover {
-            background-color: #5a6268;
+        .app-bar .user-actions button:hover { background-color: #FFB300; }
+
+        /* --- VISTA PRINCIPAL (POST-LOGIN) --- */
+        #app-view { padding: 20px 0; /* Removido padding lateral aquí, se maneja en .container */ }
+
+        /* BOTONES */
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            text-align:center;
         }
-        /* Iconos simples */
+        .btn-primary { background-color: #1A237E; color: white; }
+        .btn-primary:hover { background-color: #283593; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-success { background-color: #4CAF50; color: white; }
+        .btn-success:hover { background-color: #45a049; }
+        .btn-danger { background-color: #F44336; color: white; }
+        .btn-danger:hover { background-color: #D32F2F; }
+        .btn-warning { background-color: #FFC107; color: #333; }
+        .btn-warning:hover { background-color: #FFB300; }
+
+
+        /* LISTAS Y TARJETAS */
+        .item-list .item-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s ease;
+        }
+        .item-list .item-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .item-card h3 { margin-top: 0; color: #1A237E; }
+        .item-actions button, .item-actions a { margin-right: 5px; margin-bottom: 5px; }
+
+
+        /* DETALLE DE RUTA (Estilos base de la demo anterior, con ajustes) */
+        .route-detail-header {
+            background-color: #1A237E; color: white; padding: 15px;
+            border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;
+        }
+        .route-detail-header .driver-info { font-size: 1.2em; font-weight: bold; }
+        .route-detail-header .vehicle-info svg { margin-right: 5px; fill: white; }
+        .stops-list { list-style: none; padding: 0; background-color: white; border: 1px solid #ddd; border-top: none; margin-top:0; border-radius: 0 0 8px 8px; }
+        .stop-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: flex-start; flex-wrap: wrap;}
+        .stop-item:last-child { border-bottom: none; }
+        .stop-number { font-weight: bold; color: #1A237E; margin-right: 15px; font-size: 1.2em; width:30px; line-height: 1.2; }
+        .stop-info { flex-grow: 1; min-width:200px; margin-bottom:10px;}
+        .stop-address { font-weight: bold; font-size: 1.1em; }
+        .stop-sub-address { color: #555; font-size: 0.9em; }
+        .stop-actions-main { margin-top:5px; } /* Para agrupar acciones POD y Estado */
+        .stop-actions-main a { font-size: 0.9em; margin-right:10px; }
+        .stop-eta-window { text-align: right; min-width: 120px; flex-basis:120px; }
+        .stop-eta { font-weight: bold; color: #4CAF50; display: block; }
+        .stop-window { font-size: 0.8em; color: #777; }
+        #stop-status-display {font-size:0.8em; color: #888; margin-top:5px;}
+
+        .pod-thumbnail { max-width: 100px; max-height: 100px; border:1px solid #ccc; margin-top:5px; cursor:pointer; }
+
+        /* MAPA */
+        #routeMap { height: 300px; width:100%; border-radius: 8px; margin-bottom: 20px; border:1px solid #ccc;}
+        .map-placeholder-text {text-align:center; padding:20px; color:#777; font-style:italic;}
+
+
+        /* MODALES */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.6);
+            padding-top: 30px; padding-bottom: 30px;
+        }
+        .modal-content {
+            background-color: #fff; margin: 2% auto; padding: 25px;
+            border: 1px solid #888; width: 90%; max-width: 600px;
+            border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom:10px; border-bottom: 1px solid #eee; margin-bottom:20px; }
+        .modal-header h2 { margin:0; color: #1A237E; }
+        .close-button { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-row { display:flex; gap:15px; }
+        .form-row .form-group { flex:1; }
+        .modal-actions { margin-top: 20px; text-align: right; }
+        .modal-actions .btn { margin-left:10px; }
+
+
+        /* MODAL ACTUALIZAR ESTADO (reusado de demo anterior) */
+        .status-options label { display: block; margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; background-color: #f9f9f9; }
+        .status-options label:hover { background-color: #f0f0f0; }
+        .status-options input[type="radio"] { margin-right: 10px; vertical-align: middle; width:auto; }
+
+        /* MODAL PRUEBA DE ENTREGA (POD) (reusado de demo anterior, con ajustes) */
+        .signature-pad-container { border: 1px dashed #ccc; margin-bottom: 10px; position: relative; }
+        #signature-canvas { width: 100%; height: 150px; background-color: #f8f8f8; cursor: crosshair; display: block; }
+
+
+        /* Iconos (CSS Simple) */
         .icon-box::before { content: "📦"; margin-right: 5px; }
         .icon-check::before { content: "✔️"; margin-right: 5px; }
         .icon-cross::before { content: "❌"; margin-right: 5px; }
         .icon-pending::before { content: "⏳"; margin-right: 5px; }
+        .icon-truck::before { content: "🚚"; margin-right: 5px; fill: currentColor;}
+
+         /* Responsive */
+        @media (max-width: 600px) {
+            .stop-item { flex-direction: column; align-items: stretch; }
+            .stop-eta-window { text-align: left; margin-top:10px; }
+            .form-row { flex-direction: column; gap:0; }
+            .app-bar { flex-direction: column; gap:10px;}
+            .app-bar .logo {font-size:1.2em;}
+            .container { padding: 0 10px;}
+            .modal-content { width: 95%; margin-top: 20px; }
+        }
 
     </style>
 </head>
 <body>
 
-    <div class="app-bar">
-        <div class="logo">INRoute Demo</div>
-        <div class="user-info">Usuario: DemoUser</div>
-    </div>
+    <!-- Contenedor Principal de la App -->
+    <div id="app-root">
 
-    <div class="container">
-        <div id="main-view">
-            <!-- El contenido se cargará aquí por JS -->
+        <!-- VISTA DE LOGIN -->
+        <div id="login-view" class="container">
+            <div class="login-box">
+                <h2><span class="icon-truck"></span> INRoute Demo</h2>
+                <div id="login-error" class="error-message" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" value="demo">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" value="demo">
+                </div>
+                <button onclick="auth.login()">Iniciar Sesión</button>
+            </div>
+        </div>
+
+        <!-- VISTA DE LA APLICACIÓN (Post-Login) -->
+        <div id="app-view" style="display:none;">
+            <div class="app-bar">
+                <div class="logo"><span class="icon-truck"></span> INRoute Pro</div>
+                <div class="user-actions">
+                    <span id="currentUserDisplay" style="margin-right:15px;"></span>
+                    <button onclick="auth.logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+            <div class="container" id="main-content-area">
+                <!-- Contenido dinámico aquí -->
+            </div>
+        </div>
+
+    </div> <!-- Fin de #app-root -->
+
+
+    <!-- --- MODALES --- -->
+
+    <!-- Modal: Crear/Editar Ruta -->
+    <div id="routeFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="routeFormTitle">Crear Nueva Ruta</h2>
+                <span class="close-button" onclick="ui.closeModal('routeFormModal')">×</span>
+            </div>
+            <input type="hidden" id="routeIdEditable">
+            <div class="form-group">
+                <label for="routeFormDriver">Conductor:</label>
+                <input type="text" id="routeFormDriver" placeholder="Ej: Conductor 01">
+            </div>
+            <div class="form-group">
+                <label for="routeFormVehicle">Vehículo:</label>
+                <input type="text" id="routeFormVehicle" placeholder="Ej: VEH01">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('routeFormModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="handlers.saveRoute()">Guardar Ruta</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal para Actualizar Estado -->
+    <!-- Modal: Añadir/Editar Parada -->
+    <div id="stopFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="stopFormTitle">Añadir Nueva Parada</h2>
+                <span class="close-button" onclick="ui.closeModal('stopFormModal')">×</span>
+            </div>
+            <input type="hidden" id="stopFormRouteId">
+            <input type="hidden" id="stopIdEditable">
+            <div class="form-group">
+                <label for="stopFormAddress">Dirección:</label>
+                <input type="text" id="stopFormAddress" placeholder="Ej: Félix de Amesti 157">
+            </div>
+            <div class="form-group">
+                <label for="stopFormSubAddress">Detalles (Depto, Comuna):</label>
+                <input type="text" id="stopFormSubAddress" placeholder="Ej: Las Condes, Depto 63">
+            </div>
+            <div class="form-row">
+                 <div class="form-group">
+                    <label for="stopFormLat">Latitud (opcional):</label>
+                    <input type="number" step="any" id="stopFormLat" placeholder="Ej: -33.456">
+                </div>
+                <div class="form-group">
+                    <label for="stopFormLng">Longitud (opcional):</label>
+                    <input type="number" step="any" id="stopFormLng" placeholder="Ej: -70.678">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="stopFormETA">ETA (Hora Estimada):</label>
+                    <input type="time" id="stopFormETA">
+                </div>
+                <div class="form-group">
+                    <label for="stopFormWindowStart">Ventana Desde:</label>
+                    <input type="time" id="stopFormWindowStart">
+                </div>
+                <div class="form-group">
+                    <label for="stopFormWindowEnd">Ventana Hasta:</label>
+                    <input type="time" id="stopFormWindowEnd">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('stopFormModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="handlers.saveStop()">Guardar Parada</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Actualizar Estado de Parada (Reusado) -->
     <div id="updateStatusModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close-button" onclick="closeModal('updateStatusModal')">×</span>
-                <h2>Actualizar Estado del Pedido</h2>
+                <h2>Actualizar Estado del Pedido/Parada</h2>
+                <span class="close-button" onclick="ui.closeModal('updateStatusModal')">×</span>
             </div>
-            <p>Pedido ID: <span id="statusPedidoId"></span></p>
+            <p>ID Parada: <span id="statusStopIdDisplay"></span></p>
+            <input type="hidden" id="statusUpdateRouteId">
+            <input type="hidden" id="statusUpdateStopId">
             <div class="status-options">
-                <label><input type="radio" name="status" value="Accepted"> <span class="icon-box"></span>Aceptado</label>
-                <label><input type="radio" name="status" value="Partially"> <span class="icon-box"></span>Parcialmente</label> <!-- Podríamos necesitar otro icono -->
-                <label><input type="radio" name="status" value="Rejected"> <span class="icon-cross"></span>Rechazado</label>
-                <label><input type="radio" name="status" value="Pending"> <span class="icon-pending"></span>Pendiente</label>
+                <label><input type="radio" name="statusOption" value="Pendiente"> <span class="icon-pending"></span>Pendiente</label>
+                <label><input type="radio" name="statusOption" value="Entregado"> <span class="icon-check"></span>Entregado</label>
+                <label><input type="radio" name="statusOption" value="No Entregado"> <span class="icon-cross"></span>No Entregado</label>
+                <label><input type="radio" name="statusOption" value="Parcial"> <span class="icon-box"></span>Parcial</label>
             </div>
-            <textarea id="statusReason" placeholder="Elige una razón... (opcional)"></textarea>
+            <textarea id="statusReason" placeholder="Razón/Comentario (opcional)"></textarea>
             <div class="modal-actions">
-                <button class="cancel-btn" onclick="closeModal('updateStatusModal')">Cancelar</button>
-                <button class="accept-btn" onclick="submitStatusUpdate()">Aceptar</button>
+                <button class="btn btn-secondary" onclick="ui.closeModal('updateStatusModal')">Cancelar</button>
+                <button class="btn btn-success" onclick="handlers.submitStatusUpdate()">Aceptar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal para Prueba de Entrega (POD) -->
+    <!-- Modal: Prueba de Entrega (POD) (Reusado y Mejorado) -->
     <div id="podModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close-button" onclick="closeModal('podModal')">×</span>
                 <h2>Prueba de Entrega</h2>
+                <span class="close-button" onclick="ui.closeModal('podModal');pod.clearPODForm();">×</span>
             </div>
-            <p>Pedido ID: <span id="podPedidoId"></span></p>
-            <div class="pod-form">
-                <div class="pod-form-group">
-                    <label for="signedBy">Firmado por:</label>
-                    <input type="text" id="signedBy" name="signedBy">
+            <p>ID Parada: <span id="podStopIdDisplay"></span></p>
+            <input type="hidden" id="podRouteId">
+            <input type="hidden" id="podStopId">
+            <div class="form-group">
+                <label for="podSignedBy">Firmado por:</label>
+                <input type="text" id="podSignedBy">
+            </div>
+            <div class="form-group">
+                <label for="podRut">RUT/ID Receptor:</label>
+                <input type="text" id="podRut">
+            </div>
+            <div class="form-group">
+                <label for="podPhoto">Adjuntar Foto/Archivo (max 1MB, imagenes/pdf):</label>
+                <input type="file" id="podPhoto" accept="image/*,application/pdf">
+                <img id="podPhotoPreview" src="#" alt="Vista previa" style="max-width:100px; max-height:100px; display:none; margin-top:5px;"/>
+            </div>
+            <div class="form-group">
+                <label>Firma Digital:</label>
+                <div class="signature-pad-container">
+                    <canvas id="signature-canvas"></canvas>
                 </div>
-                <div class="pod-form-group">
-                    <label for="rut">RUT:</label>
-                    <input type="text" id="rut" name="rut">
-                </div>
-                <div class="pod-form-group">
-                    <label for="photoTest">Foto (simulado):</label>
-                    <input type="file" id="photoTest" name="photoTest">
-                </div>
-                <div class="pod-form-group">
-                    <label>Firma:</label>
-                    <div class="signature-pad-container">
-                        <canvas id="signature-canvas"></canvas>
-                    </div>
-                     <button onclick="clearSignature()" style="font-size:0.8em; padding:5px 10px; background-color:#777; color:white; border:none; border-radius:3px;">Limpiar Firma</button>
-                </div>
+                <button class="btn btn-secondary btn-sm" onclick="pod.clearSignature()">Limpiar Firma</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="ui.closeModal('podModal');pod.clearPODForm();">Cancelar</button>
+                <button class="btn btn-success" onclick="handlers.submitPOD()">Guardar POD</button>
+            </div>
+        </div>
+    </div>
 
-                <div class="pod-modal-actions">
-                    <button class="delete-btn" onclick="closeModal('podModal')">Eliminar</button> <!-- Asumiendo que "Delete" cierra sin guardar -->
-                    <button class="accept-pod-btn" onclick="submitPOD()">Aceptar</button>
-                </div>
+     <!-- Modal: Ver Prueba de Entrega (POD) -->
+    <div id="viewPodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalle Prueba de Entrega</h2>
+                <span class="close-button" onclick="ui.closeModal('viewPodModal')">×</span>
+            </div>
+            <p>ID Parada: <span id="viewPodStopIdDisplay"></span></p>
+            <div id="viewPodContent">
+                <!-- Contenido se carga aquí -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('viewPodModal')">Cerrar</button>
             </div>
         </div>
     </div>
 
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
     <script>
-        // --- DATOS DE EJEMPLO ---
-        const sampleRoutes = [
+    // --- CONFIGURACIÓN ---
+    const APP_STORAGE_KEY = 'routePlannerProData';
+    const AUTH_STORAGE_KEY = 'routePlannerProAuth';
+
+    // --- DATOS INICIALES (si localStorage está vacío) ---
+    const initialSampleData = {
+        routes: [
             {
-                id: "RUTA001",
-                driver: "Conductor 01",
-                vehicle: "VEH01",
+                id: "RUTA001", driver: "Conductor 01", vehicle: "VEH01",
                 stops: [
-                    { id: "S1-1", address: "Félix de Amesti 157", subAddress: "Las Condes", eta: "07:02", window: "07:00 - 16:00", status: "Pendiente" },
-                    { id: "S1-2", address: "Rosario Norte 400", subAddress: "depto 63, Las Condes", eta: "07:17", window: "07:00 - 16:00", status: "Pendiente" },
-                    { id: "S1-3", address: "Av. Las Condes 7026", subAddress: "Depto 707, Las Condes", eta: "07:32", window: "07:00 - 16:00", status: "Pendiente" },
-                    { id: "S1-4", address: "San Carlos de Apoquindo 994", subAddress: "Las Condes", eta: "07:56", window: "07:00 - 16:00", status: "Pendiente" },
-                    { id: "S1-5", address: "El Tatio 1550", subAddress: "Las Condes", eta: "08:20", window: "07:00 - 16:00", status: "Pendiente" }
-                ]
-            },
-            {
-                id: "RUTA002",
-                driver: "Conductor 02",
-                vehicle: "VEH02",
-                stops: [
-                    { id: "S2-1", address: "Av. Providencia 1100", subAddress: "Providencia", eta: "09:00", window: "09:00 - 17:00", status: "Pendiente" },
-                    { id: "S2-2", address: "Merced 350", subAddress: "Santiago Centro", eta: "09:25", window: "09:00 - 17:00", status: "Pendiente" }
+                    { id: "S1-1", address: "Félix de Amesti 157", subAddress: "Las Condes", lat: -33.4159, lng: -70.5658, eta: "07:02", windowStart: "07:00", windowEnd: "16:00", status: "Pendiente", pod: null },
+                    { id: "S1-2", address: "Rosario Norte 400", subAddress: "Las Condes", lat: -33.4080, lng: -70.5731, eta: "07:17", windowStart: "07:00", windowEnd: "16:00", status: "Pendiente", pod: null },
                 ]
             }
-        ];
+        ],
+        nextRouteId: 2, // Para generar RUTA002
+        nextStopIdGlobal: 3 // Para generar S1-3, S2-1, etc.
+    };
 
-        let currentRouteIdForModal = null; // Para saber qué parada se está actualizando
 
-        // --- MANEJO DE VISTAS ---
-        const mainView = document.getElementById('main-view');
+    // --- LÓGICA DE DATOS (localStorage) ---
+    const dataStore = {
+        _data: null,
 
-        function showRouteList() {
-            mainView.innerHTML = `
-                <h2>Rutas Disponibles</h2>
-                <div id="route-list-container"></div>
-                <div class="map-placeholder">
-                    Vista de Águila de Rutas (Simulada)<br>
-                    Aquí iría un mapa interactivo global.
-                </div>
-            `;
-            const routeListContainer = document.getElementById('route-list-container');
-            sampleRoutes.forEach(route => {
-                const routeElement = document.createElement('div');
-                routeElement.className = 'route-list-item';
-                routeElement.innerHTML = `
-                    <h3>${route.id}</h3>
-                    <p>Conductor: ${route.driver} | Vehículo: ${route.vehicle}</p>
-                    <p>Paradas: ${route.stops.length}</p>
-                `;
-                routeElement.onclick = () => showRouteDetail(route.id);
-                routeListContainer.appendChild(routeElement);
-            });
+        load: function() {
+            const storedData = localStorage.getItem(APP_STORAGE_KEY);
+            if (storedData) {
+                this._data = JSON.parse(storedData);
+            } else {
+                this._data = JSON.parse(JSON.stringify(initialSampleData)); // Deep copy
+                this.save();
+            }
+        },
+
+        save: function() {
+            localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(this._data));
+        },
+
+        getRoutes: function() { return this._data.routes; },
+        getRouteById: function(routeId) { return this._data.routes.find(r => r.id === routeId); },
+
+        addRoute: function(driver, vehicle) {
+            const newRouteIdNumeric = this._data.nextRouteId++;
+            const newRoute = {
+                id: `RUTA${String(newRouteIdNumeric).padStart(3, '0')}`,
+                driver: driver,
+                vehicle: vehicle,
+                stops: []
+            };
+            this._data.routes.push(newRoute);
+            this.save();
+            return newRoute;
+        },
+
+        updateRoute: function(routeId, driver, vehicle) {
+            const route = this.getRouteById(routeId);
+            if (route) {
+                route.driver = driver;
+                route.vehicle = vehicle;
+                this.save();
+            }
+        },
+
+        deleteRoute: function(routeId) {
+            this._data.routes = this._data.routes.filter(r => r.id !== routeId);
+            this.save();
+        },
+
+        addStopToRoute: function(routeId, stopData) {
+            const route = this.getRouteById(routeId);
+            if (route) {
+                const newStopIdNumeric = this._data.nextStopIdGlobal++;
+                // Simple unique ID logic: Route Prefix + Global ID
+                const routePrefix = routeId.replace('RUTA','R');
+                const newStop = {
+                    id: `S${routePrefix}-${newStopIdNumeric}`, // Ej: SR001-3
+                    ...stopData,
+                    status: "Pendiente",
+                    pod: null
+                };
+                route.stops.push(newStop);
+                this.save();
+                return newStop;
+            }
+        },
+        
+        updateStop: function(routeId, stopId, stopUpdates) {
+            const route = this.getRouteById(routeId);
+            if (route) {
+                const stop = route.stops.find(s => s.id === stopId);
+                if (stop) {
+                    Object.assign(stop, stopUpdates);
+                    this.save();
+                }
+            }
+        },
+
+        deleteStopFromRoute: function(routeId, stopId) {
+            const route = this.getRouteById(routeId);
+            if (route) {
+                route.stops = route.stops.filter(s => s.id !== stopId);
+                this.save();
+            }
+        },
+
+        getStopById: function(routeId, stopId) {
+            const route = this.getRouteById(routeId);
+            return route ? route.stops.find(s => s.id === stopId) : null;
         }
+    };
 
-        function showRouteDetail(routeId) {
-            const route = sampleRoutes.find(r => r.id === routeId);
-            if (!route) {
-                showRouteList(); // Volver a la lista si no se encuentra
-                return;
+
+    // --- LÓGICA DE AUTENTICACIÓN ---
+    const auth = {
+        currentUser: null,
+        login: function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.style.display = 'none';
+
+            // Simulación de login
+            if (username === 'demo' && password === 'demo') {
+                this.currentUser = username;
+                localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: this.currentUser }));
+                this.showAppView();
+            } else {
+                errorDiv.textContent = 'Usuario o contraseña incorrectos.';
+                errorDiv.style.display = 'block';
+            }
+        },
+
+        logout: function() {
+            this.currentUser = null;
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            this.showLoginView();
+        },
+
+        checkSession: function() {
+            const session = localStorage.getItem(AUTH_STORAGE_KEY);
+            if (session) {
+                this.currentUser = JSON.parse(session).username;
+                this.showAppView();
+            } else {
+                this.showLoginView();
+            }
+        },
+
+        showLoginView: function() {
+            document.getElementById('login-view').style.display = 'flex';
+            document.getElementById('app-view').style.display = 'none';
+        },
+
+        showAppView: function() {
+            document.getElementById('login-view').style.display = 'none';
+            document.getElementById('app-view').style.display = 'block';
+            document.getElementById('currentUserDisplay').textContent = `Usuario: ${this.currentUser}`;
+            ui.renderRouteList(); // Mostrar la lista de rutas al iniciar sesión
+        }
+    };
+
+    // --- LÓGICA DE UI Y RENDERIZADO ---
+    const ui = {
+        currentRouteId: null, // Para saber qué ruta se está viendo en detalle
+        mapInstance: null,
+
+        renderRouteList: function() {
+            const routes = dataStore.getRoutes();
+            let content = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2>Mis Rutas</h2>
+                    <button class="btn btn-primary" onclick="handlers.openRouteForm()">+ Nueva Ruta</button>
+                </div>
+                <div class="item-list">
+            `;
+            if (routes.length === 0) {
+                content += '<p>No hay rutas creadas. ¡Añade una!</p>';
+            } else {
+                routes.forEach(route => {
+                    content += `
+                        <div class="item-card">
+                            <h3>${route.id}</h3>
+                            <p><span class="icon-truck"></span> Conductor: ${route.driver || 'N/A'} | Vehículo: ${route.vehicle || 'N/A'}</p>
+                            <p>Paradas: ${route.stops.length}</p>
+                            <div class="item-actions">
+                                <button class="btn btn-primary btn-sm" onclick="ui.renderRouteDetail('${route.id}')">Ver Detalles</button>
+                                <button class="btn btn-warning btn-sm" onclick="handlers.openRouteForm('${route.id}')">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="handlers.deleteRoute('${route.id}')">Eliminar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            content += '</div>';
+            document.getElementById('main-content-area').innerHTML = content;
+        },
+
+        renderRouteDetail: function(routeId) {
+            this.currentRouteId = routeId;
+            const route = dataStore.getRouteById(routeId);
+            if (!route) { this.renderRouteList(); return; }
+
+            let stopsHtml = '';
+            if (route.stops.length === 0) {
+                stopsHtml = '<li class="stop-item" style="justify-content:center; padding:20px;">No hay paradas en esta ruta.</li>';
+            } else {
+                route.stops.forEach((stop, index) => {
+                    const podStatus = stop.pod ? `<img src="${stop.pod.signature || stop.pod.fileDataURL || 'placeholder.png'}" alt="POD" class="pod-thumbnail" onclick="handlers.openViewPodModal('${route.id}', '${stop.id}')">` : 'No';
+                    stopsHtml += `
+                        <li class="stop-item">
+                            <span class="stop-number">${index + 1}</span>
+                            <div class="stop-info">
+                                <div class="stop-address">${stop.address} ${stop.lat && stop.lng ? `(${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)})` : ''}</div>
+                                <div class="stop-sub-address">${stop.subAddress || ''}</div>
+                                <div id="stop-status-display-${stop.id}" style="font-size:0.8em; color: #555; margin-top:5px;">
+                                    Estado: ${stop.status || 'Pendiente'} ${stop.statusComment ? '('+stop.statusComment+')': ''}
+                                </div>
+                                <div style="font-size:0.8em; color: #555;">POD: ${podStatus}</div>
+                                <div class="stop-actions-main">
+                                    <a href="#" onclick="handlers.openUpdateStatusModal('${route.id}','${stop.id}')" class="btn btn-warning btn-xs" style="font-size:0.8em; padding:3px 8px;">Estado</a>
+                                    <a href="#" onclick="handlers.openPodModal('${route.id}','${stop.id}')" class="btn btn-success btn-xs" style="font-size:0.8em; padding:3px 8px;">POD</a>
+                                    <a href="#" onclick="handlers.openStopForm('${route.id}', '${stop.id}')" class="btn btn-secondary btn-xs" style="font-size:0.8em; padding:3px 8px;">Editar</a>
+                                    <a href="#" onclick="handlers.deleteStop('${route.id}', '${stop.id}')" class="btn btn-danger btn-xs" style="font-size:0.8em; padding:3px 8px;">Borrar</a>
+                                </div>
+                            </div>
+                            <div class="stop-eta-window">
+                                ${stop.eta ? `<span class="stop-eta">ETA ${stop.eta}</span>` : ''}
+                                ${stop.windowStart && stop.windowEnd ? `<span class="stop-window">${stop.windowStart} - ${stop.windowEnd}</span>` : ''}
+                            </div>
+                        </li>
+                    `;
+                });
             }
 
-            let stopsHtml = route.stops.map((stop, index) => `
-                <li class="stop-item">
-                    <span class="stop-number">${index + 1}</span>
-                    <div class="stop-info">
-                        <div class="stop-address">${stop.address}</div>
-                        <div class="stop-sub-address">${stop.subAddress}</div>
-                        <div>
-                            <small>
-                                <a href="#" onclick="openUpdateStatusModal('${stop.id}')" style="color: #1A237E; text-decoration: none;">Actualizar Estado</a> |
-                                <a href="#" onclick="openPodModal('${stop.id}')" style="color: #4CAF50; text-decoration: none;">Prueba de Entrega</a>
-                            </small>
-                        </div>
-                    </div>
-                    <div class="stop-eta-window">
-                        <span class="stop-eta">ETA ${stop.eta}</span>
-                        <span class="stop-window">${stop.window}</span>
-                        <div id="status-${stop.id}" style="font-size:0.8em; color: #888; margin-top:5px;">${stop.status}</div>
-                    </div>
-                </li>
-            `).join('');
-
-            mainView.innerHTML = `
-                <a href="#" onclick="showRouteList()" class="back-button">← Volver a Rutas</a>
+            const content = `
+                <div style="margin-bottom:15px;">
+                    <button class="btn btn-secondary btn-sm" onclick="ui.renderRouteList()">← Volver a Rutas</button>
+                </div>
+                <div id="routeMap"></div>
                 <div class="route-detail-card">
                     <div class="route-detail-header">
                         <div class="driver-info">${route.driver}</div>
                         <div class="vehicle-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h40L40-880h80l200 160h320q33 0 56.5 23.5T720-640v360q0 33-23.5 56.5T640-200H240L160-120Zm0-80h480v-360H160v360Zm190-80q21 0 35.5-14.5T400-330q0-21-14.5-35.5T350-380q-21 0-35.5 14.5T300-330q0 21 14.5 35.5T350-280Zm220 0q21 0 35.5-14.5T620-330q0-21-14.5-35.5T570-380q-21 0-35.5 14.5T520-330q0 21 14.5 35.5T570-280ZM160-200v-360 360Z"/></svg>
-                            ${route.vehicle}
+                           <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h40L40-880h80l200 160h320q33 0 56.5 23.5T720-640v360q0 33-23.5 56.5T640-200H240L160-120Zm0-80h480v-360H160v360Zm190-80q21 0 35.5-14.5T400-330q0-21-14.5-35.5T350-380q-21 0-35.5 14.5T300-330q0 21 14.5 35.5T350-280Zm220 0q21 0 35.5-14.5T620-330q0-21-14.5-35.5T570-380q-21 0-35.5 14.5T520-330q0 21 14.5 35.5T570-280ZM160-200v-360 360Z"/></svg>
+                           ${route.vehicle}
                         </div>
                     </div>
                     <ul class="stops-list">${stopsHtml}</ul>
-                    <div class="start-route-button-container">
-                       <button class="start-route-button">Iniciar Ruta</button>
+                    <div style="padding: 15px; background-color:white; border: 1px solid #ddd; border-top:none; border-radius:0 0 8px 8px; text-align:center;">
+                       <button class="btn btn-success" onclick="handlers.openStopForm('${route.id}')">+ Añadir Parada</button>
                     </div>
                 </div>
-                <br>
-                <div class="map-placeholder">
-                   Mapa de Ruta Específica (Simulado) para ${route.id}<br/>
-                   Aquí se mostraría el trazado de la ruta actual.
-                </div>
             `;
-        }
+            document.getElementById('main-content-area').innerHTML = content;
+            this.initRouteMap(route.stops);
+        },
+        
+        initRouteMap: function(stops) {
+            const mapContainer = document.getElementById('routeMap');
+            if (!mapContainer) return;
 
+            if (this.mapInstance) {
+                this.mapInstance.remove();
+            }
 
-        // --- LÓGICA DE MODALES ---
-        function openUpdateStatusModal(stopId) {
-            currentRouteIdForModal = stopId;
-            document.getElementById('statusPedidoId').textContent = stopId;
-            // Reset form
-            document.querySelectorAll('#updateStatusModal input[name="status"]').forEach(rb => rb.checked = false);
-            document.getElementById('statusReason').value = '';
-            document.getElementById('updateStatusModal').style.display = 'block';
-        }
+            // Centrar en Santiago de Chile si no hay paradas o no tienen lat/lng
+            let mapCenter = [-33.45694, -70.64827]; // Santiago
+            let zoomLevel = 6;
 
-        function openPodModal(stopId) {
-            currentRouteIdForModal = stopId;
-            document.getElementById('podPedidoId').textContent = stopId;
-            // Reset form
-            document.getElementById('signedBy').value = '';
-            document.getElementById('rut').value = '';
-            document.getElementById('photoTest').value = ''; // Reset file input
-            clearSignature();
-            document.getElementById('podModal').style.display = 'block';
-            initSignatureCanvas(); // Initialize or re-initialize canvas
-        }
+            const validStopsWithCoords = stops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function submitStatusUpdate() {
-            const selectedStatus = document.querySelector('#updateStatusModal input[name="status"]:checked');
-            const reason = document.getElementById('statusReason').value;
-            if (selectedStatus) {
-                console.log(`Estado actualizado para ${currentRouteIdForModal}: ${selectedStatus.value}, Razón: ${reason}`);
-                // Actualizar UI (simulado)
-                const statusElement = document.getElementById(`status-${currentRouteIdForModal}`);
-                if (statusElement) {
-                   let icon = "";
-                   if (selectedStatus.value === "Accepted") icon = "✔️ ";
-                   else if (selectedStatus.value === "Rejected") icon = "❌ ";
-                   else if (selectedStatus.value === "Pending") icon = "⏳ ";
-                   else if (selectedStatus.value === "Partially") icon = "📦 "; // (Reusando ícono por simplicidad)
-                   statusElement.textContent = icon + selectedStatus.value;
+            if (validStopsWithCoords.length > 0) {
+                mapCenter = [validStopsWithCoords[0].lat, validStopsWithCoords[0].lng];
+                zoomLevel = 13;
+                 // Para centrar entre todas las paradas
+                const bounds = L.latLngBounds(validStopsWithCoords.map(s => [s.lat, s.lng]));
+                if (bounds.isValid()) {
+                    mapCenter = bounds.getCenter();
                 }
-                 // Encontrar la parada y actualizar su estado en los datos de ejemplo (para persistencia en la sesión)
-                sampleRoutes.forEach(route => {
-                    const stop = route.stops.find(s => s.id === currentRouteIdForModal);
-                    if (stop) {
-                        stop.status = selectedStatus.value;
-                    }
-                });
+            }
 
-            } else {
-                alert("Por favor, selecciona un estado.");
+            this.mapInstance = L.map('routeMap').setView(mapCenter, zoomLevel);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(this.mapInstance);
+            
+            if (validStopsWithCoords.length === 0) {
+                mapContainer.innerHTML = '<div class="map-placeholder-text">No hay paradas con coordenadas para mostrar en el mapa. Añade lat/lon a las paradas.</div>';
+                 if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null;} // limpiar mapa si no hay nada
                 return;
             }
-            closeModal('updateStatusModal');
-        }
 
-        function submitPOD() {
-            const signedBy = document.getElementById('signedBy').value;
-            const rut = document.getElementById('rut').value;
-            // La foto y la firma son más complejas de "enviar" en esta demo.
-            // Para la firma, podríamos obtener el dataURL del canvas.
-            const signatureData = signatureCanvas.toDataURL(); // Esto se puede enviar/guardar
-
-            console.log(`POD para ${currentRouteIdForModal}: Firmado por ${signedBy}, RUT ${rut}. Foto (simulada). Firma guardada.`);
-            // Aquí se podría mostrar la firma o una miniatura de la foto.
-
-            alert(`Prueba de Entrega para ${currentRouteIdForModal} registrada (simulado).`);
-             // Actualizar UI (simulado)
-            const statusElement = document.getElementById(`status-${currentRouteIdForModal}`);
-            if (statusElement) {
-                statusElement.textContent = "✔️ Entregado (POD)";
-                statusElement.style.color = "green";
-            }
-            sampleRoutes.forEach(route => {
-                const stop = route.stops.find(s => s.id === currentRouteIdForModal);
-                if (stop) {
-                    stop.status = "Entregado (POD)";
-                }
+            const stopCoordinates = [];
+            validStopsWithCoords.forEach((stop, index) => {
+                L.marker([stop.lat, stop.lng])
+                    .addTo(this.mapInstance)
+                    .bindPopup(`<b>${index + 1}. ${stop.address}</b><br>${stop.subAddress || ''}<br>ETA: ${stop.eta || 'N/A'}`);
+                stopCoordinates.push([stop.lat, stop.lng]);
             });
-            closeModal('podModal');
-        }
 
-        // --- LÓGICA DE FIRMA EN CANVAS ---
-        let signatureCanvas, signatureCtx, drawing = false, lastPos;
-
-        function initSignatureCanvas() {
-            signatureCanvas = document.getElementById('signature-canvas');
-            if (!signatureCanvas) return;
-            signatureCtx = signatureCanvas.getContext('2d');
-
-            // Set display size (css pixels).
-            const style = getComputedStyle(signatureCanvas);
-            signatureCanvas.width = parseInt(style.width);
-            signatureCanvas.height = parseInt(style.height);
-
-            // Set actual size in memory (scaled to account for HDPI screens).
-            // This prevents blurry lines.
-            const dpr = window.devicePixelRatio || 1;
-            signatureCanvas.width = signatureCanvas.offsetWidth * dpr;
-            signatureCanvas.height = signatureCanvas.offsetHeight * dpr;
-            signatureCtx.scale(dpr, dpr);
-
-
-            signatureCtx.lineWidth = 2;
-            signatureCtx.lineCap = 'round';
-            signatureCtx.strokeStyle = '#333';
-
-            signatureCanvas.addEventListener('mousedown', startDrawing);
-            signatureCanvas.addEventListener('mouseup', stopDrawing);
-            signatureCanvas.addEventListener('mouseout', stopDrawing); // Stop if mouse leaves canvas
-            signatureCanvas.addEventListener('mousemove', draw);
-
-            // Touch events
-            signatureCanvas.addEventListener('touchstart', (e) => {
-                e.preventDefault(); // prevent scrolling
-                const touch = e.touches[0];
-                startDrawing(getMouseEvent(touch, signatureCanvas));
-            }, { passive: false });
-            signatureCanvas.addEventListener('touchend', (e) => {
-                 e.preventDefault();
-                 stopDrawing();
-            }, { passive: false });
-            signatureCanvas.addEventListener('touchmove', (e) => {
-                 e.preventDefault();
-                const touch = e.touches[0];
-                draw(getMouseEvent(touch, signatureCanvas));
-            }, { passive: false });
-        }
-
-        function getMouseEvent(touchEvent, canvasElement) {
-             const rect = canvasElement.getBoundingClientRect();
-             return { // Simular un evento de mouse
-                offsetX: touchEvent.clientX - rect.left,
-                offsetY: touchEvent.clientY - rect.top,
-                button: 0 // Asumir botón izquierdo para touch
-            };
-        }
-
-
-        function startDrawing(e) {
-            if (e.button !== 0) return; // Solo dibujar con click izquierdo
-            drawing = true;
-            lastPos = { x: e.offsetX, y: e.offsetY };
-            // signatureCtx.beginPath(); // No necesitas beginPath aquí para cada punto si quieres una linea continua
-        }
-
-        function stopDrawing() {
-            if (!drawing) return;
-            drawing = false;
-            signatureCtx.beginPath(); // Finaliza la ruta actual
-        }
-
-        function draw(e) {
-            if (!drawing) return;
-            signatureCtx.beginPath(); // Inicia una nueva sub-ruta para cada segmento
-            signatureCtx.moveTo(lastPos.x, lastPos.y);
-            signatureCtx.lineTo(e.offsetX, e.offsetY);
-            signatureCtx.stroke();
-            lastPos = { x: e.offsetX, y: e.offsetY };
-        }
-
-        function clearSignature() {
-            if (signatureCtx && signatureCanvas) {
-                signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+            if (stopCoordinates.length > 1) {
+                L.polyline(stopCoordinates, { color: 'blue' }).addTo(this.mapInstance);
+                this.mapInstance.fitBounds(stopCoordinates, {padding: [20, 20]});
+            } else if (stopCoordinates.length === 1) {
+                 this.mapInstance.setView(stopCoordinates[0], 15); // Centrar en la única parada con zoom
             }
-        }
+        },
+
+        openModal: function(modalId) { document.getElementById(modalId).style.display = 'block'; },
+        closeModal: function(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    };
+
+    // --- LÓGICA DE MANEJADORES DE EVENTOS Y ACCIONES ---
+    const handlers = {
+        openRouteForm: function(routeIdToEdit = null) {
+            const modal = document.getElementById('routeFormModal');
+            const title = document.getElementById('routeFormTitle');
+            const driverInput = document.getElementById('routeFormDriver');
+            const vehicleInput = document.getElementById('routeFormVehicle');
+            const idInput = document.getElementById('routeIdEditable');
+
+            if (routeIdToEdit) {
+                const route = dataStore.getRouteById(routeIdToEdit);
+                if (route) {
+                    title.textContent = `Editar Ruta: ${route.id}`;
+                    driverInput.value = route.driver;
+                    vehicleInput.value = route.vehicle;
+                    idInput.value = route.id;
+                }
+            } else {
+                title.textContent = 'Crear Nueva Ruta';
+                driverInput.value = '';
+                vehicleInput.value = '';
+                idInput.value = '';
+            }
+            ui.openModal('routeFormModal');
+        },
+
+        saveRoute: function() {
+            const driver = document.getElementById('routeFormDriver').value;
+            const vehicle = document.getElementById('routeFormVehicle').value;
+            const routeId = document.getElementById('routeIdEditable').value;
+
+            if (!driver.trim() || !vehicle.trim()) {
+                alert("Por favor, completa los campos de conductor y vehículo.");
+                return;
+            }
+
+            if (routeId) { // Editando
+                dataStore.updateRoute(routeId, driver, vehicle);
+            } else { // Creando
+                dataStore.addRoute(driver, vehicle);
+            }
+            ui.closeModal('routeFormModal');
+            ui.renderRouteList();
+        },
+
+        deleteRoute: function(routeId) {
+            if (confirm(`¿Estás seguro de que quieres eliminar la ruta ${routeId} y todas sus paradas?`)) {
+                dataStore.deleteRoute(routeId);
+                ui.renderRouteList();
+            }
+        },
+
+        openStopForm: function(routeId, stopIdToEdit = null) {
+            const modal = document.getElementById('stopFormModal');
+            const title = document.getElementById('stopFormTitle');
+            document.getElementById('stopFormRouteId').value = routeId; // Siempre necesitamos la ruta actual
+            document.getElementById('stopIdEditable').value = stopIdToEdit || '';
+
+            const address = document.getElementById('stopFormAddress');
+            const subAddress = document.getElementById('stopFormSubAddress');
+            const lat = document.getElementById('stopFormLat');
+            const lng = document.getElementById('stopFormLng');
+            const eta = document.getElementById('stopFormETA');
+            const windowStart = document.getElementById('stopFormWindowStart');
+            const windowEnd = document.getElementById('stopFormWindowEnd');
+            
+            if (stopIdToEdit) {
+                const stop = dataStore.getStopById(routeId, stopIdToEdit);
+                if (stop) {
+                    title.textContent = `Editar Parada: ${stop.id}`;
+                    address.value = stop.address;
+                    subAddress.value = stop.subAddress || '';
+                    lat.value = stop.lat || '';
+                    lng.value = stop.lng || '';
+                    eta.value = stop.eta || '';
+                    windowStart.value = stop.windowStart || '';
+                    windowEnd.value = stop.windowEnd || '';
+                }
+            } else { // Nueva parada
+                title.textContent = `Añadir Parada a ${routeId}`;
+                address.value = ''; subAddress.value = ''; lat.value = ''; lng.value = '';
+                eta.value = ''; windowStart.value = ''; windowEnd.value = '';
+            }
+            ui.openModal('stopFormModal');
+        },
+
+        saveStop: function() {
+            const routeId = document.getElementById('stopFormRouteId').value;
+            const stopId = document.getElementById('stopIdEditable').value;
+
+            const stopData = {
+                address: document.getElementById('stopFormAddress').value,
+                subAddress: document.getElementById('stopFormSubAddress').value,
+                lat: parseFloat(document.getElementById('stopFormLat').value) || null,
+                lng: parseFloat(document.getElementById('stopFormLng').value) || null,
+                eta: document.getElementById('stopFormETA').value,
+                windowStart: document.getElementById('stopFormWindowStart').value,
+                windowEnd: document.getElementById('stopFormWindowEnd').value
+            };
+
+            if (!stopData.address.trim()) {
+                alert("La dirección de la parada es obligatoria.");
+                return;
+            }
+
+            if(stopData.lat && isNaN(stopData.lat)) stopData.lat = null; // Limpiar si no es número válido
+            if(stopData.lng && isNaN(stopData.lng)) stopData.lng = null;
+
+            if (stopId) { // Editando
+                dataStore.updateStop(routeId, stopId, stopData);
+            } else { // Creando
+                dataStore.addStopToRoute(routeId, stopData);
+            }
+            ui.closeModal('stopFormModal');
+            ui.renderRouteDetail(routeId); // Re-renderizar detalle de la ruta actual
+        },
+
+        deleteStop: function(routeId, stopId) {
+             if (confirm(`¿Estás seguro de que quieres eliminar la parada ${stopId} de la ruta ${routeId}?`)) {
+                dataStore.deleteStopFromRoute(routeId, stopId);
+                ui.renderRouteDetail(routeId);
+            }
+        },
         
-        // Cargar vista inicial
-        window.onload = () => {
-            showRouteList();
-            // Cerrar modales si se hace clic fuera del contenido
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    closeModal(event.target.id);
+        openUpdateStatusModal: function(routeId, stopId) {
+            document.getElementById('statusUpdateRouteId').value = routeId;
+            document.getElementById('statusUpdateStopId').value = stopId;
+            document.getElementById('statusStopIdDisplay').textContent = stopId;
+
+            const stop = dataStore.getStopById(routeId, stopId);
+            if(stop && stop.status){
+                 const radio = document.querySelector(`#updateStatusModal input[name="statusOption"][value="${stop.status}"]`);
+                 if(radio) radio.checked = true; else document.querySelector(`#updateStatusModal input[name="statusOption"][value="Pendiente"]`).checked = true;
+                 document.getElementById('statusReason').value = stop.statusComment || '';
+            } else { // Default
+                 document.querySelector(`#updateStatusModal input[name="statusOption"][value="Pendiente"]`).checked = true;
+                 document.getElementById('statusReason').value = '';
+            }
+            ui.openModal('updateStatusModal');
+        },
+
+        submitStatusUpdate: function() {
+            const routeId = document.getElementById('statusUpdateRouteId').value;
+            const stopId = document.getElementById('statusUpdateStopId').value;
+            const selectedStatusRadio = document.querySelector('#updateStatusModal input[name="statusOption"]:checked');
+            const reason = document.getElementById('statusReason').value.trim();
+
+            if (selectedStatusRadio) {
+                dataStore.updateStop(routeId, stopId, { status: selectedStatusRadio.value, statusComment: reason });
+                ui.closeModal('updateStatusModal');
+                ui.renderRouteDetail(routeId);
+            } else {
+                alert("Por favor, selecciona un estado.");
+            }
+        },
+
+        openPodModal: function(routeId, stopId) {
+            pod.clearPODForm();
+            document.getElementById('podRouteId').value = routeId;
+            document.getElementById('podStopId').value = stopId;
+            document.getElementById('podStopIdDisplay').textContent = stopId;
+
+            const stop = dataStore.getStopById(routeId, stopId);
+             if (stop && stop.pod) { // Cargar datos existentes si hay
+                document.getElementById('podSignedBy').value = stop.pod.signedBy || '';
+                document.getElementById('podRut').value = stop.pod.rut || '';
+                // Previsualización de foto no implementada aquí al abrir, sólo al seleccionar
+                if(stop.pod.signature){ // Mostrar firma si existe (como si se acabara de dibujar)
+                    // Esta parte es compleja, la firma está como dataURL.
+                    // Podríamos cargarla en un <img> o re-dibujarla si fuera necesario,
+                    // pero para editar, mejor es borrar y re-firmar.
                 }
             }
-        };
+            pod.initSignatureCanvas();
+            ui.openModal('podModal');
+        },
+        
+        openViewPodModal: function(routeId, stopId) {
+            const stop = dataStore.getStopById(routeId, stopId);
+            document.getElementById('viewPodStopIdDisplay').textContent = stopId;
+            const contentDiv = document.getElementById('viewPodContent');
+            contentDiv.innerHTML = ''; // Limpiar
+
+            if (stop && stop.pod) {
+                let podHtml = `
+                    <p><strong>Firmado por:</strong> ${stop.pod.signedBy || 'N/A'}</p>
+                    <p><strong>RUT/ID:</strong> ${stop.pod.rut || 'N/A'}</p>
+                `;
+                if (stop.pod.signature) {
+                    podHtml += `<h4>Firma:</h4><img src="${stop.pod.signature}" alt="Firma" style="max-width:100%; border:1px solid #ccc;">`;
+                }
+                if (stop.pod.fileDataURL) {
+                    const fileType = stop.pod.fileType || '';
+                    if (fileType.startsWith('image/')) {
+                         podHtml += `<h4>Archivo Adjunto (Imagen):</h4><img src="${stop.pod.fileDataURL}" alt="Archivo adjunto" style="max-width:100%; border:1px solid #ccc;">`;
+                    } else if (fileType === 'application/pdf') {
+                         podHtml += `<h4>Archivo Adjunto (PDF):</h4><p><a href="${stop.pod.fileDataURL}" target="_blank" download="${stop.pod.fileName || 'archivo.pdf'}">Descargar PDF</a></p>
+                         <iframe src="${stop.pod.fileDataURL}" width="100%" height="300px" style="border:1px solid #ccc;"></iframe>`; // iframe para PDF puede no funcionar con dataURL en todos los navegadores por seguridad
+                    } else {
+                        podHtml += `<h4>Archivo Adjunto:</h4><p><a href="${stop.pod.fileDataURL}" download="${stop.pod.fileName || 'archivo'}">${stop.pod.fileName || 'Descargar Archivo'}</a> (${stop.pod.fileType})</p>`;
+                    }
+                }
+                 if (!stop.pod.signature && !stop.pod.fileDataURL) {
+                    podHtml += '<p>No hay firma ni archivo adjunto para esta entrega.</p>';
+                }
+                contentDiv.innerHTML = podHtml;
+
+            } else {
+                contentDiv.innerHTML = '<p>No se encontró Prueba de Entrega para esta parada.</p>';
+            }
+            ui.openModal('viewPodModal');
+        },
+
+        submitPOD: function() {
+            const routeId = document.getElementById('podRouteId').value;
+            const stopId = document.getElementById('podStopId').value;
+
+            const podData = {
+                signedBy: document.getElementById('podSignedBy').value.trim(),
+                rut: document.getElementById('podRut').value.trim(),
+                signature: pod.isSignatureCanvasEmpty() ? null : pod.signatureCanvas.toDataURL('image/png'),
+                fileDataURL: pod.currentFilePreviewDataURL, // Guardar DataURL del archivo
+                fileName: pod.currentFileName,
+                fileType: pod.currentFileType
+            };
+            
+            // Validar que al menos un campo POD exista
+            if (!podData.signedBy && !podData.rut && !podData.signature && !podData.fileDataURL) {
+                alert("Debe completar al menos un campo o firmar/adjuntar un archivo para la Prueba de Entrega.");
+                return;
+            }
+
+            dataStore.updateStop(routeId, stopId, { pod: podData, status: "Entregado (POD)" });
+            ui.closeModal('podModal');
+            pod.clearPODForm();
+            ui.renderRouteDetail(routeId);
+        }
+    };
+
+    // --- LÓGICA ESPECÍFICA DE PRUEBA DE ENTREGA (POD) ---
+    const pod = {
+        signatureCanvas: null,
+        signatureCtx: null,
+        drawing: false,
+        lastPos: null,
+        currentFilePreviewDataURL: null,
+        currentFileName: null,
+        currentFileType: null,
+
+
+        initSignatureCanvas: function() {
+            this.signatureCanvas = document.getElementById('signature-canvas');
+            if (!this.signatureCanvas) return;
+            this.signatureCtx = this.signatureCanvas.getContext('2d');
+            
+            const dpr = window.devicePixelRatio || 1;
+            // Get the actual style attribute and convert it to a number.
+            const styleWidth = +getComputedStyle(this.signatureCanvas).getPropertyValue("width").slice(0, -2);
+            const styleHeight = +getComputedStyle(this.signatureCanvas).getPropertyValue("height").slice(0, -2);
+            
+            this.signatureCanvas.width = styleWidth * dpr;
+            this.signatureCanvas.height = styleHeight * dpr;
+            this.signatureCtx.scale(dpr, dpr);
+            
+            this.signatureCtx.lineWidth = 2;
+            this.signatureCtx.lineCap = 'round';
+            this.signatureCtx.strokeStyle = '#333';
+            this.clearSignature(); // Limpiar al inicializar
+
+            this.signatureCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
+            this.signatureCanvas.addEventListener('mouseup', () => this.stopDrawing());
+            this.signatureCanvas.addEventListener('mouseout', () => this.stopDrawing());
+            this.signatureCanvas.addEventListener('mousemove', (e) => this.draw(e));
+            // Touch
+            this.signatureCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.startDrawing(this.getTouchPos(e));}, { passive: false });
+            this.signatureCanvas.addEventListener('touchend', (e) => { e.preventDefault(); this.stopDrawing();}, { passive: false });
+            this.signatureCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.draw(this.getTouchPos(e));}, { passive: false });
+        
+            // Manejador para la previsualización de fotos
+            const photoInput = document.getElementById('podPhoto');
+            const photoPreview = document.getElementById('podPhotoPreview');
+            photoInput.onchange = evt => {
+                const [file] = photoInput.files
+                if (file) {
+                    if (file.size > 1 * 1024 * 1024) { // Límite 1MB
+                        alert("El archivo es demasiado grande. Máximo 1MB.");
+                        photoInput.value = ""; // Limpiar selección
+                        photoPreview.style.display = 'none';
+                        this.currentFilePreviewDataURL = null;
+                        this.currentFileName = null;
+                        this.currentFileType = null;
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.currentFilePreviewDataURL = e.target.result;
+                        this.currentFileName = file.name;
+                        this.currentFileType = file.type;
+                        if(file.type.startsWith('image/')){
+                            photoPreview.src = this.currentFilePreviewDataURL;
+                            photoPreview.style.display = 'block';
+                        } else {
+                            photoPreview.style.display = 'none'; // No previsualizar si no es imagen directa (ej. PDF)
+                            // Pero el DataURL se guarda
+                            alert(`Archivo "${file.name}" seleccionado (${(file.size / 1024).toFixed(1)}KB). Se guardará su contenido.`);
+                        }
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    photoPreview.style.display = 'none';
+                    this.currentFilePreviewDataURL = null;
+                }
+            }
+        },
+        getTouchPos: function(touchEvent) {
+            const rect = this.signatureCanvas.getBoundingClientRect();
+            return {
+                offsetX: touchEvent.touches[0].clientX - rect.left,
+                offsetY: touchEvent.touches[0].clientY - rect.top
+            };
+        },
+
+        startDrawing: function(e) {
+            if (e.button && e.button !== 0) return; // Ignorar clicks no-izquierdos
+            this.drawing = true;
+            this.lastPos = { x: e.offsetX, y: e.offsetY };
+        },
+        stopDrawing: function() {
+            if (!this.drawing) return;
+            this.drawing = false;
+            this.signatureCtx.beginPath(); // Terminar línea actual
+        },
+        draw: function(e) {
+            if (!this.drawing) return;
+            this.signatureCtx.beginPath();
+            this.signatureCtx.moveTo(this.lastPos.x, this.lastPos.y);
+            this.signatureCtx.lineTo(e.offsetX, e.offsetY);
+            this.signatureCtx.stroke();
+            this.lastPos = { x: e.offsetX, y: e.offsetY };
+        },
+        clearSignature: function() {
+            if (this.signatureCtx && this.signatureCanvas) {
+                 this.signatureCtx.clearRect(0, 0, this.signatureCanvas.width / (window.devicePixelRatio || 1), this.signatureCanvas.height / (window.devicePixelRatio || 1) );
+            }
+        },
+         isSignatureCanvasEmpty: function() {
+            if (!this.signatureCanvas) return true;
+            // Comprobar si el canvas está vacío buscando pixeles no transparentes.
+            // Esto es una simplificación, para un canvas con fondo blanco, hay que verificar pixeles de firma
+            const pixelBuffer = new Uint32Array(
+                this.signatureCtx.getImageData(0, 0, this.signatureCanvas.width, this.signatureCanvas.height).data.buffer
+            );
+            // Check if all pixels are the background color or transparent
+            // For this demo, a simpler check: if the canvas has been drawn on at all, it might generate a non-trivial dataURL
+            // For practical purposes, if its DataURL is very short after header, it's likely empty.
+            // For robust check: sum all pixel data. if sum is 0 (or background color value sum), it's empty.
+            // However, the most practical check after drawing a few lines, its dataURL will not be equal to a clean canvas.
+             const cleanDataUrl = document.createElement('canvas').getContext('2d').canvas.toDataURL();
+             const currentDataUrl = this.signatureCanvas.toDataURL();
+             return currentDataUrl === cleanDataUrl; // Esto puede no ser perfecto
+        },
+        clearPODForm: function() {
+            document.getElementById('podSignedBy').value = '';
+            document.getElementById('podRut').value = '';
+            const photoInput = document.getElementById('podPhoto');
+            photoInput.value = ''; // Reset file input
+            const photoPreview = document.getElementById('podPhotoPreview');
+            photoPreview.style.display = 'none';
+            photoPreview.src = '#';
+            this.currentFilePreviewDataURL = null;
+            this.currentFileName = null;
+            this.currentFileType = null;
+            if (this.signatureCanvas) this.clearSignature();
+        }
+    };
+
+
+    // --- INICIALIZACIÓN ---
+    window.onload = () => {
+        dataStore.load();
+        auth.checkSession();
+
+        // Cerrar modales si se hace clic fuera del contenido (background)
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                ui.closeModal(event.target.id);
+                 if (event.target.id === 'podModal') pod.clearPODForm(); // Limpiar form de POD si se cierra por fuera
+            }
+        }
+    };
 
     </script>
 </body>
