@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificador de Rutas Pro v3 (Demo)</title>
+    <title>Planificador de Rutas Pro v2 (Demo)</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin=""/>
 
     <style>
-        /* CSS (Reusado y con pequeños ajustes si son necesarios para los nuevos elementos) */
-        /* ... (Mayormente igual a la v2) ... */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        /* --- CSS GENERAL (Reusado de la v1 con ajustes) --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; background-color: #f0f2f5; color: #333; line-height: 1.6;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
         .container { max-width: 900px; margin: 0 auto; padding: 0 15px; flex-grow: 1; }
         h1, h2, h3 { color: #1A237E; }
         button { cursor: pointer; font-family: inherit; }
         input, textarea, select { font-family: inherit; box-sizing: border-box; padding:10px; border:1px solid #ccc; border-radius:4px; width:100%; margin-bottom:10px;}
         textarea { min-height: 80px; }
 
+        /* --- LOGIN VIEW (Reusado) --- */
         #login-view { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; }
         .login-box { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
         .login-box h2 { text-align:center; margin-top:0; }
@@ -26,27 +30,31 @@
         .login-box button:hover { background-color: #283593; }
         .error-message { color: #D32F2F; font-size:0.9em; margin-bottom:10px; text-align:center;}
 
+        /* --- APP BAR / HEADER (Reusado) --- */
         .app-bar { background-color: #1A237E; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .app-bar .logo { font-size: 1.5em; font-weight: bold; }
         .app-bar .user-actions button { background-color: #FFC107; color: #333; border: none; padding: 8px 15px; border-radius: 4px; font-size:0.9em; }
         .app-bar .user-actions button:hover { background-color: #FFB300; }
         
+        /* --- BOTONES (Reusado) --- */
         .btn { padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; margin: 5px; text-decoration: none; display: inline-block; text-align:center;}
         .btn-primary { background-color: #1A237E; color: white; } .btn-primary:hover { background-color: #283593; }
         .btn-secondary { background-color: #6c757d; color: white; } .btn-secondary:hover { background-color: #5a6268; }
         .btn-success { background-color: #4CAF50; color: white; } .btn-success:hover { background-color: #45a049; }
         .btn-danger { background-color: #F44336; color: white; } .btn-danger:hover { background-color: #D32F2F; }
         .btn-warning { background-color: #FFC107; color: #333; } .btn-warning:hover { background-color: #FFB300; }
-        .btn-info { background-color: #17a2b8; color: white; } .btn-info:hover { background-color: #138496; }
         .btn-sm { padding: 5px 10px; font-size: 0.85em;}
         .btn-xs { padding: 3px 8px; font-size: 0.75em;}
 
+
+        /* LISTAS Y TARJETAS (Reusado) */
         .item-list .item-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: box-shadow 0.3s ease; }
         .item-list .item-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .item-card h3 { margin-top: 0; color: #1A237E; }
         .item-actions button, .item-actions a { margin-right: 5px; margin-bottom: 5px; }
 
-        .route-detail-header { background-color: #1A237E; color: white; padding: 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap;}
+        /* DETALLE DE RUTA */
+        .route-detail-header { background-color: #1A237E; color: white; padding: 15px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; }
         .stops-list { list-style: none; padding: 0; background-color: white; border: 1px solid #ddd; border-top: none; margin-top:0; border-radius: 0 0 8px 8px; }
         .stop-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; align-items: flex-start; }
         .stop-item:last-child { border-bottom: none; }
@@ -54,17 +62,23 @@
         .stop-info { flex-grow: 1; min-width:250px; margin-bottom:10px;}
         .stop-address { font-weight: bold; font-size: 1.1em; }
         .stop-sub-address, .stop-contact-info { color: #555; font-size: 0.9em; margin-top: 3px;}
-        .stop-actions-main { margin-top:8px; } .stop-actions-main .btn { margin-right:5px;}
+        .stop-actions-main { margin-top:8px; }
+        .stop-actions-main .btn { margin-right:5px;}
         .stop-eta-window { text-align: right; min-width: 120px; flex-basis:120px; margin-left:auto;}
         .pod-thumbnail { max-width: 60px; max-height: 60px; border:1px solid #ccc; margin-top:5px; cursor:pointer; vertical-align: middle; }
         #stop-status-display { font-size:0.85em; color: #555; margin-top:5px; }
         .pod-display-label { font-size:0.85em; color: #555;}
 
+
+        /* MAPA */
         #routeMapContainer { position: relative; margin-bottom: 20px; }
         #routeMap { height: 350px; width:100%; border-radius: 8px; border:1px solid #ccc;}
         .map-placeholder-text { text-align:center; padding:20px; color:#777; font-style:italic;}
-        .leaflet-routing-container { background-color: rgba(255,255,255,0.8); border-radius: 5px; padding: 5px; max-height: 300px; overflow-y: auto;}
+        /* Ajuste para que el control de ruteo se vea mejor */
+        .leaflet-routing-container { background-color: rgba(255,255,255,0.8); border-radius: 5px; padding: 5px; }
 
+
+        /* MODALES (Reusado y ajustado) */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); padding-top: 20px; padding-bottom: 20px;}
         .modal-content { background-color: #fff; margin: 1% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 700px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom:10px; border-bottom: 1px solid #eee; margin-bottom:20px; }
@@ -73,319 +87,697 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
         .form-row { display:flex; gap:15px; flex-wrap:wrap;}
-        .form-row .form-group { flex:1; min-width: calc(50% - 8px); }
-        .modal-actions { margin-top: 20px; text-align: right; } .modal-actions .btn { margin-left:10px; }
+        .form-row .form-group { flex:1; min-width: calc(50% - 8px); /* Ajusta para el gap */}
+        .modal-actions { margin-top: 20px; text-align: right; }
+        .modal-actions .btn { margin-left:10px; }
+
+        /* MODAL AÑADIR/EDITAR PARADA: MiniMapa */
         #stopLocationMap { height: 200px; width: 100%; border-radius: 4px; margin-bottom: 15px; border:1px solid #ccc; cursor: pointer; }
         .map-instructions { font-size:0.85em; color: #777; margin-top: -10px; margin-bottom:10px; }
-        #podLocationStatus { font-size:0.9em; margin-top:5px; color:#555; }
+
+        /* MODAL PRUEBA DE ENTREGA (POD): Geolocalización */
+        #podLocationStatus { font-size:0.9em; margin-top:10px; color:#555; }
         #podLocationInfo { font-size:0.8em; color: #777;}
         .signature-pad-container { border: 1px dashed #ccc; margin-bottom: 10px; position: relative; }
-        #signature-canvas { width: 100%; height: 150px; background-color: #f8f8f8; cursor: crosshair; display: block; touch-action: none; /* Crucial for touch events on canvas */}
+        #signature-canvas { width: 100%; height: 150px; background-color: #f8f8f8; cursor: crosshair; display: block; }
         #podPhotoPreview { max-width:100px; max-height:100px; display:none; margin-top:5px; border:1px solid #eee;}
+
+        /* Iconos */
         .icon-truck::before { content: "🚚"; margin-right: 5px;}
         .icon-pin::before { content: "📍"; margin-right: 3px;}
 
-        /* Report Modal */
-        #reportModal .modal-content {max-width: 800px;}
-        #reportTextPreview {
-            white-space: pre-wrap; /* Mantener saltos de línea */
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            padding: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9em;
+
+         /* Responsive */
+        @media (max-width: 768px) {
+            .form-row .form-group { min-width: 100%; }
+            .stop-item { flex-direction: column; align-items: stretch; }
+            .stop-eta-window { text-align: left; margin-top:10px; margin-left:0; }
+            .app-bar { flex-direction: column; gap:10px;}
         }
-
-        @media (max-width: 768px) { /* ... (igual) ... */ }
-        @media (max-width: 600px) { /* ... (igual) ... */ }
-
+         @media (max-width: 600px) {
+            .container { padding: 0 10px;}
+            .modal-content { width: 95%; margin-top: 10px; margin-bottom: 10px; padding:15px; }
+            .modal-header h2 { font-size: 1.2em; }
+        }
     </style>
 </head>
 <body>
-    <div id="app-root"> <!-- ... Contenido de Login y App-View igual que v2 ... --> </div>
+
+    <div id="app-root">
+        <div id="login-view" class="container"> /* Contenido de Login */ </div>
+        <div id="app-view" style="display:none;">
+            <div class="app-bar"> /* Contenido del App Bar */ </div>
+            <div class="container" id="main-content-area"> /* Contenido Dinámico */ </div>
+        </div>
+    </div>
 
     <!-- --- MODALES --- -->
     <!-- Modal: Crear/Editar Ruta (Reusado) -->
-    <div id="routeFormModal" class="modal"> <div class="modal-content"> <!-- HTML interno igual --> </div> </div>
-    <!-- Modal: Añadir/Editar Parada (Reusado con MiniMapa) -->
-    <div id="stopFormModal" class="modal"> <div class="modal-content"> <!-- HTML interno igual --> </div> </div>
-    <!-- Modal: Actualizar Estado de Parada (Reusado) -->
-    <div id="updateStatusModal" class="modal"> <div class="modal-content"> <!-- HTML interno igual --> </div> </div>
-    <!-- Modal: Prueba de Entrega (POD) (Reusado) -->
-    <div id="podModal" class="modal"> <div class="modal-content"> <!-- HTML interno igual --> </div> </div>
-    <!-- Modal: Ver Prueba de Entrega (POD) (Reusado) -->
-    <div id="viewPodModal" class="modal"> <div class="modal-content"> <!-- HTML interno igual --> </div> </div>
+    <div id="routeFormModal" class="modal"> <div class="modal-content"> /* ... */ </div> </div>
 
-    <!-- NUEVO Modal: Generar Reporte de Ruta -->
-    <div id="reportModal" class="modal">
+    <!-- Modal: Añadir/Editar Parada (Con MiniMapa y Nuevos Campos) -->
+    <div id="stopFormModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Reporte de Ruta Finalizada</h2>
-                <span class="close-button" onclick="ui.closeModal('reportModal')">×</span>
+                <h2 id="stopFormTitle">Añadir Nueva Parada</h2>
+                <span class="close-button" onclick="ui.closeModal('stopFormModal')">×</span>
             </div>
-            <h4>Ruta: <span id="reportRouteIdDisplay"></span></h4>
-            <p>A continuación se muestra el resumen de la ruta. Puedes enviarlo por WhatsApp o Correo.</p>
-            <div id="reportTextPreview" style="margin-bottom:15px;"></div>
+            <input type="hidden" id="stopFormRouteId">
+            <input type="hidden" id="stopIdEditable">
+            <div class="form-group">
+                <label for="stopFormAddress">Dirección Principal:</label>
+                <input type="text" id="stopFormAddress" placeholder="Ej: Av. Providencia 123">
+            </div>
+            <div class="form-group">
+                <label for="stopFormSubAddress">Detalles Adicionales (Comuna, Depto, Observaciones):</label>
+                <input type="text" id="stopFormSubAddress" placeholder="Ej: Providencia, Depto 101, Casa Roja">
+            </div>
+             <div class="form-row">
+                <div class="form-group">
+                    <label for="stopFormReceiverName">Nombre Receptor:</label>
+                    <input type="text" id="stopFormReceiverName" placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="stopFormContactPhone">Teléfono Contacto:</label>
+                    <input type="tel" id="stopFormContactPhone" placeholder="Ej: +56912345678">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="icon-pin"></span>Ubicación en Mapa (Lat/Lon):</label>
+                <div id="stopLocationMap"></div>
+                <p class="map-instructions">Haz clic en el mapa para establecer la ubicación. Arrastra el marcador si es necesario.</p>
+                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="stopFormLat">Latitud:</label>
+                        <input type="number" step="any" id="stopFormLat" placeholder="Automático por mapa">
+                    </div>
+                    <div class="form-group">
+                        <label for="stopFormLng">Longitud:</label>
+                        <input type="number" step="any" id="stopFormLng" placeholder="Automático por mapa">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="stopFormETA">ETA (Hora Estimada):</label> <input type="time" id="stopFormETA">
+                </div>
+                <div class="form-group">
+                    <label for="stopFormWindowStart">Ventana Desde:</label> <input type="time" id="stopFormWindowStart">
+                </div>
+                 <div class="form-group">
+                    <label for="stopFormWindowEnd">Ventana Hasta:</label> <input type="time" id="stopFormWindowEnd">
+                </div>
+            </div>
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="ui.closeModal('reportModal')">Cancelar</button>
-                <button id="sendWhatsAppReportBtn" class="btn btn-success">Enviar por WhatsApp</button>
-                <button id="sendEmailReportBtn" class="btn btn-info">Enviar por Correo</button>
+                <button class="btn btn-secondary" onclick="ui.closeModal('stopFormModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="handlers.saveStop()">Guardar Parada</button>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JS y Leaflet Routing Machine JS (igual) -->
+    <!-- Modal: Actualizar Estado de Parada (Reusado) -->
+    <div id="updateStatusModal" class="modal"> <div class="modal-content"> /* ... */ </div> </div>
+
+    <!-- Modal: Prueba de Entrega (POD) (Con Geolocalización) -->
+    <div id="podModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Prueba de Entrega</h2>
+                <span class="close-button" onclick="ui.closeModal('podModal');pod.clearPODForm();">×</span>
+            </div>
+            <p>ID Parada: <span id="podStopIdDisplay"></span></p>
+            <input type="hidden" id="podRouteId"> <input type="hidden" id="podStopId">
+            
+            <div class="form-group">
+                <label for="podSignedBy">Recibido por (Nombre Completo):</label>
+                <input type="text" id="podSignedBy">
+            </div>
+             <div class="form-group">
+                <label for="podRut">RUT/ID Receptor:</label>
+                <input type="text" id="podRut">
+            </div>
+
+            <div class="form-group">
+                 <label for="podLocation">Ubicación de Entrega:</label>
+                 <button class="btn btn-secondary btn-sm" onclick="pod.requestLocation()" style="margin-bottom:10px;">
+                    <span class="icon-pin"></span> Detectar Ubicación Actual
+                 </button>
+                 <div id="podLocationStatus"></div>
+                 <div id="podLocationInfo">Lat: N/A, Lon: N/A (Precisión: N/A)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="podPhoto">Adjuntar Foto/Archivo (max 1MB, imagenes/pdf):</label>
+                <input type="file" id="podPhoto" accept="image/*,application/pdf">
+                <img id="podPhotoPreview" src="#" alt="Vista previa"/>
+            </div>
+            <div class="form-group">
+                <label>Firma Digital:</label>
+                <div class="signature-pad-container"><canvas id="signature-canvas"></canvas></div>
+                <button class="btn btn-secondary btn-sm" onclick="pod.clearSignature()">Limpiar Firma</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="ui.closeModal('podModal');pod.clearPODForm();">Cancelar</button>
+                <button class="btn btn-success" onclick="handlers.submitPOD()">Guardar POD</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ver Prueba de Entrega (POD) (Reusado) -->
+    <div id="viewPodModal" class="modal"> <div class="modal-content"> /* ... */ </div> </div>
+
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <!-- Leaflet Routing Machine JS -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin=""></script>
 
     <script>
-    // --- CONFIGURACIÓN Y DATOS INICIALES (igual que v2) ---
-    const APP_STORAGE_KEY = 'routePlannerProData_v3';
-    const AUTH_STORAGE_KEY = 'routePlannerProAuth_v3';
-    const initialSampleData = { /* ... igual que v2 ... */ };
-    
-    // Rellenar modales abreviados (igual que v2)
-    document.addEventListener('DOMContentLoaded', () => { /* ... igual que v2 ... */});
+    // --- CONFIGURACIÓN Y DATOS INICIALES (reusados) ---
+    const APP_STORAGE_KEY = 'routePlannerProData_v2';
+    const AUTH_STORAGE_KEY = 'routePlannerProAuth_v2';
+    const initialSampleData = { // Actualizar con nuevos campos
+        routes: [
+            {
+                id: "RUTA001", driver: "Conductor Demo", vehicle: "DEMO01",
+                stops: [
+                    { id: "S_R001-1", address: "Plaza Baquedano", subAddress: "Santiago Centro", receiverName: "Juan Ejemplo", contactPhone: "987654321", lat: -33.4372, lng: -70.6346, eta: "09:00", windowStart: "09:00", windowEnd: "12:00", status: "Pendiente", statusComment: null, pod: null },
+                    { id: "S_R001-2", address: "Costanera Center", subAddress: "Providencia", receiverName: "Ana Muestra", contactPhone: "912345678", lat: -33.4175, lng: -70.6064, eta: "10:30", windowStart: "10:00", windowEnd: "14:00", status: "Pendiente", statusComment: null, pod: null },
+                ]
+            }
+        ],
+        nextRouteId: 2,
+        nextStopIdGlobal: 3
+    };
 
-    // --- LÓGICA DE DATOS (localStorage) (sin cambios respecto a v2) ---
-    const dataStore = { /* ... igual que v2 ... */ };
+    // Rellenar el contenido de los modales y vistas que fueron abreviados arriba con "/* ... */"
+    // Esta es una práctica común para mantener el ejemplo HTML más legible.
+    // En una implementación real, estos serían sus propios archivos o componentes.
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginViewHTML = `
+            <div class="login-box">
+                <h2><span class="icon-truck"></span> INRoute Pro</h2>
+                <div id="login-error" class="error-message" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" value="demo">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" value="demo">
+                </div>
+                <button onclick="auth.login()">Iniciar Sesión</button>
+            </div>`;
+        document.getElementById('login-view').innerHTML = loginViewHTML;
 
-    // --- LÓGICA DE AUTENTICACIÓN (sin cambios respecto a v2) ---
-    const auth = { /* ... igual que v2 ... */ };
+        const appViewHeaderHTML = `
+            <div class="logo"><span class="icon-truck"></span> INRoute Pro</div>
+            <div class="user-actions">
+                <span id="currentUserDisplay" style="margin-right:15px;"></span>
+                <button onclick="auth.logout()">Cerrar Sesión</button>
+            </div>`;
+        document.querySelector('#app-view .app-bar').innerHTML = appViewHeaderHTML;
+
+        const routeFormModalHTML = `
+            <div class="modal-header">
+                <h2 id="routeFormTitle">Crear Nueva Ruta</h2>
+                <span class="close-button" onclick="ui.closeModal('routeFormModal')">×</span>
+            </div>
+            <input type="hidden" id="routeIdEditable">
+            <div class="form-group">
+                <label for="routeFormDriver">Conductor:</label>
+                <input type="text" id="routeFormDriver" placeholder="Ej: Conductor 01">
+            </div>
+            <div class="form-group">
+                <label for="routeFormVehicle">Vehículo:</label>
+                <input type="text" id="routeFormVehicle" placeholder="Ej: VEH01">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('routeFormModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="handlers.saveRoute()">Guardar Ruta</button>
+            </div>`;
+        document.querySelector('#routeFormModal .modal-content').innerHTML = routeFormModalHTML;
+        
+        const updateStatusModalHTML = `
+            <div class="modal-header">
+                <h2>Actualizar Estado del Pedido/Parada</h2>
+                <span class="close-button" onclick="ui.closeModal('updateStatusModal')">×</span>
+            </div>
+            <p>ID Parada: <span id="statusStopIdDisplay"></span></p>
+            <input type="hidden" id="statusUpdateRouteId">
+            <input type="hidden" id="statusUpdateStopId">
+            <div class="status-options">
+                <label><input type="radio" name="statusOption" value="Pendiente"> Pendiente</label>
+                <label><input type="radio" name="statusOption" value="Entregado"> Entregado</label>
+                <label><input type="radio" name="statusOption" value="No Entregado"> No Entregado</label>
+                <label><input type="radio" name="statusOption" value="Parcial"> Parcial</label>
+            </div>
+            <textarea id="statusReason" placeholder="Razón/Comentario (opcional)"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('updateStatusModal')">Cancelar</button>
+                <button class="btn btn-success" onclick="handlers.submitStatusUpdate()">Aceptar</button>
+            </div>`;
+        document.querySelector('#updateStatusModal .modal-content').innerHTML = updateStatusModalHTML;
+
+        const viewPodModalHTML = `
+            <div class="modal-header">
+                <h2>Detalle Prueba de Entrega</h2>
+                <span class="close-button" onclick="ui.closeModal('viewPodModal')">×</span>
+            </div>
+            <p>ID Parada: <span id="viewPodStopIdDisplay"></span></p>
+            <div id="viewPodContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="ui.closeModal('viewPodModal')">Cerrar</button>
+            </div>`;
+        document.querySelector('#viewPodModal .modal-content').innerHTML = viewPodModalHTML;
+    });
+
+    // --- LÓGICA DE DATOS (localStorage) (actualizada para nuevos campos de parada) ---
+    const dataStore = {
+        _data: null, // ... (load, save, getRoutes, getRouteById, addRoute, updateRoute, deleteRoute sin cambios)
+        load: function() {
+            const storedData = localStorage.getItem(APP_STORAGE_KEY);
+            if (storedData) {
+                this._data = JSON.parse(storedData);
+                // Asegurar que los objetos de parada tengan los nuevos campos si se cargan datos viejos
+                this._data.routes.forEach(route => {
+                    route.stops.forEach(stop => {
+                        if (stop.receiverName === undefined) stop.receiverName = '';
+                        if (stop.contactPhone === undefined) stop.contactPhone = '';
+                        if (stop.pod && stop.pod.geolocation === undefined) stop.pod.geolocation = null;
+                    });
+                });
+
+            } else {
+                this._data = JSON.parse(JSON.stringify(initialSampleData));
+                this.save();
+            }
+        },
+        save: function() { localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(this._data)); },
+        getRoutes: function() { return this._data.routes; },
+        getRouteById: function(routeId) { return this._data.routes.find(r => r.id === routeId); },
+        addRoute: function(driver, vehicle) {
+            const newRouteIdNumeric = this._data.nextRouteId++;
+            const newRoute = { id: `RUTA${String(newRouteIdNumeric).padStart(3, '0')}`, driver, vehicle, stops: [] };
+            this._data.routes.push(newRoute); this.save(); return newRoute;
+        },
+        updateRoute: function(routeId, driver, vehicle) {
+            const route = this.getRouteById(routeId);
+            if (route) { route.driver = driver; route.vehicle = vehicle; this.save(); }
+        },
+        deleteRoute: function(routeId) {
+            this._data.routes = this._data.routes.filter(r => r.id !== routeId); this.save();
+        },
+        addStopToRoute: function(routeId, stopData) {
+            const route = this.getRouteById(routeId);
+            if (route) {
+                const newStopIdNumeric = this._data.nextStopIdGlobal++;
+                const routePrefix = routeId.replace('RUTA','_R');
+                const newStop = {
+                    id: `S${routePrefix}-${newStopIdNumeric}`,
+                    ...stopData, // incluye address, subAddress, receiverName, contactPhone, lat, lng, eta, windowStart, windowEnd
+                    status: "Pendiente", statusComment: null, pod: null
+                };
+                route.stops.push(newStop); this.save(); return newStop;
+            }
+        },
+        updateStop: function(routeId, stopId, stopUpdates) { // stopUpdates ahora puede tener más campos
+            const route = this.getRouteById(routeId);
+            if (route) {
+                const stop = route.stops.find(s => s.id === stopId);
+                if (stop) { Object.assign(stop, stopUpdates); this.save(); }
+            }
+        },
+        deleteStopFromRoute: function(routeId, stopId) { /* ... (sin cambios) */
+            const route = this.getRouteById(routeId);
+            if (route) { route.stops = route.stops.filter(s => s.id !== stopId); this.save(); }
+        },
+        getStopById: function(routeId, stopId) { /* ... (sin cambios) */
+            const route = this.getRouteById(routeId); return route ? route.stops.find(s => s.id === stopId) : null;
+        }
+    };
+
+    // --- LÓGICA DE AUTENTICACIÓN (sin cambios) ---
+    const auth = { /* ... */ 
+        currentUser: null,
+        login: function() {
+            const username = document.getElementById('username').value; const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error'); errorDiv.style.display = 'none';
+            if (username === 'demo' && password === 'demo') {
+                this.currentUser = username; localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: this.currentUser })); this.showAppView();
+            } else { errorDiv.textContent = 'Usuario o contraseña incorrectos.'; errorDiv.style.display = 'block'; }
+        },
+        logout: function() { this.currentUser = null; localStorage.removeItem(AUTH_STORAGE_KEY); this.showLoginView(); },
+        checkSession: function() {
+            const session = localStorage.getItem(AUTH_STORAGE_KEY);
+            if (session) { this.currentUser = JSON.parse(session).username; this.showAppView(); } else { this.showLoginView(); }
+        },
+        showLoginView: function() { document.getElementById('login-view').style.display = 'flex'; document.getElementById('app-view').style.display = 'none';},
+        showAppView: function() {
+            document.getElementById('login-view').style.display = 'none'; document.getElementById('app-view').style.display = 'block';
+            document.getElementById('currentUserDisplay').textContent = `Usuario: ${this.currentUser}`; ui.renderRouteList();
+        }
+    };
 
     // --- LÓGICA DE UI Y RENDERIZADO (actualizada) ---
     const ui = {
-        // ... (currentRouteId, mapInstance, routingControl, stopLocationMapInstance, stopLocationMarker igual) ...
-        renderRouteList: function() { /* ... igual que v2 ... */ },
+        currentRouteId: null,
+        mapInstance: null, // Para el mapa principal de la ruta
+        routingControl: null, // Para Leaflet Routing Machine
+        stopLocationMapInstance: null, // Para el minimapa en modal de parada
+        stopLocationMarker: null, // Marcador del minimapa
+
+        renderRouteList: function() { /* ... (actualizar si se muestra más info de parada en resumen) */
+            const routes = dataStore.getRoutes(); let content = `...`; // Contenido igual al anterior
+             content = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2>Mis Rutas</h2>
+                    <button class="btn btn-primary" onclick="handlers.openRouteForm()">+ Nueva Ruta</button>
+                </div> <div class="item-list">`;
+            if (routes.length === 0) { content += '<p>No hay rutas creadas. ¡Añade una!</p>'; }
+            else { routes.forEach(route => { content += `...`; }); } // HTML igual al anterior
+             routes.forEach(route => {
+                content += `
+                    <div class="item-card">
+                        <h3>${route.id}</h3>
+                        <p><span class="icon-truck"></span> Conductor: ${route.driver || 'N/A'} | Vehículo: ${route.vehicle || 'N/A'}</p>
+                        <p>Paradas: ${route.stops.length}</p>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-sm" onclick="ui.renderRouteDetail('${route.id}')">Ver Detalles</button>
+                            <button class="btn btn-warning btn-sm" onclick="handlers.openRouteForm('${route.id}')">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="handlers.deleteRoute('${route.id}')">Eliminar</button>
+                        </div></div>`;});
+            content += '</div>'; document.getElementById('main-content-area').innerHTML = content;
+        },
 
         renderRouteDetail: function(routeId) {
-            // ... (Lógica para construir `stopsHtml` igual que v2) ...
-            // Añadir el botón de "Finalizar y Reportar" al final del detalle de ruta
-            const route = dataStore.getRouteById(routeId);
-            const isAnyStopPending = route.stops.some(stop => stop.status === "Pendiente"); // Para habilitar/deshabilitar botón
-
-            const content = `
-                <!-- ... HTML del encabezado de detalle y mapa como en v2 ... -->
-                <div style="padding: 15px; background-color:white; border: 1px solid #ddd; border-top:none; border-radius:0 0 8px 8px; text-align:center; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-                   <button class="btn btn-success" onclick="handlers.openStopForm('${routeId}')">+ Añadir Parada</button>
-                   <button class="btn btn-info" onclick="handlers.openReportModal('${routeId}')" ${isAnyStopPending ? 'disabled title="Complete todas las paradas para reportar"' : ''}>Finalizar y Reportar Ruta</button>
-                </div>
-            `; // HTML completo con .route-detail-card etc.
-             // Llenar el contenido HTML de las secciones de app-view y los modales como antes.
-             // Este ejemplo solo se enfoca en los cambios a la función renderRouteDetail.
-            let mainContentArea = document.getElementById('main-content-area'); //Asumiendo que esto existe.
-            if (mainContentArea) { // Aquí iría el renderizado completo de la vista de detalle
-                // Esto es un placeholder. Debes integrar el `content` completo.
-                 mainContentArea.innerHTML = `
-                    <div style="margin-bottom:15px;">
-                        <button class="btn btn-secondary btn-sm" onclick="ui.renderRouteList()">← Volver a Rutas</button>
+            this.currentRouteId = routeId; const route = dataStore.getRouteById(routeId);
+            if (!route) { this.renderRouteList(); return; }
+            let stopsHtml = ''; // ... (HTML para cada parada, incluir receiverName y contactPhone)
+             route.stops.forEach((stop, index) => {
+                const podIcon = stop.pod ? `<img src="${(stop.pod.signature || stop.pod.fileDataURL) ? (stop.pod.fileType && stop.pod.fileType.startsWith('image/') ? stop.pod.fileDataURL : stop.pod.signature || 'placeholder.png') : 'placeholder.png'}" alt="POD" class="pod-thumbnail" onclick="handlers.openViewPodModal('${route.id}', '${stop.id}')">` : 'No';
+                stopsHtml += `
+                <li class="stop-item">
+                    <span class="stop-number">${index + 1}</span>
+                    <div class="stop-info">
+                        <div class="stop-address">${stop.address} ${stop.lat && stop.lng ? `(${stop.lat.toFixed(4)}, ${stop.lng.toFixed(4)})` : ''}</div>
+                        <div class="stop-sub-address">${stop.subAddress || ''}</div>
+                        <div class="stop-contact-info">Para: ${stop.receiverName || 'N/A'} / Tel: ${stop.contactPhone || 'N/A'}</div>
+                        <div id="stop-status-display-${stop.id}" class="stop-status-display">
+                            Estado: ${stop.status || 'Pendiente'} ${stop.statusComment ? '('+stop.statusComment+')': ''}
+                        </div>
+                        <div class="pod-display-label">POD: ${podIcon}</div>
+                        <div class="stop-actions-main">
+                            <button onclick="handlers.openUpdateStatusModal('${route.id}','${stop.id}')" class="btn btn-warning btn-xs">Estado</button>
+                            <button onclick="handlers.openPodModal('${route.id}','${stop.id}')" class="btn btn-success btn-xs">POD</button>
+                            <button onclick="handlers.openStopForm('${route.id}', '${stop.id}')" class="btn btn-secondary btn-xs">Editar</button>
+                            <button onclick="handlers.deleteStop('${route.id}', '${stop.id}')" class="btn btn-danger btn-xs">Borrar</button>
+                        </div>
                     </div>
-                    <div id="routeMapContainer"><div id="routeMap"></div></div>
-                    <div class="route-detail-card">
-                       <div class="route-detail-header">
-                            <div class="driver-info">${route.driver}</div>
-                            <div class="vehicle-info"> ${route.vehicle} </div>
-                       </div>
-                        <ul class="stops-list">${/*stopsHtml debe ser generado aquí*/}</ul>
-                        ${content} <!-- El div con los botones de Añadir Parada y Reportar -->
-                    </div>`;
+                    <div class="stop-eta-window">
+                        ${stop.eta ? `<span class="stop-eta">ETA ${stop.eta}</span>` : ''}
+                        ${stop.windowStart && stop.windowEnd ? `<span class="stop-window">${stop.windowStart} - ${stop.windowEnd}</span>` : ''}
+                    </div>
+                </li>`;
+            });
+
+            const content = `<!-- ... (HTML de encabezado de detalle de ruta igual) -->
+                <div style="margin-bottom:15px;"><button class="btn btn-secondary btn-sm" onclick="ui.renderRouteList()">← Volver a Rutas</button></div>
+                <div id="routeMapContainer"><div id="routeMap"></div></div>
+                <div class="route-detail-card">
+                   <div class="route-detail-header"> <!-- Igual --> </div>
+                    <ul class="stops-list">${stopsHtml}</ul>
+                    <div style="padding: 15px; background-color:white; border: 1px solid #ddd; border-top:none; border-radius:0 0 8px 8px; text-align:center;">
+                       <button class="btn btn-success" onclick="handlers.openStopForm('${route.id}')">+ Añadir Parada</button>
+                    </div>
+                </div>
+            `; // Header HTML igual
+            document.getElementById('main-content-area').innerHTML = content;
+            this.initRouteMapWithRouting(route.stops); // Usar ruteo
+        },
+        
+        initRouteMapWithRouting: function(stops) {
+            const mapContainer = document.getElementById('routeMap');
+            if (!mapContainer || !L.Routing) { mapContainer.innerHTML = '<p>Error al cargar componentes de mapa/ruteo.</p>'; return; }
+
+            if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null; }
+            if (this.routingControl) { this.routingControl = null; } // No tiene un método .remove() directo
+
+            const validStopsWithCoords = stops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+            
+            let mapCenter = [-33.45694, -70.64827]; // Santiago default
+            let zoomLevel = 10;
+
+            if (validStopsWithCoords.length > 0) {
+                const bounds = L.latLngBounds(validStopsWithCoords.map(s => [s.lat, s.lng]));
+                if (bounds.isValid()) { mapCenter = bounds.getCenter(); }
+            }
+            
+            this.mapInstance = L.map('routeMap').setView(mapCenter, zoomLevel);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
+            }).addTo(this.mapInstance);
+
+            if (validStopsWithCoords.length < 2) {
+                mapContainer.innerHTML = '<div class="map-placeholder-text">Se necesitan al menos 2 paradas con coordenadas para mostrar una ruta.</div>';
+                if(validStopsWithCoords.length === 1){ // Mostrar un marcador si hay 1 parada
+                     L.marker([validStopsWithCoords[0].lat, validStopsWithCoords[0].lng]).addTo(this.mapInstance)
+                        .bindPopup(`<b>${validStopsWithCoords[0].address}</b>`);
+                     this.mapInstance.setView([validStopsWithCoords[0].lat, validStopsWithCoords[0].lng], 14);
+                }
+                return;
             }
 
-            this.initRouteMapWithRouting(route.stops);
+            const waypoints = validStopsWithCoords.map(stop => L.latLng(stop.lat, stop.lng));
+
+            this.routingControl = L.Routing.control({
+                waypoints: waypoints,
+                routeWhileDragging: false, // Deshabilitado para simplificar la demo
+                showAlternatives: false,
+                lineOptions: { styles: [{color: 'blue', opacity: 0.8, weight: 5}] },
+                createMarker: function(i, waypoint, n) { // Personalizar marcadores
+                    const stop = validStopsWithCoords[i];
+                    return L.marker(waypoint.latLng, {
+                        draggable: false, // No hacerlos arrastrables en esta vista
+                        title: `${i+1}. ${stop.address}`
+                    }).bindPopup(`<b>${i+1}. ${stop.address}</b><br>${stop.subAddress||''}`);
+                },
+                 // Usar OSRM demo server (con limitaciones)
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1'
+                }),
+                fitSelectedRoutes: 'smart'
+            }).addTo(this.mapInstance);
+            
+            this.routingControl.on('routesfound', function(e) {
+                // Opcional: e.routes[0].summary contiene distancia y tiempo estimado
+                 console.log('Ruta encontrada:', e.routes[0].summary);
+            });
+            this.routingControl.on('routingerror', function(e) {
+                console.error("Error de ruteo:", e.error);
+                mapContainer.innerHTML += '<p style="color:red; text-align:center;">Error al calcular la ruta. El servidor de demo puede estar ocupado o las ubicaciones son inaccesibles.</p>';
+            });
         },
-        initRouteMapWithRouting: function(stops) { /* ... igual que v2 ... */ },
-        initStopLocationMap: function(lat, lng) { /* ... igual que v2 ... */ },
-        openModal: function(modalId) { /* ... igual que v2 ... */ },
-        closeModal: function(modalId) { /* ... igual que v2 ... */ }
+
+        initStopLocationMap: function(lat, lng) { // Para el modal de parada
+            const mapDiv = document.getElementById('stopLocationMap');
+            if (!mapDiv) return;
+
+            if (this.stopLocationMapInstance) { this.stopLocationMapInstance.remove(); }
+            
+            const initialCoords = (lat && lng) ? [lat, lng] : [-33.45694, -70.64827]; // Santiago default
+            const initialZoom = (lat && lng) ? 15 : 10;
+
+            this.stopLocationMapInstance = L.map(mapDiv).setView(initialCoords, initialZoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.stopLocationMapInstance);
+
+            if (this.stopLocationMarker) { this.stopLocationMarker.remove(); }
+            this.stopLocationMarker = L.marker(initialCoords, { draggable: true }).addTo(this.stopLocationMapInstance);
+
+            // Actualizar campos Lat/Lng al mover el marcador
+            this.stopLocationMarker.on('dragend', (event) => {
+                const position = event.target.getLatLng();
+                document.getElementById('stopFormLat').value = position.lat.toFixed(6);
+                document.getElementById('stopFormLng').value = position.lng.toFixed(6);
+            });
+            
+            // Actualizar marcador y campos al hacer clic en el mapa
+            this.stopLocationMapInstance.on('click', (event) => {
+                 const position = event.latlng;
+                 this.stopLocationMarker.setLatLng(position);
+                 document.getElementById('stopFormLat').value = position.lat.toFixed(6);
+                 document.getElementById('stopFormLng').value = position.lng.toFixed(6);
+            });
+
+            // Forzar el redibujado del mapa si el modal lo hace visible de forma abrupta
+            // Puede ser necesario si el mapa se inicializa mientras el div está display:none
+             setTimeout(() => {
+                if(this.stopLocationMapInstance) this.stopLocationMapInstance.invalidateSize();
+             }, 200); 
+        },
+
+        openModal: function(modalId) { /* ... */ document.getElementById(modalId).style.display = 'block'; },
+        closeModal: function(modalId) { /* ... */ document.getElementById(modalId).style.display = 'none'; }
     };
 
     // --- LÓGICA DE MANEJADORES DE EVENTOS Y ACCIONES (actualizada) ---
     const handlers = {
-        // ... (openRouteForm, saveRoute, deleteRoute, openStopForm, saveStop, deleteStop sin cambios importantes de v2) ...
-        // ... (openUpdateStatusModal, submitStatusUpdate, openViewPodModal sin cambios importantes de v2) ...
-        // ... (openPodModal, submitPOD necesitarán que `pod.currentGeolocation` se guarde)
+        openRouteForm: function(routeIdToEdit = null) { /* ... (sin cambios) */
+            const driverInput = document.getElementById('routeFormDriver'); vehicleInput = document.getElementById('routeFormVehicle'); idInput = document.getElementById('routeIdEditable');
+            if (routeIdToEdit) { /* ... */ } else { /* ... */ }
+            ui.openModal('routeFormModal');
+        },
+        saveRoute: function() { /* ... (sin cambios) */
+             const driver = document.getElementById('routeFormDriver').value, vehicle = document.getElementById('routeFormVehicle').value, routeId = document.getElementById('routeIdEditable').value;
+             if (routeId) dataStore.updateRoute(routeId, driver, vehicle); else dataStore.addRoute(driver, vehicle);
+             ui.closeModal('routeFormModal'); ui.renderRouteList();
+        },
+        deleteRoute: function(routeId) { /* ... (sin cambios) */
+             if (confirm(`Eliminar ${routeId}?`)) { dataStore.deleteRoute(routeId); ui.renderRouteList(); }
+        },
+        openStopForm: function(routeId, stopIdToEdit = null) {
+            // ... (Campos anteriores: address, subAddress, eta, windowStart, windowEnd)
+            const receiverName = document.getElementById('stopFormReceiverName');
+            const contactPhone = document.getElementById('stopFormContactPhone');
+            const latInput = document.getElementById('stopFormLat');
+            const lngInput = document.getElementById('stopFormLng');
+            // Limpiar o establecer valores ...
+            if (stopIdToEdit) {
+                const stop = dataStore.getStopById(routeId, stopIdToEdit); // ...
+                receiverName.value = stop.receiverName || '';
+                contactPhone.value = stop.contactPhone || '';
+                latInput.value = stop.lat || '';
+                lngInput.value = stop.lng || '';
+                ui.initStopLocationMap(stop.lat, stop.lng);
+            } else {
+                // ... Limpiar campos ...
+                receiverName.value = ''; contactPhone.value = '';
+                latInput.value = ''; lngInput.value = '';
+                ui.initStopLocationMap(null, null); // Mapa centrado por defecto
+            }
+             document.getElementById('stopFormRouteId').value = routeId; document.getElementById('stopIdEditable').value = stopIdToEdit || '';
+             const address = document.getElementById('stopFormAddress'), subAddress = document.getElementById('stopFormSubAddress'), eta = document.getElementById('stopFormETA'), windowStart = document.getElementById('stopFormWindowStart'), windowEnd = document.getElementById('stopFormWindowEnd');
+             if (stopIdToEdit) { /* ... */ } else { /* ... */ } // Logica de carga/limpieza de campos
+             ui.openModal('stopFormModal');
+             // Forzar un refresco del mapa del modal tras abrirlo
+            setTimeout(() => { if(ui.stopLocationMapInstance) ui.stopLocationMapInstance.invalidateSize();}, 10);
+        },
 
-        openReportModal: function(routeId) {
-            const route = dataStore.getRouteById(routeId);
-            if (!route) return;
-
-            document.getElementById('reportRouteIdDisplay').textContent = route.id;
-            
-            let reportText = `*** REPORTE DE RUTA FINALIZADA ***\n`;
-            reportText += `Ruta ID: ${route.id}\n`;
-            reportText += `Conductor: ${route.driver}\n`;
-            reportText += `Vehículo: ${route.vehicle}\n`;
-            reportText += `Fecha: ${new Date().toLocaleString()}\n\n`;
-            reportText += `--- DETALLE DE PARADAS ---\n`;
-
-            route.stops.forEach((stop, index) => {
-                reportText += `\nParada ${index + 1}: ${stop.address}\n`;
-                if(stop.subAddress) reportText += `  Detalles: ${stop.subAddress}\n`;
-                if(stop.receiverName) reportText += `  Receptor: ${stop.receiverName}\n`;
-                if(stop.contactPhone) reportText += `  Teléfono: ${stop.contactPhone}\n`;
-                reportText += `  Estado: ${stop.status || 'N/A'}`;
-                if(stop.statusComment) reportText += ` (${stop.statusComment})\n`; else reportText += `\n`;
-
-                if (stop.pod) {
-                    reportText += `  POD Registrado: Sí\n`;
-                    if (stop.pod.signedBy) reportText += `    Recibido por: ${stop.pod.signedBy}\n`;
-                    if (stop.pod.signature) reportText += `    Firma: Adjunta/Registrada\n`;
-                    if (stop.pod.fileDataURL) reportText += `    Archivo: Adjunto (${stop.pod.fileName || 'Archivo'})\n`;
-                    if (stop.pod.geolocation) {
-                        reportText += `    Ubic. POD: Lat ${stop.pod.geolocation.lat.toFixed(5)}, Lon ${stop.pod.geolocation.lng.toFixed(5)}\n`;
-                    }
-                } else {
-                    reportText += `  POD Registrado: No\n`;
-                }
-            });
-            reportText += `\n--- FIN DEL REPORTE ---`;
-
-            document.getElementById('reportTextPreview').textContent = reportText;
-
-            const whatsappBtn = document.getElementById('sendWhatsAppReportBtn');
-            const emailBtn = document.getElementById('sendEmailReportBtn');
-            
-            // Limpiar listeners anteriores para evitar múltiples envíos
-            whatsappBtn.onclick = null;
-            emailBtn.onclick = null;
-
-            whatsappBtn.onclick = () => {
-                const whatsappLink = `https://wa.me/?text=${encodeURIComponent(reportText)}`;
-                window.open(whatsappLink, '_blank');
+        saveStop: function() { // ... (Incluir receiverName, contactPhone)
+            const routeId = document.getElementById('stopFormRouteId').value;
+            const stopId = document.getElementById('stopIdEditable').value;
+            const stopData = { // ... (address, subAddress, eta, etc.)
+                address: document.getElementById('stopFormAddress').value, subAddress: document.getElementById('stopFormSubAddress').value,
+                receiverName: document.getElementById('stopFormReceiverName').value,
+                contactPhone: document.getElementById('stopFormContactPhone').value,
+                lat: parseFloat(document.getElementById('stopFormLat').value) || null,
+                lng: parseFloat(document.getElementById('stopFormLng').value) || null,
+                eta: document.getElementById('stopFormETA').value, windowStart: document.getElementById('stopFormWindowStart').value, windowEnd: document.getElementById('stopFormWindowEnd').value
             };
+            if (!stopData.address.trim()) { alert("La dirección es obligatoria."); return; }
+            if (stopId) dataStore.updateStop(routeId, stopId, stopData); else dataStore.addStopToRoute(routeId, stopData);
+            ui.closeModal('stopFormModal'); ui.renderRouteDetail(routeId);
+        },
+        deleteStop: function(routeId, stopId) { /* ... (sin cambios) */
+            if(confirm(`Eliminar parada ${stopId}?`)) { dataStore.deleteStopFromRoute(routeId, stopId); ui.renderRouteDetail(routeId);}
+        },
+        openUpdateStatusModal: function(routeId, stopId) { /* ... (sin cambios) */
+             document.getElementById('statusUpdateRouteId').value = routeId; document.getElementById('statusUpdateStopId').value = stopId; document.getElementById('statusStopIdDisplay').textContent = stopId;
+             ui.openModal('updateStatusModal');
+        },
+        submitStatusUpdate: function() { /* ... (sin cambios) */
+             const routeId = document.getElementById('statusUpdateRouteId').value, stopId = document.getElementById('statusUpdateStopId').value; const selectedStatusRadio = document.querySelector('#updateStatusModal input[name="statusOption"]:checked'); const reason = document.getElementById('statusReason').value.trim();
+             if (selectedStatusRadio) { dataStore.updateStop(routeId, stopId, { status: selectedStatusRadio.value, statusComment: reason }); ui.closeModal('updateStatusModal'); ui.renderRouteDetail(routeId); }
+             else { alert("Selecciona un estado."); }
+        },
+        openPodModal: function(routeId, stopId) { /* ... (sin cambios de apertura, pero POD ahora maneja geolocalización) */
+             pod.clearPODForm(); document.getElementById('podRouteId').value = routeId; document.getElementById('podStopId').value = stopId; document.getElementById('podStopIdDisplay').textContent = stopId;
+             const stop = dataStore.getStopById(routeId, stopId);
+             if(stop && stop.pod && stop.pod.signedBy) document.getElementById('podSignedBy').value = stop.pod.signedBy; // Autocompletar receptor si ya existe un POD
+             else if(stop && stop.receiverName) document.getElementById('podSignedBy').value = stop.receiverName; // Autocompletar con receiverName de la parada
 
-            emailBtn.onclick = () => {
-                const subject = `Reporte Ruta Finalizada: ${route.id}`;
-                const mailtoLink = `mailto:oficina@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(reportText)}`;
-                // window.open(mailtoLink); // Usar window.open puede ser bloqueado, mejor href
-                window.location.href = mailtoLink;
+             pod.initSignatureCanvas(); ui.openModal('podModal');
+        },
+        openViewPodModal: function(routeId, stopId) { // Mostrar coords de POD si existen
+             const stop = dataStore.getStopById(routeId, stopId); /* ... (resto sin cambios) ... */
+             document.getElementById('viewPodStopIdDisplay').textContent = stopId; const contentDiv = document.getElementById('viewPodContent'); contentDiv.innerHTML = '';
+             if(stop && stop.pod) {
+                 let podHtml = `<p><strong>Recibido por:</strong> ${stop.pod.signedBy || 'N/A'}</p> <p><strong>RUT/ID:</strong> ${stop.pod.rut || 'N/A'}</p>`;
+                 if (stop.pod.geolocation) {
+                    podHtml += `<p><strong>Ubicación POD:</strong> Lat: ${stop.pod.geolocation.lat.toFixed(5)}, Lon: ${stop.pod.geolocation.lng.toFixed(5)} (Precisión: ${stop.pod.geolocation.accuracy}m)</p>`;
+                 }
+                 /* ... (Resto del renderizado de firma e imagen del POD) ... */
+                 if(stop.pod.signature) { /* ... */ } if(stop.pod.fileDataURL) { /* ... */ }
+                 contentDiv.innerHTML = podHtml;
+             } else { contentDiv.innerHTML = "<p>No hay POD.</p>"; }
+             ui.openModal('viewPodModal');
+        },
+        submitPOD: function() { // ... (guardará las coordenadas POD si existen)
+            const routeId = document.getElementById('podRouteId').value; const stopId = document.getElementById('podStopId').value;
+            const podData = {
+                signedBy: document.getElementById('podSignedBy').value.trim(), rut: document.getElementById('podRut').value.trim(),
+                signature: pod.isSignatureCanvasEmpty() ? null : pod.signatureCanvas.toDataURL('image/png'),
+                fileDataURL: pod.currentFilePreviewDataURL, fileName: pod.currentFileName, fileType: pod.currentFileType,
+                geolocation: pod.currentGeolocation // Añadir geolocalización
             };
-            ui.openModal('reportModal');
+            if (!podData.signedBy && !podData.signature && !podData.fileDataURL) { alert("Debe completar al menos un campo o firmar/adjuntar archivo."); return; }
+            dataStore.updateStop(routeId, stopId, { pod: podData, status: "Entregado (POD)" });
+            ui.closeModal('podModal'); pod.clearPODForm(); ui.renderRouteDetail(routeId);
         }
     };
 
-    // --- LÓGICA ESPECÍFICA DE PRUEBA DE ENTREGA (POD) (actualizada firma y geoloc) ---
+    // --- LÓGICA ESPECÍFICA DE PRUEBA DE ENTREGA (POD) (actualizada con Geolocalización) ---
     const pod = {
-        // ... (currentFilePreviewDataURL, currentFileName, currentFileType, currentGeolocation) ...
-        signatureCanvas: null, signatureCtx: null, drawing: false, lastPos: {x:0, y:0}, // Inicializar lastPos
-        isDirty: false, // Para saber si se ha dibujado algo
+        // ... (signatureCanvas, signatureCtx, drawing, lastPos, fileData, fileName, fileType sin cambios)
+        currentGeolocation: null, // Para guardar las coordenadas detectadas
 
-        initSignatureCanvas: function() {
-            this.signatureCanvas = document.getElementById('signature-canvas');
-            if (!this.signatureCanvas) return;
-            this.signatureCtx = this.signatureCanvas.getContext('2d');
-            this.isDirty = false;
+        initSignatureCanvas: function() { /* ... (sin cambios) */ },
+        getTouchPos: function(touchEvent) { /* ... (sin cambios) */ },
+        startDrawing: function(e) { /* ... (sin cambios) */ },
+        stopDrawing: function() { /* ... (sin cambios) */ },
+        draw: function(e) { /* ... (sin cambios) */ },
+        clearSignature: function() { /* ... (sin cambios) */ },
+        isSignatureCanvasEmpty: function() { /* ... (sin cambios) */ return !this.signatureCanvas || this.signatureCanvas.toDataURL() === document.createElement('canvas').getContext('2d').canvas.toDataURL(); },
 
-            // Set display size (css pixels).
-            const style = getComputedStyle(this.signatureCanvas.parentElement); // Usar el contenedor para el ancho inicial
-            this.signatureCanvas.style.width = '100%'; // Que ocupe el 100% de su contenedor
-            this.signatureCanvas.style.height = '150px'; // Altura fija
-
-            // Set actual size in memory (scaled to account for HDPI screens).
-            const dpr = window.devicePixelRatio || 1;
-            // Importante: establecer el width/height del canvas después de que el estilo CSS lo haya definido
-            this.signatureCanvas.width = this.signatureCanvas.offsetWidth * dpr;
-            this.signatureCanvas.height = this.signatureCanvas.offsetHeight * dpr;
-            this.signatureCtx.scale(dpr, dpr);
-
-            this.signatureCtx.lineWidth = 2;
-            this.signatureCtx.lineCap = 'round';
-            this.signatureCtx.strokeStyle = '#000'; // Color negro para más visibilidad
-            this.clearSignature(true); // Limpiar al inicializar, 'true' para no marcar como dirty
-
-            // Remover listeners antiguos si existieran (más robusto si el modal se abre varias veces)
-            const newCanvas = this.signatureCanvas.cloneNode(true); // Clonar para quitar listeners de forma segura
-            this.signatureCanvas.parentNode.replaceChild(newCanvas, this.signatureCanvas);
-            this.signatureCanvas = newCanvas;
-            this.signatureCtx = this.signatureCanvas.getContext('2d'); // Reobtener contexto del clon
-            // Reaplicar propiedades tras clonar
-            this.signatureCtx.scale(dpr, dpr);
-            this.signatureCtx.lineWidth = 2; this.signatureCtx.lineCap = 'round'; this.signatureCtx.strokeStyle = '#000';
-
-            this.signatureCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
-            this.signatureCanvas.addEventListener('mouseup', () => this.stopDrawing());
-            this.signatureCanvas.addEventListener('mouseout', () => this.stopDrawing());
-            this.signatureCanvas.addEventListener('mousemove', (e) => this.draw(e));
-
-            this.signatureCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.startDrawing(this.getTouchPos(e));}, { passive: false });
-            this.signatureCanvas.addEventListener('touchend', (e) => { e.preventDefault(); this.stopDrawing();}, { passive: false });
-            this.signatureCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.draw(this.getTouchPos(e));}, { passive: false });
-
-            const photoInput = document.getElementById('podPhoto'); /* ... (manejador de foto igual) ... */
-        },
-        
-        getTouchPos: function(touchEvent) { /* ... igual que v2 ... */
-             const rect = this.signatureCanvas.getBoundingClientRect();
-             return { offsetX: touchEvent.touches[0].clientX - rect.left, offsetY: touchEvent.touches[0].clientY - rect.top };
-        },
-
-        startDrawing: function(e) { /* ... (añadir isDirty) ... */
-            this.drawing = true;
-            this.isDirty = true; // Se ha empezado a dibujar
-            this.lastPos = { x: e.offsetX, y: e.offsetY };
-            this.signatureCtx.beginPath(); // Comenzar una nueva ruta aquí
-            this.signatureCtx.moveTo(this.lastPos.x, this.lastPos.y);
-        },
-        stopDrawing: function() { this.drawing = false; this.signatureCtx.beginPath(); }, // Reset path
-        draw: function(e) {
-            if (!this.drawing) return;
-            this.signatureCtx.lineTo(e.offsetX, e.offsetY);
-            this.signatureCtx.stroke();
-            // No necesitas beginPath() aquí si es una línea continua desde el moveTo en startDrawing
-            // pero sí es bueno actualizar el lastPos
-             this.signatureCtx.beginPath(); // Prepara para el siguiente segmento si se levanta el lápiz momentáneamente
-             this.signatureCtx.moveTo(e.offsetX, e.offsetY); // La posición actual se convierte en el inicio del siguiente trazo si continúa
-            this.lastPos = { x: e.offsetX, y: e.offsetY }; // Actualizar para el siguiente `lineTo` si sigue `mousemove` sin `mouseup`
-        },
-        clearSignature: function(initializing = false) {
-            if (this.signatureCtx && this.signatureCanvas) {
-                 // El tamaño a limpiar debe ser el no escalado por DPR, ya que el scale lo maneja el canvas
-                 this.signatureCtx.clearRect(0, 0, this.signatureCanvas.width / (window.devicePixelRatio||1), this.signatureCanvas.height / (window.devicePixelRatio||1));
-            }
-            if (!initializing) this.isDirty = false; // Marcar como limpio si no es inicialización
-        },
-        isSignatureCanvasEmpty: function() { return !this.isDirty; },
-
-        clearPODForm: function() { /* ... (limpiar también currentGeolocation) ... */
-            // Resto igual a v2
+        clearPODForm: function() { // ... (Limpiar también currentGeolocation y su display)
+            document.getElementById('podSignedBy').value = ''; document.getElementById('podRut').value = '';
+            const photoInput = document.getElementById('podPhoto'); photoInput.value = '';
+            const photoPreview = document.getElementById('podPhotoPreview'); photoPreview.style.display = 'none'; photoPreview.src = '#';
+            this.currentFilePreviewDataURL = null; this.currentFileName = null; this.currentFileType = null;
+            if (this.signatureCanvas) this.clearSignature();
+            // Limpiar Geolocalización
             this.currentGeolocation = null;
-            document.getElementById('podLocationStatus').textContent = 'Pulsa el botón para detectar.';
-            document.getElementById('podLocationInfo').textContent = 'Lat: N/A, Lon: N/A';
+            document.getElementById('podLocationStatus').textContent = '';
+            document.getElementById('podLocationInfo').textContent = 'Lat: N/A, Lon: N/A (Precisión: N/A)';
         },
 
         requestLocation: function() {
             const statusDiv = document.getElementById('podLocationStatus');
             const infoDiv = document.getElementById('podLocationInfo');
-            statusDiv.textContent = 'Intentando obtener ubicación...';
-            infoDiv.textContent = 'Lat: ..., Lon: ... (Por favor, espera)';
-            this.currentGeolocation = null; 
+            statusDiv.textContent = 'Obteniendo ubicación...';
+            infoDiv.textContent = 'Lat: ..., Lon: ...';
+            this.currentGeolocation = null; // Resetear
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         this.currentGeolocation = {
-                            lat: position.coords.latitude, lng: position.coords.longitude,
-                            accuracy: position.coords.accuracy, timestamp: position.timestamp
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: position.timestamp
                         };
-                        statusDiv.textContent = 'Ubicación obtenida exitosamente.';
+                        statusDiv.textContent = 'Ubicación obtenida.';
                         infoDiv.textContent = `Lat: ${this.currentGeolocation.lat.toFixed(5)}, Lon: ${this.currentGeolocation.lng.toFixed(5)} (Precisión: ${this.currentGeolocation.accuracy.toFixed(0)}m)`;
                     },
                     (error) => {
-                        let errorMsg = '';
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED: errorMsg = "Permiso de ubicación denegado."; break;
-                            case error.POSITION_UNAVAILABLE: errorMsg = "Información de ubicación no disponible."; break;
-                            case error.TIMEOUT: errorMsg = "Timeout al obtener ubicación."; break;
-                            default: errorMsg = "Error desconocido al obtener ubicación."; break;
-                        }
-                        statusDiv.innerHTML = `Error: ${errorMsg} <button class="btn btn-warning btn-xs" onclick="pod.requestLocation()">Reintentar</button>`;
+                        statusDiv.textContent = `Error al obtener ubicación: ${error.message}`;
                         infoDiv.textContent = 'Lat: Error, Lon: Error';
-                        console.error("Error de Geolocalización:", error.code, error.message);
-                        this.currentGeolocation = { error: errorMsg };
+                        console.error("Error de Geolocalización:", error);
+                        this.currentGeolocation = { error: error.message }; // Guardar el error también
                     },
-                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 } // Timeout más largo, cache por 1min
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Opciones
                 );
             } else {
                 statusDiv.textContent = 'Geolocalización no es soportada por este navegador.';
@@ -395,7 +787,12 @@
     };
 
     // --- INICIALIZACIÓN (sin cambios) ---
-    window.onload = () => { /* ... igual que v2 ... */ };
+    window.onload = () => {
+        dataStore.load(); auth.checkSession();
+        window.onclick = function(event) { /* ... (manejo de cierre de modal al clickear afuera) ... */
+             if (event.target.classList.contains('modal')) { ui.closeModal(event.target.id); if (event.target.id === 'podModal') pod.clearPODForm(); }
+        }
+    };
     </script>
 </body>
-    </html>
+</html>
