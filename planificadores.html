@@ -1,328 +1,101 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificador de Rutas Pro (Demo Estable + Mejoras)</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    <!-- NO incluimos Leaflet Routing Machine por ahora para simplificar y volver a la estabilidad de v2 -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin=""/> -->
-    <style>
-        /* --- CSS Esencial (Similar a lo que tenías en v2.0) --- */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 15px; flex-grow: 1; }
-        h1, h2, h3 { color: #1A237E; }
-        button { cursor: pointer; font-family: inherit; }
-        input, textarea, select { font-family: inherit; box-sizing: border-box; padding:10px; border:1px solid #ccc; border-radius:4px; width:100%; margin-bottom:10px;}
-        textarea { min-height: 80px; }
-
-        #login-view { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; }
-        .login-box { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
-        
-        .app-bar { background-color: #1A237E; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-wrap:wrap;}
-        
-        .btn { padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; margin: 5px; text-decoration: none; display: inline-block; text-align:center;}
-        .btn-primary { background-color: #1A237E; color: white; }
-        .btn-success { background-color: #4CAF50; color: white; }
-        .btn-info { background-color: #17a2b8; color: white; }
-        .btn-warning { background-color: #FFC107; color: #333; }
-        .btn-danger { background-color: #F44336; color: white; }
-        .btn-secondary { background-color: #6c757d; color: white; }
-        .btn-sm { padding: 5px 10px; font-size: 0.85em;}
-        .btn-xs { padding: 3px 8px; font-size: 0.75em;}
-
-
-        .item-list .item-card { background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); padding-top: 20px; padding-bottom: 20px;}
-        .modal-content { background-color: #fff; margin: 2% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 700px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding-bottom:10px; border-bottom: 1px solid #eee; margin-bottom:20px; }
-        .modal-header h2 { margin:0; color: #1A237E; font-size: 1.4em; }
-        .close-button { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-
-        #routeMap { height: 300px; width:100%; border-radius: 8px; margin-bottom: 20px; border:1px solid #ccc;}
-        #stopLocationMap { height: 200px; width: 100%; border-radius: 4px; margin-bottom: 15px; border:1px solid #ccc; cursor: pointer; }
-        #signature-canvas { width: 100%; height: 150px; background-color: #f8f8f8; cursor: crosshair; display: block; touch-action: none; /* Evita scroll en touch */}
-        #podPhotoPreview { max-width:100px; max-height:100px; display:none; margin-top:5px; border:1px solid #eee;}
-        #reportModal .modal-content {max-width: 800px;}
-        #reportTextPreview { white-space: pre-wrap; background-color: #f9f9f9; border: 1px solid #eee; padding: 10px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9em; }
-        /* Otros estilos necesarios */
-    </style>
-</head>
-<body>
-    <div id="app-root">
-        <div id="login-view" class="container">
-             <div class="login-box">
-                <h2>INRoute Pro</h2>
-                <div id="login-error" class="error-message" style="display:none;"></div>
-                <div class="form-group"><label for="username">Usuario:</label><input type="text" id="username" value="demo"></div>
-                <div class="form-group"><label for="password">Contraseña:</label><input type="password" id="password" value="demo"></div>
-                <button onclick="auth.login()">Iniciar Sesión</button>
-            </div>
-        </div>
-        <div id="app-view" style="display:none;">
-            <div class="app-bar">
-                <div class="logo">INRoute Pro</div>
-                <div class="user-actions"><span id="currentUserDisplay" style="margin-right:15px;"></span><button onclick="auth.logout()">Cerrar Sesión</button></div>
-            </div>
-            <div class="container" id="main-content-area"></div>
-        </div>
-    </div>
-
-    <!-- Modales Estáticos -->
-    <div id="routeFormModal" class="modal"> /* ... (Contenido del modal como en v3.2) ... */ </div>
-    <div id="stopFormModal" class="modal"> /* ... (Contenido del modal como en v3.2, con stopLocationMap) ... */ </div>
-    <div id="updateStatusModal" class="modal"> /* ... (Contenido del modal como en v3.2) ... */ </div>
-    <div id="podModal" class="modal"> <!-- Contenido del modal POD (incluyendo signature-canvas y podLocationStatus/Info) --> 
-        <div class="modal-content">
-            <div class="modal-header"><h2>Prueba de Entrega</h2><span class="close-button" onclick="ui.closeModal('podModal');pod.clearPODForm();">×</span></div>
-            <p>Parada ID: <span id="podStopIdDisplay"></span></p><input type="hidden" id="podRouteId"><input type="hidden" id="podStopId">
-            <div class="form-group"><label for="podSignedBy">Recibido por:</label><input type="text" id="podSignedBy"></div>
-            <div class="form-group"><label for="podRut">RUT/ID Receptor:</label><input type="text" id="podRut"></div>
-            <div class="form-group">
-                <label for="podLocation">Ubicación Entrega:</label>
-                <button class="btn btn-secondary btn-sm" onclick="pod.requestLocation()"><span class="icon-pin"></span>Detectar Ubicación</button>
-                <div id="podLocationStatus">Pulsa para detectar.</div>
-                <div id="podLocationInfo">Lat: N/A, Lon: N/A</div>
-            </div>
-            <div class="form-group">
-                <label for="podPhoto">Adjuntar Foto/Archivo (max 1MB):</label>
-                <input type="file" id="podPhoto" accept="image/*,application/pdf">
-                <img id="podPhotoPreview" src="#">
-            </div>
-            <div class="form-group">
-                <label>Firma Digital:</label>
-                <div class="signature-pad-container"><canvas id="signature-canvas"></canvas></div>
-                <button class="btn btn-secondary btn-sm" onclick="pod.clearSignature()">Limpiar Firma</button>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-danger" onclick="ui.closeModal('podModal');pod.clearPODForm();">Cancelar</button>
-                <button class="btn btn-success" onclick="handlers.submitPOD()">Guardar POD</button>
-            </div>
-        </div>
-    </div>
-    <div id="viewPodModal" class="modal"> /* ... (Contenido del modal como en v3.2) ... */ </div>
-    <div id="reportModal" class="modal"> /* ... (Contenido del modal como en v3.2) ... */ </div>
-
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <!-- <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin=""></script> -->
-
     <script>
     // --- CONFIGURACIÓN Y DATOS INICIALES ---
-    const APP_STORAGE_KEY = 'routePlannerPro_Stable'; // Nueva key para esta versión estable
+    const APP_STORAGE_KEY = 'routePlannerPro_Stable';
     const AUTH_STORAGE_KEY = 'routePlannerProAuth_Stable';
-    const initialSampleData = { /* ... (como en la versión funcional, asegúrate que tenga los campos nuevos si son necesarios para las funciones que se añadirán) ... */
+    const initialSampleData = { /* ... tu initialSampleData ... */
         routes: [ { id: "RUTA001", driver: "Conductor Demo", vehicle: "DEMO01", stops: [ { id: "S_R001-1", address: "Plaza Italia", subAddress: "Providencia", receiverName: "Cliente A", contactPhone:"123", lat: -33.4372, lng: -70.6346, eta: "10:00", windowStart: "09:00", windowEnd: "17:00", status: "Pendiente", pod: null } ] } ], nextRouteId: 2, nextStopIdGlobal: 2
     };
 
-    // Rellenar el HTML de los modales que estaban abreviados (de v3.2, por ejemplo)
-    // Ejemplo para routeFormModal
-     document.addEventListener('DOMContentLoaded', () => { // Solo si algún modal aún no está completamente en el HTML de arriba
-        const routeFormContent = document.querySelector('#routeFormModal .modal-content');
-        if (routeFormContent && !routeFormContent.querySelector('.modal-header')) { // Solo llenar si está vacío
-            routeFormContent.innerHTML = `<div class="modal-header"><h2 id="routeFormTitle">Crear Ruta</h2><span class="close-button" onclick="ui.closeModal('routeFormModal')">×</span></div> <input type="hidden" id="routeIdEditable"> <div class="form-group"><label for="routeFormDriver">Conductor:</label><input type="text" id="routeFormDriver"></div> <div class="form-group"><label for="routeFormVehicle">Vehículo:</label><input type="text" id="routeFormVehicle"></div> <div class="modal-actions"><button class="btn btn-secondary" onclick="ui.closeModal('routeFormModal')">Cancelar</button><button class="btn btn-primary" onclick="handlers.saveRoute()">Guardar</button></div>`;
-        }
-        // Repetir para OTROS modales si no están completos en el HTML estático de arriba
-        // viewPodModal, reportModal, stopFormModal, updateStatusModal...
-    });
-
-
     // --- LÓGICA DE DATOS (localStorage) ---
-    const dataStore = { /* ... (De la v2.0 / v3.1 que funcionaba, con `load()` robusto) ... */ };
+    const dataStore = {
+        _data: null,
+        load: function() { try { const storedData = localStorage.getItem(APP_STORAGE_KEY); if (storedData) { this._data = JSON.parse(storedData); if (!this._data || !this._data.routes || !this._data.hasOwnProperty('nextRouteId') || !this._data.hasOwnProperty('nextStopIdGlobal')) { throw new Error("Estructura de datos principal faltante o corrupta."); } this._data.routes.forEach(route => { route.stops = route.stops || []; route.stops.forEach(stop => { if (stop.receiverName === undefined) stop.receiverName = ''; if (stop.contactPhone === undefined) stop.contactPhone = ''; stop.pod = stop.pod || null; if (stop.pod && stop.pod.geolocation === undefined) stop.pod.geolocation = null; stop.statusComment = stop.statusComment || null; }); }); } else { this._data = JSON.parse(JSON.stringify(initialSampleData)); this.save(); } } catch (error) { console.warn("Error cargando localStorage, reiniciando:", error); localStorage.removeItem(APP_STORAGE_KEY); this._data = JSON.parse(JSON.stringify(initialSampleData)); this.save(); } },
+        save: function() { localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(this._data)); },
+        getRoutes: function() { return this._data.routes; },
+        getRouteById: function(routeId) { return this._data.routes.find(r => r.id === routeId); },
+        addRoute: function(driver, vehicle) {  const newRouteIdNumeric = this._data.nextRouteId++; const newRoute = { id: `RUTA${String(newRouteIdNumeric).padStart(3, '0')}`, driver, vehicle, stops: [] }; this._data.routes.push(newRoute); this.save(); return newRoute; },
+        updateRoute: function(routeId, driver, vehicle) { const route = this.getRouteById(routeId); if (route) { route.driver = driver; route.vehicle = vehicle; this.save(); } },
+        deleteRoute: function(routeId) { this._data.routes = this._data.routes.filter(r => r.id !== routeId); this.save(); },
+        addStopToRoute: function(routeId, stopData) {  const route = this.getRouteById(routeId); if (route) { const newStopIdNumeric = this._data.nextStopIdGlobal++; const routePrefix = routeId.replace('RUTA','_R'); const newStop = { id: `S${routePrefix}-${newStopIdNumeric}`, ...stopData, status: "Pendiente", statusComment: null, pod: null }; route.stops.push(newStop); this.save(); return newStop; } },
+        updateStop: function(routeId, stopId, stopUpdates) { const route = this.getRouteById(routeId); if (route) { const stop = route.stops.find(s => s.id === stopId); if (stop) { Object.assign(stop, stopUpdates); this.save(); } } },
+        deleteStopFromRoute: function(routeId, stopId) { const route = this.getRouteById(routeId); if (route) { route.stops = route.stops.filter(s => s.id !== stopId); this.save(); } },
+        getStopById: function(routeId, stopId) { const route = this.getRouteById(routeId); return route ? route.stops.find(s => s.id === stopId) : null; }
+    };
+
     // --- LÓGICA DE AUTENTICACIÓN ---
-    const auth = { /* ... (De la v2.0 / v3.1 que funcionaba) ... */ };
+    const auth = {
+        currentUser: null,
+        login: function() { const username = document.getElementById('username').value; const password = document.getElementById('password').value; const errorDiv = document.getElementById('login-error'); errorDiv.style.display = 'none'; if (username === 'demo' && password === 'demo') { this.currentUser = username; localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username: this.currentUser })); this.showAppView(); } else { errorDiv.textContent = 'Usuario o contraseña incorrectos.'; errorDiv.style.display = 'block'; } },
+        logout: function() { this.currentUser = null; localStorage.removeItem(AUTH_STORAGE_KEY); this.showLoginView(); },
+        checkSession: function() { const session = localStorage.getItem(AUTH_STORAGE_KEY); if (session) { try { this.currentUser = JSON.parse(session).username; this.showAppView(); } catch(e){ console.warn("Sesión corrupta, limpiando."); localStorage.removeItem(AUTH_STORAGE_KEY); this.showLoginView(); } } else { this.showLoginView(); } },
+        showLoginView: function() { const lv = document.getElementById('login-view'); if(lv) lv.style.display = 'flex'; const av = document.getElementById('app-view'); if(av) av.style.display = 'none';},
+        showAppView: function() { const lv = document.getElementById('login-view'); if(lv) lv.style.display = 'none'; const av = document.getElementById('app-view'); if(av) av.style.display = 'block'; const cu = document.getElementById('currentUserDisplay'); if(cu) cu.textContent = `Usuario: ${this.currentUser}`; if(typeof ui !== 'undefined' && ui.renderRouteList) ui.renderRouteList(); else console.error("ui.renderRouteList no está disponible en showAppView");}
+    };
+
     // --- LÓGICA DE UI Y RENDERIZADO ---
     const ui = {
-        // ...
-        initRouteMap: function(stops) { // ESTA ES LA VERSIÓN SIN RUTEO REAL, SOLO LÍNEAS Y MARCADORES
-            const mapContainer = document.getElementById('routeMap');
-            if (!mapContainer) return;
-            if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null; }
-
-            let mapCenter = [-33.45694, -70.64827]; let zoomLevel = 10;
-            const validStopsWithCoords = stops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
-
-            if (validStopsWithCoords.length > 0) {
-                const bounds = L.latLngBounds(validStopsWithCoords.map(s => [s.lat, s.lng]));
-                if (bounds.isValid()) { mapCenter = bounds.getCenter(); }
-            }
-            this.mapInstance = L.map('routeMap').setView(mapCenter, zoomLevel);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(this.mapInstance);
-
-            if (validStopsWithCoords.length === 0) {
-                if(mapContainer) mapContainer.innerHTML = '<div style="text-align:center;padding:20px;">No hay paradas con coordenadas.</div>'; return;
-            }
-            const stopCoordinates = [];
-            validStopsWithCoords.forEach((stop, index) => {
-                L.marker([stop.lat, stop.lng]).addTo(this.mapInstance)
-                    .bindPopup(`<b>${index + 1}. ${stop.address}</b>`);
-                stopCoordinates.push([stop.lat, stop.lng]);
-            });
-            if (stopCoordinates.length > 1) {
-                L.polyline(stopCoordinates, { color: 'red' }).addTo(this.mapInstance); // Línea directa
-                this.mapInstance.fitBounds(stopCoordinates, {padding: [30, 30]});
-            } else if (stopCoordinates.length === 1) {
-                this.mapInstance.setView(stopCoordinates[0], 14);
-            }
-        },
-        initStopLocationMap: function(lat,lng) { /* ... (Igual que v3.2, asegurando invalidateSize) ... */},
-        openModal: function(modalId) { const modal = document.getElementById(modalId); if(modal) modal.style.display = 'block'; else console.error("Modal no encontrado: " + modalId);},
-        closeModal: function(modalId) { const modal = document.getElementById(modalId); if(modal) modal.style.display = 'none';}
-        // ... ui.renderRouteList, ui.renderRouteDetail (modificadas para no usar RoutingMachine por ahora)
+        currentRouteId: null, mapInstance: null, routingControl: null, stopLocationMapInstance: null, stopLocationMarker: null,
+        renderRouteList: function() { const routes = dataStore.getRoutes(); let content = ''; const mainContentArea = document.getElementById('main-content-area'); if(!mainContentArea) {console.error("main-content-area no encontrado"); return;} content = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;"><h2>Mis Rutas</h2><button class="btn btn-primary" onclick="handlers.openRouteForm()">+ Nueva Ruta</button></div><div class="item-list">`; if (routes.length === 0) { content += '<p>No hay rutas creadas.</p>'; } else { routes.forEach(route => { content += `<div class="item-card"><h3>${route.id}</h3><p><span class="icon-truck"></span> C: ${route.driver || 'N/A'} | V: ${route.vehicle || 'N/A'}</p><p>Paradas: ${route.stops.length}</p><div class="item-actions"><button class="btn btn-primary btn-sm" onclick="ui.renderRouteDetail('${route.id}')">Ver</button><button class="btn btn-warning btn-sm" onclick="handlers.openRouteForm('${route.id}')">Editar</button><button class="btn btn-danger btn-sm" onclick="handlers.deleteRoute('${route.id}')">X</button></div></div>`;}); } content += '</div>'; mainContentArea.innerHTML = content; },
+        renderRouteDetail: function(routeId) { this.currentRouteId = routeId; const route = dataStore.getRouteById(routeId); if (!route) { this.renderRouteList(); return; } let stopsHtml = ''; if (route.stops.length === 0) { stopsHtml = '<li class="stop-item" style="justify-content:center; padding:20px;">No hay paradas.</li>'; } else { route.stops.forEach((stop, index) => { const podIcon = stop.pod ? `<img src="${(stop.pod.signature || (stop.pod.fileType && stop.pod.fileType.startsWith('image/') ? stop.pod.fileDataURL : null) || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')}" alt="POD" class="pod-thumbnail" onclick="handlers.openViewPodModal('${route.id}', '${stop.id}')">` : 'No'; stopsHtml += `<li class="stop-item"><span class="stop-number">${index + 1}</span><div class="stop-info"><div class="stop-address">${stop.address} ${stop.lat && stop.lng ? `(${stop.lat.toFixed(4)},${stop.lng.toFixed(4)})` : ''}</div><div class="stop-sub-address">${stop.subAddress||''}</div><div class="stop-contact-info">Para: ${stop.receiverName||'N/A'} / Tel: ${stop.contactPhone||'N/A'}</div><div class="stop-status-display">Estado: ${stop.status||'Pendiente'} ${stop.statusComment?'('+stop.statusComment+')':''}</div><div class="pod-display-label">POD: ${podIcon}</div><div class="stop-actions-main"><button onclick="handlers.openUpdateStatusModal('${route.id}','${stop.id}')" class="btn btn-warning btn-xs">Estado</button><button onclick="handlers.openPodModal('${route.id}','${stop.id}')" class="btn btn-success btn-xs">POD</button><button onclick="handlers.openStopForm('${route.id}','${stop.id}')" class="btn btn-secondary btn-xs">Editar</button><button onclick="handlers.deleteStop('${route.id}','${stop.id}')" class="btn btn-danger btn-xs">X</button></div></div><div class="stop-eta-window">${stop.eta?`<span class="stop-eta">ETA ${stop.eta}</span>`:''} ${stop.windowStart&&stop.windowEnd?`<span class="stop-window">${stop.windowStart} - ${stop.windowEnd}</span>`:''}</div></li>`;});} const isAnyStopPending = route.stops.some(stop => stop.status === "Pendiente"); const mainContentArea = document.getElementById('main-content-area'); mainContentArea.innerHTML = `<div style="margin-bottom:15px;"><button class="btn btn-secondary btn-sm" onclick="ui.renderRouteList()">← Rutas</button></div><div id="routeMapContainer"><div id="routeMap"></div></div><div class="route-detail-card"><div class="route-detail-header"><div class="driver-info">${route.driver} (${route.id})</div><div class="vehicle-info"> ${route.vehicle} </div></div><ul class="stops-list">${stopsHtml}</ul><div style="padding:15px;background-color:white;border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;text-align:center;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;"><button class="btn btn-success" onclick="handlers.openStopForm('${route.id}')">+ Parada</button><button class="btn btn-info" onclick="handlers.openReportModal('${route.id}')" ${isAnyStopPending?'disabled title="Complete todas las paradas para reportar"':''}>Reportar Ruta</button></div></div>`; this.initRouteMap(route.stops); /* USANDO initRouteMap sin ruteo real */ },
+        initRouteMap: function(stops) { const mapContainer = document.getElementById('routeMap'); if (!mapContainer) {console.error("routeMap container no encontrado");return;} if (this.mapInstance) { this.mapInstance.remove(); this.mapInstance = null; } let mapCenter = [-33.45694, -70.64827]; let zoomLevel = 10; const validStopsWithCoords = stops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number'); if (validStopsWithCoords.length > 0) { const bounds = L.latLngBounds(validStopsWithCoords.map(s => [s.lat, s.lng])); if (bounds.isValid()) mapCenter = bounds.getCenter(); } this.mapInstance = L.map('routeMap').setView(mapCenter, zoomLevel); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(this.mapInstance); if (validStopsWithCoords.length === 0) { if(mapContainer) mapContainer.innerHTML = '<div style="text-align:center;padding:20px;">No hay paradas con coordenadas.</div>'; return; } const stopCoordinates = []; validStopsWithCoords.forEach((stop, index) => { L.marker([stop.lat, stop.lng]).addTo(this.mapInstance).bindPopup(`<b>${index + 1}. ${stop.address}</b>`); stopCoordinates.push([stop.lat, stop.lng]); }); if (stopCoordinates.length > 1) { L.polyline(stopCoordinates, { color: 'red' }).addTo(this.mapInstance); this.mapInstance.fitBounds(stopCoordinates, {padding: [30, 30]}); } else if (stopCoordinates.length === 1) { this.mapInstance.setView(stopCoordinates[0], 14); } },
+        initStopLocationMap: function(lat, lng) { const mapDiv = document.getElementById('stopLocationMap'); if (!mapDiv){console.error("stopLocationMap no encontrado"); return;} if (this.stopLocationMapInstance) { this.stopLocationMapInstance.remove(); this.stopLocationMapInstance=null;} const initialCoords = (lat != null && lng != null) ? [lat, lng] : [-33.45694, -70.64827]; const initialZoom = (lat != null && lng != null) ? 15 : 10; try { this.stopLocationMapInstance = L.map(mapDiv).setView(initialCoords, initialZoom); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.stopLocationMapInstance); if (this.stopLocationMarker) {this.stopLocationMarker.remove(); this.stopLocationMarker = null;} this.stopLocationMarker = L.marker(initialCoords, { draggable: true }).addTo(this.stopLocationMapInstance); this.stopLocationMarker.on('dragend', e => { const pos = e.target.getLatLng(); document.getElementById('stopFormLat').value = pos.lat.toFixed(6); document.getElementById('stopFormLng').value = pos.lng.toFixed(6);}); this.stopLocationMapInstance.on('click', e => { this.stopLocationMarker.setLatLng(e.latlng); document.getElementById('stopFormLat').value = e.latlng.lat.toFixed(6); document.getElementById('stopFormLng').value = e.latlng.lng.toFixed(6);}); setTimeout(() => { if(this.stopLocationMapInstance) this.stopLocationMapInstance.invalidateSize();}, 250); } catch(mapError){ console.error("Error inicializando stopLocationMap:", mapError); if(mapDiv) mapDiv.innerHTML = "Error al cargar mapa.";}},
+        openModal: function(modalId) { const modal = document.getElementById(modalId); if(modal) modal.style.display = 'block'; else console.error(`Modal con ID ${modalId} no encontrado.`);},
+        closeModal: function(modalId) { const modal = document.getElementById(modalId); if(modal) modal.style.display = 'none'; }
     };
 
     // --- LÓGICA DE MANEJADORES DE EVENTOS Y ACCIONES ---
     const handlers = {
-        openRouteForm: function(routeIdToEdit = null) { /* ... (lógica de v3.2) ... */ ui.openModal('routeFormModal'); },
-        // ... (otros handlers de la v3.1 / v3.2) ...
-        openPodModal: function(routeId, stopId) {
-            pod.clearPODForm(); 
-            document.getElementById('podRouteId').value = routeId; 
-            document.getElementById('podStopId').value = stopId; 
-            document.getElementById('podStopIdDisplay').textContent = stopId; 
-            const stop = dataStore.getStopById(routeId, stopId); 
-            document.getElementById('podSignedBy').value = (stop && stop.pod && stop.pod.signedBy) ? stop.pod.signedBy : (stop ? stop.receiverName || '' : '');
-            
-            ui.openModal('podModal'); // Primero hacer visible
-            pod.initSignatureCanvas(); // LUEGO inicializar canvas
-        },
-        openReportModal: function(routeId) { // (Simplificado, pero asegurar listeners en botones)
-            const route = dataStore.getRouteById(routeId); if (!route) return;
-            document.getElementById('reportRouteIdDisplay').textContent = route.id;
-            let reportText = `REPORTE RUTA: ${route.id}\n... (generar texto) ...`;
-            document.getElementById('reportTextPreview').textContent = reportText;
-            
-            const whatsappBtn = document.getElementById('sendWhatsAppReportBtn');
-            const emailBtn = document.getElementById('sendEmailReportBtn');
-
-            // Forma simple de asegurar listeners únicos (podría mejorarse)
-            const newWhatsappBtn = whatsappBtn.cloneNode(true); whatsappBtn.parentNode.replaceChild(newWhatsappBtn, whatsappBtn);
-            const newEmailBtn = emailBtn.cloneNode(true); emailBtn.parentNode.replaceChild(newEmailBtn, emailBtn);
-            
-            newWhatsappBtn.addEventListener('click', () => window.open(`https://wa.me/?text=${encodeURIComponent(reportText)}`, '_blank'));
-            newEmailBtn.addEventListener('click', () => window.location.href = `mailto:oficina@example.com?subject=${encodeURIComponent('Reporte '+route.id)}&body=${encodeURIComponent(reportText)}`);
-            
-            ui.openModal('reportModal');
-        },
-        //... más handlers
+        openRouteForm: function(routeIdToEdit = null) { const driverInput = document.getElementById('routeFormDriver'); const vehicleInput = document.getElementById('routeFormVehicle'); const idInput = document.getElementById('routeIdEditable'); const title = document.getElementById('routeFormTitle'); if (routeIdToEdit) { const route = dataStore.getRouteById(routeIdToEdit); if(!route){ui.renderRouteList(); return;} title.textContent=`Editar Ruta ${route.id}`; driverInput.value=route.driver; vehicleInput.value=route.vehicle; idInput.value=route.id;} else { title.textContent='Crear Nueva Ruta'; driverInput.value=''; vehicleInput.value=''; idInput.value='';} ui.openModal('routeFormModal'); },
+        saveRoute: function() { const driver = document.getElementById('routeFormDriver').value; const vehicle = document.getElementById('routeFormVehicle').value; const routeId = document.getElementById('routeIdEditable').value; if (!driver.trim() || !vehicle.trim()) { alert("Conductor y vehículo son obligatorios."); return; } if (routeId) dataStore.updateRoute(routeId, driver, vehicle); else dataStore.addRoute(driver, vehicle); ui.closeModal('routeFormModal'); ui.renderRouteList(); },
+        deleteRoute: function(routeId) { if(confirm(`¿Eliminar ruta ${routeId} y todas sus paradas?`)) {dataStore.deleteRoute(routeId); ui.renderRouteList();} },
+        openStopForm: function(routeId, stopIdToEdit = null) { document.getElementById('stopFormRouteId').value = routeId; document.getElementById('stopIdEditable').value = stopIdToEdit || ''; const title = document.getElementById('stopFormTitle'); const addr = document.getElementById('stopFormAddress'), subAddr = document.getElementById('stopFormSubAddress'), recName = document.getElementById('stopFormReceiverName'), conPhone = document.getElementById('stopFormContactPhone'), latInput = document.getElementById('stopFormLat'), lngInput = document.getElementById('stopFormLng'), eta = document.getElementById('stopFormETA'), ws = document.getElementById('stopFormWindowStart'), we = document.getElementById('stopFormWindowEnd'); let stopLat = null, stopLng = null; if (stopIdToEdit) { const stop = dataStore.getStopById(routeId, stopIdToEdit); if(!stop){ui.renderRouteDetail(routeId);return;} title.textContent = `Editar Parada ${stop.id}`; addr.value=stop.address; subAddr.value=stop.subAddress||''; recName.value=stop.receiverName||''; conPhone.value=stop.contactPhone||''; latInput.value=stop.lat||''; lngInput.value=stop.lng||''; eta.value=stop.eta||''; ws.value=stop.windowStart||''; we.value=stop.windowEnd||''; stopLat = stop.lat; stopLng = stop.lng; } else { title.textContent=`Añadir Parada a ${routeId}`; addr.value=''; subAddr.value=''; recName.value=''; conPhone.value=''; latInput.value=''; lngInput.value=''; eta.value=''; ws.value=''; we.value=''; } ui.openModal('stopFormModal'); ui.initStopLocationMap(stopLat, stopLng); },
+        saveStop: function() { const routeId = document.getElementById('stopFormRouteId').value, stopId = document.getElementById('stopIdEditable').value; const stopData = {address:document.getElementById('stopFormAddress').value, subAddress:document.getElementById('stopFormSubAddress').value, receiverName:document.getElementById('stopFormReceiverName').value, contactPhone:document.getElementById('stopFormContactPhone').value, lat:parseFloat(document.getElementById('stopFormLat').value)||null, lng:parseFloat(document.getElementById('stopFormLng').value)||null, eta:document.getElementById('stopFormETA').value, windowStart:document.getElementById('stopFormWindowStart').value, windowEnd:document.getElementById('stopFormWindowEnd').value }; if(!stopData.address.trim()){alert("Dirección obligatoria.");return;} if(stopId)dataStore.updateStop(routeId, stopId, stopData);else dataStore.addStopToRoute(routeId,stopData); ui.closeModal('stopFormModal');ui.renderRouteDetail(routeId);},
+        deleteStop: function(routeId, stopId) { if(confirm(`¿Eliminar parada ${stopId}?`)){dataStore.deleteStopFromRoute(routeId,stopId); ui.renderRouteDetail(routeId);} },
+        openUpdateStatusModal: function(routeId, stopId) { const stop=dataStore.getStopById(routeId,stopId); document.getElementById('statusUpdateRouteId').value=routeId; document.getElementById('statusUpdateStopId').value=stopId; document.getElementById('statusStopIdDisplay').textContent=stopId; if(stop && stop.status) { const radioToSelect = document.querySelector(`#updateStatusModal input[name="statusOption"][value="${stop.status}"]`); if (radioToSelect) radioToSelect.checked=true; else document.querySelector(`#updateStatusModal input[name="statusOption"][value="Pendiente"]`).checked=true;} else {document.querySelector(`#updateStatusModal input[name="statusOption"][value="Pendiente"]`).checked=true;} document.getElementById('statusReason').value=stop?stop.statusComment||'':''; ui.openModal('updateStatusModal');},
+        submitStatusUpdate: function() { const routeId=document.getElementById('statusUpdateRouteId').value, stopId=document.getElementById('statusUpdateStopId').value; const radio=document.querySelector('#updateStatusModal input[name="statusOption"]:checked'); const reason=document.getElementById('statusReason').value.trim(); if(radio){dataStore.updateStop(routeId,stopId,{status:radio.value, statusComment:reason});ui.closeModal('updateStatusModal');ui.renderRouteDetail(routeId);}else alert("Selecciona estado");},
+        openPodModal: function(routeId, stopId) { pod.clearPODForm(); document.getElementById('podRouteId').value=routeId; document.getElementById('podStopId').value=stopId; document.getElementById('podStopIdDisplay').textContent=stopId; const stop=dataStore.getStopById(routeId,stopId); document.getElementById('podSignedBy').value = (stop && stop.pod && stop.pod.signedBy) ? stop.pod.signedBy : (stop ? stop.receiverName || '' : ''); ui.openModal('podModal'); pod.initSignatureCanvas(); },
+        submitPOD: function() { const routeId=document.getElementById('podRouteId').value, stopId=document.getElementById('podStopId').value; const podData={signedBy:document.getElementById('podSignedBy').value.trim(), rut:document.getElementById('podRut').value.trim(), signature:pod.isSignatureCanvasEmpty()?null:pod.signatureCanvas.toDataURL('image/png'), fileDataURL:pod.currentFilePreviewDataURL,fileName:pod.currentFileName,fileType:pod.currentFileType, geolocation:pod.currentGeolocation }; if(!podData.signedBy && !podData.rut && !podData.signature && !podData.fileDataURL){alert("Complete al menos un campo para el POD (Nombre, RUT, Firma o Archivo).");return;} dataStore.updateStop(routeId,stopId,{pod:podData,status:"Entregado (POD)"});ui.closeModal('podModal');pod.clearPODForm();ui.renderRouteDetail(routeId);},
+        openViewPodModal: function(routeId, stopId) { const stop=dataStore.getStopById(routeId,stopId); if(!stop){ui.renderRouteDetail(routeId);return;} document.getElementById('viewPodStopIdDisplay').textContent=stopId; const contentDiv=document.getElementById('viewPodContent'); contentDiv.innerHTML = ''; if(stop && stop.pod){ let podHtml=`<p><strong>Recibido por:</strong> ${stop.pod.signedBy||'N/A'}</p><p><strong>RUT/ID:</strong> ${stop.pod.rut||'N/A'}</p>`; if(stop.pod.geolocation)podHtml+=`<p><strong>Ubic. POD:</strong> Lat ${stop.pod.geolocation.lat.toFixed(5)}, Lon ${stop.pod.geolocation.lng.toFixed(5)} (Precisión: ${stop.pod.geolocation.accuracy}m)</p>`; if(stop.pod.signature)podHtml+=`<h4>Firma:</h4><img src="${stop.pod.signature}" style="max-width:100%; border:1px solid #ccc;">`; if(stop.pod.fileDataURL){if(stop.pod.fileType && stop.pod.fileType.startsWith('image/'))podHtml+=`<h4>Adjunto:</h4><img src="${stop.pod.fileDataURL}" style="max-width:100%; border:1px solid #ccc;">`; else podHtml+=`<h4>Adjunto:</h4><p><a href="${stop.pod.fileDataURL}" download="${stop.pod.fileName||'archivo'}">Descargar ${stop.pod.fileName||'archivo'}</a> (${stop.pod.fileType||'N/A'})</p>`;} if (!stop.pod.signature && !stop.pod.fileDataURL && !stop.pod.signedBy) { podHtml += "<p>No hay datos de POD para mostrar.</p>";} contentDiv.innerHTML=podHtml; } else contentDiv.innerHTML="<p>No hay Prueba de Entrega registrada para esta parada.</p>"; ui.openModal('viewPodModal');},
+        openReportModal: function(routeId) { const route = dataStore.getRouteById(routeId); if (!route) return; document.getElementById('reportRouteIdDisplay').textContent = route.id; let reportText = `*** REPORTE RUTA FINALIZADA: ${route.id} ***\n`; reportText += `Conductor: ${route.driver || 'N/A'}\nVehículo: ${route.vehicle || 'N/A'}\nFecha Reporte: ${new Date().toLocaleString('es-CL')}\n\n`; reportText += `--- DETALLE DE PARADAS ---\n`; route.stops.forEach((stop, index) => { reportText += `\nParada ${index + 1}: ${stop.address}\n`; if(stop.subAddress) reportText += `  Detalles: ${stop.subAddress}\n`; reportText += `  Receptor: ${stop.receiverName||'N/A'}, Tel: ${stop.contactPhone||'N/A'}\n`; reportText += `  Estado: ${stop.status||'N/A'}${stop.statusComment?' ('+stop.statusComment+')':''}\n`; if(stop.pod){ reportText += `  POD Registrado: Sí\n`; if(stop.pod.signedBy) reportText+=`    Recibido por: ${stop.pod.signedBy}\n`; if(stop.pod.rut) reportText+=`    RUT/ID: ${stop.pod.rut}\n`; if(stop.pod.geolocation) reportText+=`    Ubic. POD: Lat ${stop.pod.geolocation.lat.toFixed(5)}, Lon ${stop.pod.geolocation.lng.toFixed(5)} (Prec. ${stop.pod.geolocation.accuracy}m)\n`; if(stop.pod.signature) reportText+="    Firma: Registrada\n"; if(stop.pod.fileDataURL) reportText+=`    Archivo Adjunto: ${stop.pod.fileName||'Sí'}\n`;} else { reportText += `  POD Registrado: No\n`; }}); reportText += `\n--- FIN DEL REPORTE ---`; document.getElementById('reportTextPreview').textContent = reportText; const whatsappBtn = document.getElementById('sendWhatsAppReportBtn'); const emailBtn = document.getElementById('sendEmailReportBtn'); const newWhatsappBtn = whatsappBtn.cloneNode(true); whatsappBtn.parentNode.replaceChild(newWhatsappBtn, whatsappBtn); const newEmailBtn = emailBtn.cloneNode(true); emailBtn.parentNode.replaceChild(newEmailBtn, emailBtn); newWhatsappBtn.addEventListener('click', () => { window.open(`https://wa.me/?text=${encodeURIComponent(reportText)}`, '_blank'); }); newEmailBtn.addEventListener('click', () => { window.location.href = `mailto:?subject=${encodeURIComponent('Reporte Ruta Finalizada: '+route.id)}&body=${encodeURIComponent(reportText)}`; }); ui.openModal('reportModal'); }
     };
 
     // --- LÓGICA ESPECÍFICA DE PRUEBA DE ENTREGA (POD) ---
     const pod = {
-        signatureCanvas: null, signatureCtx: null, drawing: false, lastPos:{x:0, y:0}, isDirty: false,
-        currentFilePreviewDataURL:null, currentFileName:null, currentFileType:null, currentGeolocation:null,
-        canvasEventListenersAttached: false, // Flag para listeners
-
-        initSignatureCanvas:function(){
-            this.signatureCanvas = document.getElementById('signature-canvas');
-            if(!this.signatureCanvas) { console.error("Canvas de Firma no encontrado en el DOM."); return; }
-
-            this.signatureCtx = this.signatureCanvas.getContext('2d');
-            if(!this.signatureCtx) { console.error("No se pudo obtener el contexto 2D del canvas."); return; }
-
-            this.isDirty = false; // Se ha dibujado algo?
-
-            // Establecer dimensiones basado en el tamaño renderizado del elemento
-            const dpr = window.devicePixelRatio || 1;
-            const rect = this.signatureCanvas.getBoundingClientRect();
-
-            if (rect.width === 0 || rect.height === 0) {
-                console.warn("Dimensiones del canvas son 0x0. Visible?", this.signatureCanvas.offsetParent !== null);
-                // Si sigue siendo 0x0, puede que el modal no esté completamente listo. Reintentar es una opción.
-                // O verificar que el CSS que lo define permita un tamaño.
-                // Para esta demo, asumiremos que `getBoundingClientRect` da dimensiones válidas si el modal está display:block
-                return; // Evitar error, la firma no funcionará
-            }
-
-            this.signatureCanvas.width = rect.width * dpr;
-            this.signatureCanvas.height = rect.height * dpr;
-            this.signatureCtx.scale(dpr, dpr);
-
-            this.signatureCtx.lineWidth = 2.5; // Un poco más grueso
-            this.signatureCtx.lineCap = 'round';
-            this.signatureCtx.strokeStyle = '#222'; // Negro más oscuro
-            this.clearSignature(true); // Limpiar sin marcar como dirty
-
-            if (!this.canvasEventListenersAttached) {
-                const getCoordinates = (event) => {
-                    const canvasRect = this.signatureCanvas.getBoundingClientRect();
-                    let clientX, clientY;
-                    if (event.touches && event.touches[0]) {
-                        clientX = event.touches[0].clientX;
-                        clientY = event.touches[0].clientY;
-                    } else {
-                        clientX = event.clientX;
-                        clientY = event.clientY;
-                    }
-                    return { x: clientX - canvasRect.left, y: clientY - canvasRect.top };
-                };
-
-                const mousedownHandler = (e) => {
-                    this.drawing = true;
-                    this.isDirty = true;
-                    const coords = getCoordinates(e);
-                    this.lastPos = { x: coords.x, y: coords.y };
-                    this.signatureCtx.beginPath(); // Empezar nueva ruta
-                    this.signatureCtx.moveTo(this.lastPos.x, this.lastPos.y);
-                };
-                const mousemoveHandler = (e) => {
-                    if (!this.drawing) return;
-                    const coords = getCoordinates(e);
-                    this.signatureCtx.lineTo(coords.x, coords.y);
-                    this.signatureCtx.stroke(); // Dibujar el segmento
-                    // No es necesario beginPath/moveTo aquí si es una línea continua
-                    this.lastPos = { x: coords.x, y: coords.y }; // Actualizar para el siguiente potencial lineTo
-                };
-                const mouseupHandler = () => {
-                    if (this.drawing) {
-                        this.drawing = false;
-                        // Opcional: this.signatureCtx.beginPath(); para finalizar explícitamente el path actual.
-                    }
-                };
-
-                // Mouse events
-                this.signatureCanvas.addEventListener('mousedown', mousedownHandler);
-                this.signatureCanvas.addEventListener('mousemove', mousemoveHandler);
-                this.signatureCanvas.addEventListener('mouseup', mouseupHandler);
-                this.signatureCanvas.addEventListener('mouseout', mouseupHandler); // Si sale del canvas, para de dibujar
-
-                // Touch events
-                this.signatureCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); mousedownHandler(e); }, { passive: false });
-                this.signatureCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); mousemoveHandler(e); }, { passive: false });
-                this.signatureCanvas.addEventListener('touchend', (e) => { e.preventDefault(); mouseupHandler(e); }, { passive: false });
-                this.canvasEventListenersAttached = true;
-            }
-             // Lógica de carga de archivo igual que v3.2
-            document.getElementById('podPhoto').onchange=evt=>{ /* ... */ };
-        },
-        clearSignature:function(initializing=false){ /* ... (igual que v3.2) ... */},
+        signatureCanvas:null, signatureCtx:null, drawing:false, lastPos:{x:0,y:0}, isDirty:false, currentFilePreviewDataURL:null,currentFileName:null,currentFileType:null, currentGeolocation:null, canvasEventListenersAttached: false, 
+        initSignatureCanvas:function(){ this.signatureCanvas = document.getElementById('signature-canvas'); if(!this.signatureCanvas) { console.error("Firma Canvas no encontrado!"); return; } this.signatureCtx = this.signatureCanvas.getContext('2d'); if(!this.signatureCtx) { console.error("Contexto 2D de firma no obtenido!"); return; } this.isDirty = false; const dpr = window.devicePixelRatio || 1; const rect = this.signatureCanvas.getBoundingClientRect(); if (rect.width === 0 || rect.height === 0) { console.warn("Canvas de firma tiene dimensiones 0. Reintentando en breve."); setTimeout(() => this.initSignatureCanvas(), 200); return; } this.signatureCanvas.width = rect.width * dpr; this.signatureCanvas.height = rect.height * dpr; this.signatureCtx.scale(dpr, dpr); this.signatureCtx.lineWidth = 2.5; this.signatureCtx.lineCap = 'round'; this.signatureCtx.strokeStyle = '#333'; this.clearSignature(true); if (!this.canvasEventListenersAttached) { const getCoordinates = (event) => { const canvasRect = this.signatureCanvas.getBoundingClientRect(); let clientX, clientY; if (event.touches && event.touches[0]) { clientX = event.touches[0].clientX; clientY = event.touches[0].clientY; } else { clientX = event.clientX; clientY = event.clientY; } return { x: clientX - canvasRect.left, y: clientY - canvasRect.top }; }; const mousedownHandler=(e)=>{ this.drawing=true; this.isDirty=true; const coords=getCoordinates(e); this.lastPos={x:coords.x, y:coords.y}; this.signatureCtx.beginPath(); this.signatureCtx.moveTo(this.lastPos.x,this.lastPos.y); if(e.type === 'touchstart') e.preventDefault();}; const mousemoveHandler=(e)=>{ if(!this.drawing)return; const coords=getCoordinates(e); this.signatureCtx.lineTo(coords.x,coords.y); this.signatureCtx.stroke(); this.lastPos={x:coords.x, y:coords.y}; if(e.type === 'touchmove') e.preventDefault();}; const mouseupHandler=(e)=>{ if (this.drawing) { this.drawing = false; } if(e.type === 'touchend') e.preventDefault();}; this.signatureCanvas.addEventListener('mousedown',mousedownHandler); this.signatureCanvas.addEventListener('mousemove',mousemoveHandler); this.signatureCanvas.addEventListener('mouseup',mouseupHandler); this.signatureCanvas.addEventListener('mouseout',mouseupHandler); this.signatureCanvas.addEventListener('touchstart',mousedownHandler,{passive:false}); this.signatureCanvas.addEventListener('touchmove',mousemoveHandler,{passive:false}); this.signatureCanvas.addEventListener('touchend',mouseupHandler,{passive:false}); this.canvasEventListenersAttached = true; } document.getElementById('podPhoto').onchange=evt=>{ const [file] = evt.target.files; const preview = document.getElementById('podPhotoPreview'); if (file) { if (file.size > 1 * 1024 * 1024) { alert("Archivo máx. 1MB."); evt.target.value=""; preview.style.display='none'; this.currentFilePreviewDataURL=null; return; } const reader = new FileReader(); reader.onload = e_reader => { this.currentFilePreviewDataURL = e_reader.target.result; this.currentFileName = file.name; this.currentFileType = file.type; if(file.type.startsWith('image/')){ preview.src=this.currentFilePreviewDataURL; preview.style.display='block';} else { preview.style.display='none'; preview.src="#"; alert(`Archivo "${file.name}" seleccionado.`);} } reader.readAsDataURL(file); } else { preview.style.display='none'; preview.src="#"; this.currentFilePreviewDataURL=null;}}; },
+        clearSignature:function(initializing=false){if(this.signatureCtx&&this.signatureCanvas){const dpr=window.devicePixelRatio||1; this.signatureCtx.clearRect(0,0,this.signatureCanvas.width/dpr,this.signatureCanvas.height/dpr);}if(!initializing)this.isDirty=false;},
         isSignatureCanvasEmpty:function(){return !this.isDirty;},
-        clearPODForm:function(){ /* ... (igual que v3.2) ... */},
-        requestLocation: function() { /* ... (igual que v3.2) ... */ }
+        clearPODForm:function(){document.getElementById('podSignedBy').value='';document.getElementById('podRut').value='';document.getElementById('podPhoto').value='';const preview=document.getElementById('podPhotoPreview');preview.style.display='none';preview.src='#';this.currentFilePreviewDataURL=null;this.currentFileName=null;this.currentFileType=null;if(this.signatureCanvas && this.signatureCtx && this.canvasEventListenersAttached)this.clearSignature(false);this.currentGeolocation=null;document.getElementById('podLocationStatus').textContent='Pulsa el botón para detectar.';document.getElementById('podLocationInfo').textContent='Lat: N/A, Lon: N/A';},
+        requestLocation: function() { const statusDiv=document.getElementById('podLocationStatus'),infoDiv=document.getElementById('podLocationInfo');statusDiv.textContent='Obteniendo ubicación...';infoDiv.textContent='Lat:...,Lon:...';this.currentGeolocation=null;if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{this.currentGeolocation={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,timestamp:pos.timestamp};statusDiv.textContent='Ubicación obtenida.';infoDiv.textContent=`Lat: ${this.currentGeolocation.lat.toFixed(5)}, Lon: ${this.currentGeolocation.lng.toFixed(5)} (Precisión: ${this.currentGeolocation.accuracy.toFixed(0)}m)`;},err=>{let msg='';switch(err.code){case err.PERMISSION_DENIED:msg="Permiso denegado.";break;case err.POSITION_UNAVAILABLE:msg="Ubic. no disponible.";break;case err.TIMEOUT:msg="Timeout.";break;default:msg="Error desconocido.";}statusDiv.innerHTML=`Error: ${msg} <button class="btn btn-warning btn-xs" onclick="pod.requestLocation()">Reintentar</button>`;infoDiv.textContent='Lat: Error, Lon: Error';this.currentGeolocation={error:msg};},{enableHighAccuracy:true,timeout:15000,maximumAge:60000});}else{statusDiv.textContent='Geoloc. no soportada.';this.currentGeolocation={error:"Not supported"};}}
     };
-
+    
     // --- INICIALIZACIÓN ---
-    window.onload = () => { /* ... (igual que v3.2, con try-catch y listener para cerrar modales) ... */ };
-
-    // Para que el snippet sea autoejecutable y las funciones se definan globalmente
-    // Esto es solo para el entorno de prueba del snippet
-    window.dataStore = dataStore;
-    window.auth = auth;
-    window.ui = ui;
-    window.handlers = handlers;
-    window.pod = pod;
-
-    // Inicializar
-     try { 
-        dataStore.load(); 
-        auth.checkSession(); 
-        window.addEventListener('click', function(event) { if (event.target.classList.contains('modal')) { const modalId = event.target.id; if(modalId && typeof ui.closeModal === 'function') { ui.closeModal(modalId); if (modalId === 'podModal' && typeof pod.clearPODForm === 'function') pod.clearPODForm();}}});
-    } catch (error) { 
-        console.error("Error fatal durante la inicialización:", error); 
-        document.body.innerHTML = `<div style="padding:20px;text-align:center;color:red;"><h1>Error Crítico</h1><p>Ocurrió un error. Intente borrar datos de navegación.</p><pre>${error.stack||error}</pre></div>`; 
-    }
-
+    // No auto-asignaciones a window para los objetos. Serán accedidos globalmente si es necesario.
+    window.onload = () => {
+         try { 
+            if(typeof dataStore === 'undefined' || typeof dataStore.load !== 'function') {
+                throw new Error("dataStore no está definido o no tiene el método load al inicio de window.onload");
+            }
+            dataStore.load(); 
+            
+            if(typeof auth === 'undefined' || typeof auth.checkSession !== 'function') {
+                 throw new Error("auth no está definido o no tiene el método checkSession al inicio de window.onload");
+            }
+            auth.checkSession(); 
+            
+            window.addEventListener('click', function(event) {
+                 if (event.target.classList.contains('modal')) { 
+                    const modalId = event.target.id; 
+                    if(modalId && typeof ui !== 'undefined' && typeof ui.closeModal === 'function') {  ui.closeModal(modalId); 
+                        if (modalId === 'podModal' && typeof pod !== 'undefined' && typeof pod.clearPODForm === 'function') pod.clearPODForm();
+                    }
+                 }
+            });
+        } catch (error) { 
+            console.error("Error fatal durante la inicialización:", error); 
+            document.body.innerHTML = `<div style="padding:20px;text-align:center;color:red;"><h1>Error Crítico</h1><p>Ocurrió un error al cargar la aplicación. Por favor, intente borrar los datos de navegación (caché y localStorage) para este sitio y recargue la página.</p><pre>${error.stack || error}</pre></div>`; 
+        }
+    };
     </script>
 </body>
 </html>
