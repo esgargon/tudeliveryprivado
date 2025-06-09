@@ -3,434 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo SAT Demo | myGESTION</title>
+    <title>Demo Funcionalidades SAT | myGESTION</title>
     <style>
         /* Estilos Generales */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #eef1f5; /* Un gris azulado claro */
             color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             line-height: 1.6;
         }
 
-        .container {
-            width: 90%;
-            max-width: 900px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
+        .hidden { display: none !important; }
 
-        h1, h2, h3 {
-            color: #333;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Cabecera */
-        .header {
-            background-color: #e9ecef;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .header h1 {
-            font-size: 1.5em;
-            margin: 0;
-            color: #555;
-        }
-
-        .header .refresh-icon {
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #555;
-        }
-
-        /* Contenido Principal */
-        .main-content {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .module-icon {
-            width: 100px; /* Tamaño del icono de la llave inglesa */
-            height: 100px;
-            margin-bottom: 20px;
-            fill: #6c757d; /* Color del icono SVG */
-        }
-        
-        .factory-icon {
-            width: 150px;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        .module-title {
-            font-size: 2em;
-            margin-bottom: 10px;
-            color: #343a40;
-        }
-
-        .module-description {
-            font-size: 1.1em;
-            color: #555;
-            max-width: 700px;
-            margin: 0 auto 20px auto;
-        }
-
-        /* Precios y CTA */
-        .pricing-cta {
-            margin: 30px 0;
-        }
-
-        .price {
-            background-color: #007bff;
-            color: white;
-            padding: 15px 30px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border-radius: 5px;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            border: none;
-        }
-
-        .btn-gratis {
-            background-color: #fd7e14;
-            color: white;
-        }
-        .btn-gratis:hover {
-            background-color: #e66800;
-        }
-
-        /* Lista de Características */
-        .features {
-            text-align: left;
-            max-width: 600px;
-            margin: 30px auto;
-            padding-left: 20px; /* Para alinear con el texto general si se quitan bullets */
-        }
-
-        .features h3 {
-            font-size: 1.4em;
-            color: #444;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .features ul {
-            list-style-type: disc; /* Estilo de viñeta por defecto */
-            padding-left: 20px;
-            margin: 0;
-        }
-
-        .features ul li {
-            margin-bottom: 8px;
-            font-size: 1em;
-            color: #555;
-        }
-        
-        .feature-group {
-            margin-bottom: 20px;
-        }
-
-
-        /* Modal de Login */
-        .login-modal {
-            display: none; /* Oculto por defecto */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
+        /* Contenedor Principal de la App (después del login) */
+        #app-container {
             width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5); /* Fondo oscuro semitransparente */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (min-width: 768px) {
+            #app-container {
+                max-width: 1200px;
+                max-height: 90vh;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            body { /* Para centrar app-container en pantallas grandes */
+                 background-color: #d0d9e3;
+            }
         }
 
-        .login-modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 30px;
-            border: 1px solid #888;
-            width: 80%;
+
+        /* --- VISTA DE LOGIN --- */
+        #login-view {
+            width: 100%;
             max-width: 400px;
+            padding: 30px;
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
-
-        .login-modal h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
+        #login-view h1 {
+            color: #004a99; /* Azul corporativo */
+            margin-bottom: 10px;
+            font-size: 1.8em;
         }
-
-        .login-modal input[type="text"],
-        .login-modal input[type="password"] {
+        #login-view img.logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        #login-view p {
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 0.95em;
+        }
+        #login-view input[type="text"],
+        #login-view input[type="password"] {
             width: calc(100% - 22px);
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
             box-sizing: border-box;
+            font-size: 1em;
         }
-
-        .login-modal .btn-login {
-            background-color: #28a745;
-            color: white;
+        #login-view button {
             width: 100%;
             padding: 12px;
-            font-size: 1.1em;
-        }
-        .login-modal .btn-login:hover {
-            background-color: #218838;
-        }
-        
-        .login-modal .btn-close-modal {
-            background-color: #6c757d;
+            background-color: #007bff; /* Azul primario */
             color: white;
-            margin-top: 10px;
-            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-        .login-modal .btn-close-modal:hover {
-            background-color: #5a6268;
+        #login-view button:hover {
+            background-color: #0056b3;
         }
-
-        #login-message {
+        #login-error-message {
+            color: #dc3545; /* Rojo error */
             margin-top: 15px;
             font-weight: bold;
         }
-        .success-message {
-            color: green;
-        }
-        .error-message {
-            color: red;
-        }
 
-        /* Chat Bubble */
-        .chat-bubble {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #fd7e14; /* Naranja similar al botón Prueba Gratis */
+        /* --- VISTA DE APLICACIÓN (post-login) --- */
+        .app-header {
+            background-color: #004a99; /* Azul oscuro corporativo */
             color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+        .app-header .user-info {
+            font-size: 0.9em;
+        }
+        .app-header #logout-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .app-header #logout-button:hover {
+            background-color: #c82333;
+        }
+
+        .app-body {
+            display: flex;
+            flex-grow: 1; /* Ocupa el espacio restante */
+            overflow: hidden; /* Para que el scroll interno funcione bien */
+        }
+
+        .app-nav {
+            background-color: #f8f9fa; /* Gris claro */
+            width: 220px;
+            padding: 15px;
+            border-right: 1px solid #dee2e6; /* Borde sutil */
+            overflow-y: auto;
+        }
+        .app-nav h3 {
+            font-size: 1.1em;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .app-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .app-nav ul li a {
+            display: block;
             padding: 10px 15px;
-            border-radius: 20px 20px 5px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 999;
-            max-width: 250px;
-            font-size: 0.9em;
+            text-decoration: none;
+            color: #007bff;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
-        .chat-bubble-icon {
-            font-size: 1.8em; /* Ajusta el tamaño del icono de chat */
-            margin-right: 8px;
-            vertical-align: middle;
+        .app-nav ul li a:hover,
+        .app-nav ul li a.active {
+            background-color: #007bff;
+            color: white;
         }
-        .chat-bubble p {
-            margin:0;
-            display: inline;
-        }
-         /* Burbuja de chat - Solo icono si la pantalla es muy pequeña */
-        @media (max-width: 480px) {
-            .chat-bubble-text {
-                display: none;
-            }
-            .chat-bubble {
-                padding: 12px;
-                border-radius: 50%; /* Hacerlo circular */
-            }
-            .chat-bubble-icon {
-                 margin-right: 0;
-            }
-        }
-
-
-        /* Footer simple */
-        .footer {
-            text-align: center;
+        
+        .app-main-content {
+            flex-grow: 1;
             padding: 20px;
+            overflow-y: auto; /* Scroll para el contenido si es largo */
+            background-color: #ffffff;
+        }
+        .module-view {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .module-view h2 {
+            color: #004a99;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .module-view p, .module-view ul {
+            margin-bottom: 15px;
+        }
+        .module-view ul {
+            padding-left: 20px;
+        }
+        
+        /* Estilos para tablas (demo) */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
             font-size: 0.9em;
-            color: #777;
-            border-top: 1px solid #eee;
-            margin-top: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        .styled-table thead tr {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: left;
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #007bff;
+        }
+        .styled-table tbody tr:hover {
+            background-color: #e6f2ff;
+            cursor: pointer;
+        }
+
+        .placeholder-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+
+        .action-button {
+            background-color: #28a745; /* Verde */
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        .action-button:hover {
+            background-color: #218838;
+        }
+        .action-button.secondary {
+             background-color: #ffc107; /* Amarillo */
+             color: #212529;
+        }
+        .action-button.secondary:hover {
+            background-color: #e0a800;
         }
 
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <h1>Módulos del ERP | myGESTION</h1>
-        <span class="refresh-icon" onclick="location.reload();" title="Recargar página">↻</span>
-    </header>
+    <!-- Vista de Login (se muestra al inicio) -->
+    <div id="login-view">
+        <img src="https://mygestion.com/wp-content/uploads/2022/07/logo-mygestion-vectorial.svg" alt="myGESTION Logo" class="logo">
+        <h1>Acceso Demo SAT</h1>
+        <p>Introduce las credenciales de demostración.</p>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Usuario (demo)" required>
+            <input type="password" id="password" placeholder="Contraseña (password123)" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <div id="login-error-message" class="hidden"></div>
+    </div>
 
-    <div class="container">
-        <section class="main-content">
-            <!-- Icono de llave inglesa como SVG para mejor escalabilidad y color -->
-            <svg class="module-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                <path d="M487.4 315.7l-42.6-42.6c-18.7-18.7-49.1-18.7-67.9 0L352 297.9l-42.4 42.4c-8.5 8.5-22.3 8.5-30.8 0L206.1 267.6c-8.5-8.5-8.5-22.3 0-30.8l105.1-105.1c8.5-8.5 22.3-8.5 30.8 0l42.4 42.4 24.7-24.7c18.7-18.7 18.7-49.1 0-67.9l-42.6-42.6c-18.7-18.7-49.1-18.7-67.9 0L241.2 136.1c-4.2-4.2-9.7-7-15.4-7H160c-13.3 0-24 10.7-24 24v65.8c0 5.7 2.8 11.2 7 15.4l112.9 112.9c18.7 18.7 49.1 18.7 67.9 0l42.6-42.6L448 355.7c8.5 8.5 22.3 8.5 30.8 0l33.3-33.3c18.8-18.7 18.8-49.1.3-67.9zM200 184c-3.3 0-6.5.6-9.4 1.7L128 248.3v-48.6c0-4.4 3.6-8 8-8h51.7c3.1 0 6-1.2 8.3-3.3l48-48c3.3-3.3 8.5-3.3 11.8 0l17.7 17.7c3.3 3.3 3.3 8.5 0 11.8l-48 48c-2.3 2.1-5.2 3.3-8.3 3.3H200zM48 304h64c8.8 0 16-7.2 16-16s-7.2-16-16-16H48c-8.8 0-16 7.2-16 16s7.2 16 16 16zm128 96H48c-8.8 0-16 7.2-16 16s7.2 16 16 16h128c8.8 0 16-7.2 16-16s-7.2-16-16-16zm-32-48h96c8.8 0 16-7.2 16-16s-7.2-16-16-16h-96c-8.8 0-16 7.2-16 16s7.2 16 16 16z"/>
-            </svg>
-            
-            <h2 class="module-title">Módulo de Servicio Técnico SAT</h2>
-            <p class="module-description">
-                Mediante el módulo SAT podrás llevar la gestión integral de tu empresa de servicio técnico. Gestiona incidencias, avisos y órdenes de trabajo. Planifica contratos de mantenimiento y factúralos de forma masiva. Los técnicos acceden desde el móvil o tablet a realizar las órdenes y el cliente puede firmarlas.
-            </p>
-
-            <div class="pricing-cta">
-                <div class="price">15,00 € /mes</div>
-                <button id="pruebaGratisBtn" class="btn btn-gratis">Prueba Gratis</button>
+    <!-- Contenedor Principal de la Aplicación (oculto hasta login exitoso) -->
+    <div id="app-container" class="hidden">
+        <header class="app-header">
+            <h1>Módulo SAT - myGESTION</h1>
+            <div class="user-info">
+                <span>Usuario: <strong id="loggedInUser"></strong></span>
+                <button id="logout-button">Cerrar Sesión</button>
             </div>
-        </section>
+        </header>
 
-        <section class="features">
-            <h3>Características Principales:</h3>
-            <div class="feature-group">
+        <div class="app-body">
+            <nav class="app-nav">
+                <h3>Funcionalidades</h3>
                 <ul>
-                    <li>Avisos/Incidencias</li>
-                    <li>Presupuestos</li>
-                    <li>Órdenes de trabajo</li>
-                    <li>Contratos de mantenimiento</li>
+                    <li><a href="#" data-module="dashboard">Inicio Rápido</a></li>
+                    <li><a href="#" data-module="avisos">Avisos/Incidencias</a></li>
+                    <li><a href="#" data-module="presupuestos">Presupuestos</a></li>
+                    <li><a href="#" data-module="ordenes">Órdenes de Trabajo</a></li>
+                    <li><a href="#" data-module="contratos">Contratos Mantenimiento</a></li>
+                    <li><a href="#" data-module="articulos">Artículos SAT</a></li>
+                    <li><a href="#" data-module="garantias">Gestión de Garantías</a></li>
+                    <li><a href="#" data-module="appmovil">App Móvil</a></li>
+                    <li><a href="#" data-module="geolocalizacion">Geolocalización</a></li>
+                    <li><a href="#" data-module="informes">Informes y Cuadro de Mando</a></li>
+                    <li><a href="#" data-module="roles">Roles de Acceso</a></li>
+                    <li><a href="#" data-module="extranet">Extranet Clientes</a></li>
+                    <li><a href="#" data-module="api">API Desarrolladores</a></li>
                 </ul>
-            </div>
-            <div class="feature-group">
-                 <ul>
-                    <li>Artículos SAT</li>
-                    <li>Gestión de Garantías</li>
-                    <li>App Móvil</li>
-                    <li>Geolocalización</li>
-                </ul>
-            </div>
-            <div class="feature-group">
-                <ul>
-                    <li>Informes y Cuadro de Mando</li>
-                    <li>Roles de acceso por usuario</li>
-                    <li>Extranet de acceso a Clientes</li>
-                    <li>Api para Desarrolladores</li>
-                </ul>
-            </div>
-            <img src="https://via.placeholder.com/300x150/00447C/FFFFFF?text=ERP+Solutions" alt="Icono de fábrica o industria" class="factory-icon">
+            </nav>
 
-        </section>
-        
-    </div> <!-- Fin .container -->
+            <main id="app-main-content" class="app-main-content">
+                <!-- El contenido de los módulos se cargará/mostrará aquí -->
+                <div id="module-dashboard" class="module-view">
+                    <h2>Bienvenido al Módulo SAT</h2>
+                    <p>Selecciona una funcionalidad del menú de la izquierda para comenzar.</p>
+                    <p>Esta es una demostración interactiva de las capacidades del Módulo de Servicio Técnico (SAT) de myGESTION.</p>
+                    <img src="https://via.placeholder.com/600x200/004A99/FFFFFF?text=Panel+Principal+SAT" alt="Panel SAT" class="placeholder-image">
+                </div>
 
-    <!-- Modal de Login -->
-    <div id="loginModal" class="login-modal">
-        <div class="login-modal-content">
-            <span id="closeModal" class="btn btn-close-modal" style="position:absolute; top:10px; right:15px; padding: 5px 10px; background:transparent; color:#333; font-size:1.5em; line-height:1;">×</span>
-            <h2>Acceso Demo</h2>
-            <form id="loginForm">
-                <div>
-                    <input type="text" id="username" placeholder="Usuario (ej: demo)" required>
+                <div id="module-avisos" class="module-view hidden">
+                    <h2>Avisos e Incidencias</h2>
+                    <button class="action-button">Nuevo Aviso</button>
+                    <table class="styled-table">
+                        <thead><tr><th>ID</th><th>Cliente</th><th>Descripción</th><th>Estado</th><th>Fecha</th></tr></thead>
+                        <tbody>
+                            <tr><td>AV-001</td><td>Cliente A</td><td>Fallo en caldera</td><td>Abierto</td><td>2024-07-28</td></tr>
+                            <tr><td>AV-002</td><td>Cliente B</td><td>Mantenimiento AC</td><td>En progreso</td><td>2024-07-27</td></tr>
+                            <tr><td>AV-003</td><td>Cliente C</td><td>Ruido extraño motor</td><td>Cerrado</td><td>2024-07-26</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div>
-                    <input type="password" id="password" placeholder="Contraseña (ej: password123)" required>
+
+                <div id="module-presupuestos" class="module-view hidden">
+                    <h2>Presupuestos</h2>
+                    <button class="action-button">Crear Presupuesto</button>
+                     <table class="styled-table">
+                        <thead><tr><th>Nº Presup.</th><th>Cliente</th><th>Importe</th><th>Estado</th><th>Fecha</th></tr></thead>
+                        <tbody>
+                            <tr><td>PRE-2024-101</td><td>Cliente X</td><td>€ 450.00</td><td>Enviado</td><td>2024-07-25</td></tr>
+                            <tr><td>PRE-2024-102</td><td>Cliente Y</td><td>€ 1200.50</td><td>Aceptado</td><td>2024-07-20</td></tr>
+                            <tr><td>PRE-2024-103</td><td>Cliente Z</td><td>€ 80.00</td><td>Rechazado</td><td>2024-07-15</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <button type="submit" class="btn btn-login">Iniciar Sesión</button>
-            </form>
-            <div id="loginMessage"></div>
-            <button id="cancelLoginBtn" class="btn btn-close-modal">Cancelar</button>
+                
+                <div id="module-ordenes" class="module-view hidden">
+                    <h2>Órdenes de Trabajo</h2>
+                    <button class="action-button">Nueva Orden</button>
+                     <table class="styled-table">
+                        <thead><tr><th>Nº Orden</th><th>Técnico</th><th>Servicio</th><th>Estado</th><th>Prioridad</th></tr></thead>
+                        <tbody>
+                            <tr><td>OT-07-052</td><td>Carlos López</td><td>Reparación Bomba</td><td>Asignada</td><td>Alta</td></tr>
+                            <tr><td>OT-07-053</td><td>Ana Martín</td><td>Revisión Preventiva</td><td>Completada</td><td>Media</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="module-contratos" class="module-view hidden">
+                    <h2>Contratos de Mantenimiento</h2>
+                    <button class="action-button">Nuevo Contrato</button>
+                    <table class="styled-table">
+                        <thead><tr><th>Ref. Contrato</th><th>Cliente</th><th>Tipo</th><th>Vigencia</th><th>Próx. Factura</th></tr></thead>
+                        <tbody>
+                            <tr><td>CM-ELC-001</td><td>Empresa ABC</td><td>Premium Anual</td><td>01/01/24 - 31/12/24</td><td>01/12/2024</td></tr>
+                            <tr><td>CM-INF-002</td><td>Tienda XYZ</td><td>Básico Mensual</td><td>01/07/24 - 31/07/24</td><td>01/08/2024</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="module-articulos" class="module-view hidden">
+                    <h2>Artículos SAT</h2>
+                    <p>Gestión de piezas, repuestos y materiales específicos para el servicio técnico.</p>
+                     <button class="action-button">Añadir Artículo</button>
+                    <table class="styled-table">
+                        <thead><tr><th>Código</th><th>Descripción</th><th>Stock</th><th>Proveedor</th><th>Precio Coste</th></tr></thead>
+                        <tbody>
+                            <tr><td>FIL-CAL-01</td><td>Filtro Caldera Mod X</td><td>25</td><td>ProvCal S.L.</td><td>€ 12.50</td></tr>
+                            <tr><td>GAS-R410A</td><td>Gas Refrigerante R410A (kg)</td><td>150</td><td>RefriGlobal</td><td>€ 8.75</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="module-garantias" class="module-view hidden">
+                    <h2>Gestión de Garantías</h2>
+                    <p>Seguimiento de garantías de productos y servicios.</p>
+                     <button class="action-button">Registrar Garantía</button>
+                    <table class="styled-table">
+                        <thead><tr><th>Producto/Servicio</th><th>Cliente</th><th>Fecha Compra</th><th>Expira Garantía</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr><td>Caldera ZEUZ Z2000</td><td>Cliente A</td><td>15/01/2023</td><td>14/01/2025</td><td>Activa</td></tr>
+                            <tr><td>Instalación AC Fujitech</td><td>Cliente B</td><td>20/06/2024</td><td>19/06/2026</td><td>Activa</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="module-appmovil" class="module-view hidden">
+                    <h2>App Móvil para Técnicos</h2>
+                    <p>Los técnicos acceden desde el móvil o tablet a realizar las órdenes y el cliente puede firmarlas.</p>
+                    <img src="https://via.placeholder.com/300x500/ACC8E5/333333?text=Simulación+App+Móvil+SAT" alt="App Móvil" class="placeholder-image" style="max-width:300px;">
+                    <p><strong>Funcionalidades clave:</strong></p>
+                    <ul>
+                        <li>Visualización de órdenes asignadas.</li>
+                        <li>Detalles del cliente y servicio.</li>
+                        <li>Checklists y partes de trabajo digitales.</li>
+                        <li>Captura de firma del cliente.</li>
+                        <li>Registro de materiales y tiempos.</li>
+                        <li>Consulta de historial del equipo.</li>
+                        <li>Modo Offline.</li>
+                    </ul>
+                </div>
+                
+                <div id="module-geolocalizacion" class="module-view hidden">
+                    <h2>Geolocalización</h2>
+                    <p>Optimización de rutas y seguimiento en tiempo real de los técnicos.</p>
+                    <img src="https://via.placeholder.com/600x300/A2D2FF/333333?text=Mapa+Simulado+con+Técnicos" alt="Geolocalización" class="placeholder-image">
+                    <ul>
+                        <li>Visualización de la ubicación de los técnicos en un mapa.</li>
+                        <li>Asignación de servicios al técnico más cercano.</li>
+                        <li>Planificación y optimización de rutas.</li>
+                        <li>Seguimiento del progreso de las rutas.</li>
+                    </ul>
+                </div>
+
+                <div id="module-informes" class="module-view hidden">
+                    <h2>Informes y Cuadro de Mando</h2>
+                    <p>Análisis del rendimiento del servicio técnico.</p>
+                    <img src="https://via.placeholder.com/600x300/FFD166/333333?text=Gráfico+Estadísticas+SAT" alt="Cuadro de Mando" class="placeholder-image">
+                    <p><strong>Ejemplos de Informes:</strong></p>
+                    <ul>
+                        <li>Tiempo medio de resolución de incidencias.</li>
+                        <li>Número de servicios por técnico.</li>
+                        <li>Rentabilidad por contrato/cliente.</li>
+                        <li>Estado de las órdenes de trabajo.</li>
+                        <li>Uso de materiales y repuestos.</li>
+                    </ul>
+                </div>
+                
+                <div id="module-roles" class="module-view hidden">
+                    <h2>Roles de Acceso por Usuario</h2>
+                    <p>Configuración granular de permisos para diferentes usuarios del sistema (administradores, gestores, técnicos).</p>
+                    <p>Por ejemplo, un técnico solo podría ver sus órdenes asignadas, mientras que un gestor podría ver todas las órdenes y generar informes.</p>
+                    <p><em>(En esta demo, esta funcionalidad es descriptiva. Un sistema real permitiría definir y asignar roles.)</em></p>
+                     <img src="https://via.placeholder.com/500x250/BDE0FE/333333?text=Interfaz+Gestión+de+Roles" alt="Roles de Usuario" class="placeholder-image">
+                </div>
+
+                <div id="module-extranet" class="module-view hidden">
+                    <h2>Extranet de Acceso a Clientes</h2>
+                    <p>Portal para que los clientes consulten el estado de sus avisos, descarguen facturas, etc.</p>
+                    <form style="border:1px solid #ccc; padding:15px; border-radius:5px; max-width:400px;">
+                        <h4>Acceso Cliente (Simulado)</h4>
+                        <input type="text" placeholder="ID Cliente" style="width:calc(100% - 22px); padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:3px;">
+                        <input type="password" placeholder="Contraseña" style="width:calc(100% - 22px); padding:8px; margin-bottom:10px; border:1px solid #ccc; border-radius:3px;">
+                        <button type="button" class="action-button secondary">Entrar</button>
+                    </form>
+                </div>
+
+                <div id="module-api" class="module-view hidden">
+                    <h2>API para Desarrolladores</h2>
+                    <p>El módulo SAT ofrece una API REST para integrar sus funcionalidades con otras aplicaciones y sistemas.</p>
+                    <p>Esto permite, por ejemplo:</p>
+                    <ul>
+                        <li>Crear avisos desde un sistema de ticketing externo.</li>
+                        <li>Sincronizar datos de clientes con un CRM.</li>
+                        <li>Integrar con plataformas de facturación.</li>
+                        <li>Desarrollar aplicaciones personalizadas.</li>
+                    </ul>
+                    <pre style="background-color:#f0f0f0; padding:10px; border-radius:4px; overflow-x:auto;">
+// Ejemplo (conceptual) de un endpoint API
+GET /api/v1/sat/incidencias
+POST /api/v1/sat/incidencias
+{
+  "cliente_id": "CLI-007",
+  "descripcion": "Problema con el aire acondicionado",
+  "prioridad": "alta"
+}
+                    </pre>
+                </div>
+                
+            </main>
         </div>
     </div>
 
-    <!-- Chat Bubble -->
-    <div class="chat-bubble">
-        <span class="chat-bubble-icon"></span> <!-- Emoji de burbuja de diálogo Unicode -->
-        <span class="chat-bubble-text">
-            <p>¡Hola! Bienvenido a myGESTIÓN<br>¿Cómo puedo ayudarte?</p>
-        </span>
-    </div>
-
-    <footer class="footer">
-        <p>© 2024 myGESTION ERP. Todos los derechos reservados.</p>
-    </footer>
-
     <script>
-        // Elementos del DOM
-        const pruebaGratisBtn = document.getElementById('pruebaGratisBtn');
-        const loginModal = document.getElementById('loginModal');
-        const closeModalBtn = document.getElementById('closeModal');
-        const cancelLoginBtn = document.getElementById('cancelLoginBtn');
-        const loginForm = document.getElementById('loginForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginMessage = document.getElementById('loginMessage');
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginView = document.getElementById('login-view');
+            const appContainer = document.getElementById('app-container');
+            const loginForm = document.getElementById('login-form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const loginErrorMessage = document.getElementById('login-error-message');
+            const loggedInUserDisplay = document.getElementById('loggedInUser');
+            const logoutButton = document.getElementById('logout-button');
+            const navLinks = document.querySelectorAll('.app-nav ul li a');
+            const moduleViews = document.querySelectorAll('.module-view');
+            const mainContentContainer = document.getElementById('app-main-content');
 
-        // Abrir modal
-        pruebaGratisBtn.addEventListener('click', () => {
-            loginModal.style.display = 'block';
-            loginMessage.textContent = ''; // Limpiar mensajes previos
-            loginMessage.className = '';
-        });
+            // --- LÓGICA DE LOGIN ---
+            loginForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
 
-        // Cerrar modal con el botón 'x'
-        closeModalBtn.addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
+                // Credenciales demo
+                if (username === 'demo' && password === 'password123') {
+                    loginView.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    loggedInUserDisplay.textContent = username;
+                    loginErrorMessage.classList.add('hidden');
+                    usernameInput.value = ''; // Limpiar campos
+                    passwordInput.value = '';
+                    showModule('dashboard'); // Mostrar el dashboard por defecto
+                } else {
+                    loginErrorMessage.textContent = 'Usuario o contraseña incorrectos.';
+                    loginErrorMessage.classList.remove('hidden');
+                }
+            });
 
-        // Cerrar modal con el botón 'Cancelar'
-        cancelLoginBtn.addEventListener('click', () => {
-            loginModal.style.display = 'none';
-        });
+            // --- LÓGICA DE LOGOUT ---
+            logoutButton.addEventListener('click', () => {
+                appContainer.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                // Opcional: limpiar el último módulo visto o cualquier estado
+            });
 
-        // Cerrar modal si se hace clic fuera del contenido
-        window.addEventListener('click', (event) => {
-            if (event.target == loginModal) {
-                loginModal.style.display = 'none';
+            // --- LÓGICA DE NAVEGACIÓN ENTRE MÓDULOS ---
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const moduleName = link.getAttribute('data-module');
+                    showModule(moduleName);
+
+                    // Marcar como activo el link
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+
+            function showModule(moduleName) {
+                moduleViews.forEach(view => {
+                    if (view.id === `module-${moduleName}`) {
+                        view.classList.remove('hidden');
+                    } else {
+                        view.classList.add('hidden');
+                    }
+                });
+                 // Scroll al inicio del contenido del módulo
+                mainContentContainer.scrollTop = 0;
             }
-        });
+            
+            // Simular "Nuevo Aviso", "Crear Presupuesto", etc.
+            document.querySelectorAll('.action-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if(!e.target.closest('#module-extranet form') && !e.target.closest('#logout-button')){ // Evitar para botones dentro del form de extranet o logout
+                        alert(`"${e.target.textContent}" - Funcionalidad en desarrollo (demo).`);
+                    }
+                });
+            });
 
-        // Lógica del Login
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
-
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-
-            // Credenciales de demostración (puedes cambiarlas)
-            const demoUser = 'demo';
-            const demoPass = 'password123';
-
-            if (username === demoUser && password === demoPass) {
-                loginMessage.textContent = '¡Login exitoso! Bienvenido a la demo.';
-                loginMessage.className = 'success-message';
-                // Opcional: Redirigir o cambiar contenido después del login
-                setTimeout(() => {
-                    loginModal.style.display = 'none'; // Cierra el modal
-                    // Aquí podrías, por ejemplo, cambiar algo en la página principal
-                    // document.querySelector('.main-content .module-title').textContent = `Bienvenido, ${username}!`;
-                }, 2000); // Espera 2 segundos antes de cerrar
-            } else if (username === '' || password === '') {
-                loginMessage.textContent = 'Por favor, ingrese usuario y contraseña.';
-                loginMessage.className = 'error-message';
-            }
-            else {
-                loginMessage.textContent = 'Usuario o contraseña incorrectos. Intente con "demo" y "password123".';
-                loginMessage.className = 'error-message';
-            }
         });
     </script>
 
