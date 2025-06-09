@@ -3,290 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Deudores</title>
+    <title>Gestor de Deudores Pro</title>
     <style>
         :root {
-            --primary-bg: #f0f4f8; /* Un gris claro para el fondo general */
-            --header-bg: #2c5282; /* Azul oscuro para cabeceras, similar al ejemplo */
+            --primary-bg: #f0f4f8;
+            --header-bg: #2c5282; /* Azul oscuro similar al de Blanquis */
             --header-text: #ffffff;
             --list-item-bg: #ffffff;
             --list-item-border: #e2e8f0;
             --text-color: #2d3748;
             --text-muted: #718096;
-            --green-accent: #38a169; /* Verde para botones de acción positivos */
-            --red-accent: #e53e3e; /* Rojo para acciones negativas o alertas */
-            --blue-accent: #3182ce; /* Azul para información o botones neutrales */
+            --green-accent: #38a169;
+            --red-accent: #e53e3e;
+            --blue-accent: #3182ce;
+            --yellow-accent: #ecc94b; /* Para botones de editar o alerta suave */
             --shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 15px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: var(--primary-bg); color: var(--text-color); line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
         header {
-            background-color: var(--header-bg);
-            color: var(--header-text);
-            padding: 20px 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            background-color: var(--header-bg); color: var(--header-text);
+            padding: 15px; text-align: center; margin-bottom: 20px;
+            position: sticky; top: 0; z-index: 1000;
         }
+        header h1 { margin: 0; font-size: 1.6em; }
+        .header-controls { display: flex; justify-content: space-between; align-items: center; }
+        .header-controls .back-button, .header-controls .action-button {
+            background: none; border: none; color: var(--header-text);
+            font-size: 1.3em; cursor: pointer; padding: 5px;
+        }
+         .header-controls .action-button.small { font-size: 0.8em; background-color: rgba(255,255,255,0.2); border-radius:4px; padding: 6px 10px;}
 
-        header h1 {
-            margin: 0;
-            font-size: 1.8em;
-        }
-        
-        .header-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-controls .back-button {
-            background: none;
-            border: none;
-            color: var(--header-text);
-            font-size: 1.5em;
-            cursor: pointer;
-        }
 
         .button {
-            background-color: var(--green-accent);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            text-align: center;
+            background-color: var(--green-accent); color: white; border: none;
+            padding: 10px 15px; border-radius: 5px; cursor: pointer;
+            font-size: 1em; transition: background-color 0.3s ease; text-align: center;
         }
-
-        .button-secondary {
-            background-color: var(--blue-accent);
-        }
-        
-        .button-danger {
-            background-color: var(--red-accent);
-        }
-
-        .button:hover {
-            opacity: 0.9;
-        }
+        .button-secondary { background-color: var(--blue-accent); }
+        .button-warning { background-color: var(--yellow-accent); color: #4A5568; }
+        .button-danger { background-color: var(--red-accent); }
+        .button:hover { opacity: 0.9; }
+        .button.small-icon { font-size:0.8em; padding: 5px 8px; margin-left: 5px; }
 
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-            padding-top: 60px; /* Ajuste para no superponer con header fijo */
+            display: none; position: fixed; z-index: 1001; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
+            padding-top: 50px;
         }
-
         .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 25px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background-color: #fefefe; margin: 2% auto; padding: 25px;
+            border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { margin-top: 0; color: var(--header-bg); }
+        .close-button { color: var(--text-muted); font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover, .close-button:focus { color: var(--text-color); }
 
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--header-bg);
+        input[type="text"], input[type="number"], input[type="date"], input[type="tel"], input[type="search"], textarea, select {
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            border: 1px solid var(--list-item-border); border-radius: 4px; font-size: 1em;
         }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .close-button {
-            color: var(--text-muted);
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: var(--text-color);
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        input[type="tel"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--list-item-border);
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        textarea { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
         .debtor-list-item, .transaction-item {
-            background-color: var(--list-item-bg);
-            border: 1px solid var(--list-item-border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: var(--list-item-bg); border: 1px solid var(--list-item-border);
+            border-radius: 8px; padding: 15px; margin-bottom: 12px;
+            box-shadow: var(--shadow); transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .debtor-list-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+        .debtor-list-item { cursor: pointer; }
+        .debtor-list-item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         
-        .debtor-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .debtor-name {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: var(--header-bg); /* Un color que destaque */
-        }
-        
-        .debtor-amount {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--green-accent);
-        }
-
-        .debtor-details p, .transaction-item p {
-            margin: 5px 0;
-            color: var(--text-muted);
-            font-size: 0.9em;
-        }
+        .debtor-info { display: flex; justify-content: space-between; align-items: center; }
+        .debtor-name { font-weight: bold; font-size: 1.2em; color: var(--header-bg); }
+        .debtor-amount { font-size: 1.2em; font-weight: bold; color: var(--green-accent); }
+        .debtor-details p, .transaction-item p { margin: 5px 0; color: var(--text-muted); font-size: 0.9em; }
         
         #debtor-detail-view .debt-summary {
-            background-color: var(--header-bg); /* Similar al estilo de Blanquis */
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background-color: #0A3D62; /* Un azul más oscuro, como en Blanquita detalle */
+            color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;
         }
-        
-        #debtor-detail-view .debt-summary p {
-            margin: 8px 0;
-            font-size: 1.1em;
-            display: flex;
-            justify-content: space-between;
-        }
-        #debtor-detail-view .debt-summary span {
-            font-weight: bold;
-        }
+        #debtor-detail-view .debt-summary p { margin: 8px 0; font-size: 1.1em; display: flex; justify-content: space-between; }
+        #debtor-detail-view .debt-summary span { font-weight: bold; }
 
-        .transaction-item {
-            cursor: default;
-        }
-        .transaction-item .amount {
-            font-weight: bold;
-        }
-        .transaction-item .payment .amount {
-            color: var(--green-accent);
-        }
-        .transaction-item .increase .amount {
-            color: var(--red-accent);
-        }
-        .transaction-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start; /* Alinea los items al inicio verticalmente */
-        }
-        .transaction-top h4 {
-            margin-bottom: 5px; /* Ajusta si es necesario */
-        }
-        
-        .transaction-actions {
-             margin-top: 5px; /* Pequeño espacio para el botón de borrar */
-        }
+        .transaction-item { cursor: default; }
+        .transaction-item .amount { font-weight: bold; }
+        .transaction-item.payment .amount { color: var(--green-accent); }
+        .transaction-item.increase .amount { color: var(--red-accent); }
+        .transaction-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .transaction-details h4 { margin-bottom: 5px; }
+        .transaction-controls { display:flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .control-btn { background: none; border: none; cursor: pointer; font-size:0.9em; padding: 3px;}
+        .edit-btn { color: var(--blue-accent); }
+        .delete-btn { color: var(--red-accent); }
 
-        .delete-transaction-btn {
-            background: none;
-            border: none;
-            color: var(--red-accent);
-            cursor: pointer;
-            font-size: 0.9em;
-        }
 
         #total-debtors-summary {
-            background-color: var(--list-item-bg);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: right;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--header-bg);
-            box-shadow: var(--shadow);
+            background-color: var(--list-item-bg); padding: 15px; border-radius: 8px;
+            margin-top: 20px; text-align: right; font-size: 1.2em; font-weight: bold;
+            color: var(--header-bg); box-shadow: var(--shadow);
         }
         
-        /* Ocultar vistas */
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
+        .action-buttons { display: flex; gap: 10px; margin: 20px 0; }
+        .action-buttons .button { flex-grow: 1; }
 
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            margin-bottom: 20px;
+        #search-bar-container { padding: 0 0 15px 0; }
+        #search-debtor-input { margin-bottom: 0; }
+        
+        /* Print styles */
+        @media print {
+            body * { visibility: hidden; }
+            .printable-area, .printable-area * { visibility: visible; }
+            .printable-area {
+                position: absolute; left: 0; top: 0; width: 100%;
+                margin: 0; padding: 20px; font-size: 12pt; color: black;
+            }
+            .printable-area header, .printable-area .action-buttons, .printable-area .actions-for-debtor, .printable-area .back-button,
+            .printable-area #delete-debtor-btn, .printable-area #edit-debtor-data-btn, .printable-area .transaction-controls {
+                 display: none !important; 
+            }
+            .printable-area .debt-summary { background-color: #eeeeee !important; color: black !important; border: 1px solid #ccc; }
+            .printable-area .transaction-item { border: 1px solid #ddd; page-break-inside: avoid; }
+            .printable-area h1, .printable-area h3 { color: black !important; }
+            .modal, header:not(.printable-header) { display:none !important; }
         }
-        .action-buttons .button {
-            flex-grow: 1;
-        }
-        .actions-for-debtor {
-            margin-top: 15px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+        .printable-header { visibility: visible !important; background-color: transparent !important; color: black !important; text-align: left; padding:0; margin-bottom:20px;}
+        .printable-header h1 {font-size: 1.5em;}
+
+
     </style>
 </head>
 <body>
@@ -295,30 +144,31 @@
         <!-- Vista Lista de Deudores -->
         <div id="debtor-list-view">
             <header>
-                <div class="header-controls">
-                     <h1>Deudores</h1>
-                     <!-- Espacio para futuro botón de config si es necesario -->
-                     <span></span> 
-                </div>
+                <div class="header-controls"><h1>Deudores</h1></div>
             </header>
             <div class="container">
+                <div id="search-bar-container">
+                    <input type="search" id="search-debtor-input" placeholder="Buscar deudor por nombre o concepto...">
+                </div>
                 <button id="show-add-debtor-modal-btn" class="button" style="width: 100%; margin-bottom: 20px;">+ Nuevo Deudor</button>
-                <div id="debtors-list-ul">
-                    <!-- Los deudores se cargarán aquí -->
-                </div>
-                <div id="total-debtors-summary">
-                    Total Deuda General: <span id="total-debtors-amount">$0.00</span>
-                </div>
+                <div id="debtors-list-ul"></div>
+                <div id="total-debtors-summary">Total Deuda General: <span id="total-debtors-amount">$0.00</span></div>
             </div>
         </div>
 
         <!-- Vista Detalle de Deudor -->
-        <div id="debtor-detail-view" class="hidden">
-            <header>
+        <div id="debtor-detail-view" class="hidden printable-area">
+            <header class="printable-header"> <!-- Este header se mostrará en impresión -->
+                 <h1 id="detail-header-name-print"></h1>
+            </header>
+            <header> <!-- Este header es para la app -->
                 <div class="header-controls">
                     <button class="back-button" id="back-to-list-btn">←</button>
                     <h1 id="detail-header-name">Detalle Deudor</h1>
-                    <button class="button button-danger" id="delete-debtor-btn" style="font-size: 0.8em; padding: 8px 10px;">Eliminar</button>
+                    <div>
+                        <button class="action-button small" id="edit-debtor-data-btn">Editar Datos</button>
+                        <button class="action-button small button-danger" id="delete-debtor-btn" style="margin-left:5px;">Eliminar Deudor</button>
+                    </div>
                 </div>
             </header>
             <div class="container">
@@ -326,7 +176,7 @@
                     <p>Deuda Actual: <span id="detail-current-debt">$0.00</span></p>
                     <p>Deuda Inicial: <span id="detail-initial-debt">$0.00</span></p>
                 </div>
-                 <div style="background-color: var(--list-item-bg); padding:15px; border-radius:8px; margin-bottom:20px; box-shadow: var(--shadow);">
+                <div style="background-color: var(--list-item-bg); padding:15px; border-radius:8px; margin-bottom:20px; box-shadow: var(--shadow);">
                     <p><strong>Concepto:</strong> <span id="detail-concept"></span></p>
                     <p><strong>Fecha Alta:</strong> <span id="detail-date-added"></span></p>
                     <p><strong>Dirección:</strong> <span id="detail-address"></span></p>
@@ -338,68 +188,78 @@
                     <button id="show-add-payment-modal-btn" class="button">Registrar Pago</button>
                     <button id="show-add-increase-modal-btn" class="button button-secondary">Aumentar Deuda</button>
                 </div>
-                <div id="transactions-list-ul">
-                    <!-- Las transacciones se cargarán aquí -->
+                <div id="transactions-list-ul"></div>
+                
+                <h3 style="margin-top:30px;">Acciones Adicionales</h3>
+                <div class="action-buttons">
+                    <button id="export-csv-btn" class="button button-secondary">Exportar Movs. (CSV)</button>
+                    <button id="generate-pdf-btn" class="button button-secondary">Generar PDF (Estado C.)</button>
+                </div>
+                 <div class="action-buttons">
+                    <button id="share-whatsapp-btn" class="button" style="background-color:#25D366;">Compartir WhatsApp</button>
+                    <button id="share-email-btn" class="button" style="background-color:#D44638;">Enviar por Correo</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para Nuevo Deudor -->
-    <div id="add-debtor-modal" class="modal">
+    <!-- Modal para Nuevo/Editar Deudor -->
+    <div id="debtor-form-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Nuevo Deudor</h2>
-                <span class="close-button" data-modal-id="add-debtor-modal">×</span>
+                <h2 id="debtor-modal-title">Nuevo Deudor</h2>
+                <span class="close-button" data-modal-id="debtor-form-modal">×</span>
             </div>
-            <form id="add-debtor-form">
+            <form id="debtor-form">
+                <input type="hidden" id="debtor-id-edit">
                 <label for="debtor-name">Nombre:</label>
-                <input type="text" id="debtor-name" required>
+                <input type="text" id="debtor-name-input" required>
                 
                 <label for="debtor-amount">Monto Inicial ($):</label>
-                <input type="number" id="debtor-amount" step="0.01" min="0" required>
+                <input type="number" id="debtor-amount-input" step="0.01" min="0" required>
                 
                 <label for="debtor-concept">Concepto:</label>
-                <input type="text" id="debtor-concept" required>
+                <input type="text" id="debtor-concept-input" required>
                 
                 <label for="debtor-date">Fecha de Alta:</label>
-                <input type="date" id="debtor-date" required>
+                <input type="date" id="debtor-date-input" required>
                 
                 <label for="debtor-address">Dirección:</label>
-                <textarea id="debtor-address"></textarea>
+                <textarea id="debtor-address-input"></textarea>
                 
                 <label for="debtor-phone">Teléfono/Celular:</label>
-                <input type="tel" id="debtor-phone">
+                <input type="tel" id="debtor-phone-input">
                 
                 <div class="form-actions">
-                    <button type="button" class="button button-secondary close-button" data-modal-id="add-debtor-modal">Cancelar</button>
-                    <button type="submit" class="button">Guardar Deudor</button>
+                    <button type="button" class="button button-secondary close-button" data-modal-id="debtor-form-modal">Cancelar</button>
+                    <button type="submit" class="button">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal para Nueva Transacción (Pago/Aumento) -->
-    <div id="add-transaction-modal" class="modal">
+    <!-- Modal para Nuevo/Editar Movimiento -->
+    <div id="transaction-form-modal" class="modal">
         <div class="modal-content">
              <div class="modal-header">
                 <h2 id="transaction-modal-title">Registrar Movimiento</h2>
-                <span class="close-button" data-modal-id="add-transaction-modal">×</span>
+                <span class="close-button" data-modal-id="transaction-form-modal">×</span>
             </div>
-            <form id="add-transaction-form">
-                <input type="hidden" id="transaction-type"> <!-- 'payment' o 'increase' -->
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-id-edit">
+                <input type="hidden" id="transaction-type-input"> <!-- 'payment' o 'increase' -->
                 
                 <label for="transaction-description">Descripción:</label>
-                <input type="text" id="transaction-description" required>
+                <input type="text" id="transaction-description-input" required>
                 
                 <label for="transaction-amount">Monto ($):</label>
-                <input type="number" id="transaction-amount" step="0.01" min="0" required>
+                <input type="number" id="transaction-amount-input" step="0.01" min="0" required>
                 
                 <label for="transaction-date">Fecha:</label>
-                <input type="date" id="transaction-date" required>
+                <input type="date" id="transaction-date-input" required>
                 
                 <div class="form-actions">
-                     <button type="button" class="button button-secondary close-button" data-modal-id="add-transaction-modal">Cancelar</button>
+                     <button type="button" class="button button-secondary close-button" data-modal-id="transaction-form-modal">Cancelar</button>
                     <button type="submit" class="button">Guardar Movimiento</button>
                 </div>
             </form>
@@ -407,268 +267,405 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const debtorListView = document.getElementById('debtor-list-view');
-            const debtorDetailView = document.getElementById('debtor-detail-view');
-            
-            const showAddDebtorModalBtn = document.getElementById('show-add-debtor-modal-btn');
-            const addDebtorModal = document.getElementById('add-debtor-modal');
-            const addDebtorForm = document.getElementById('add-debtor-form');
-            
-            const showAddPaymentModalBtn = document.getElementById('show-add-payment-modal-btn');
-            const showAddIncreaseModalBtn = document.getElementById('show-add-increase-modal-btn');
-            const addTransactionModal = document.getElementById('add-transaction-modal');
-            const addTransactionForm = document.getElementById('add-transaction-form');
-            const transactionModalTitle = document.getElementById('transaction-modal-title');
-            
-            const debtorsListUl = document.getElementById('debtors-list-ul');
-            const transactionsListUl = document.getElementById('transactions-list-ul');
+    document.addEventListener('DOMContentLoaded', () => {
+        const debtorListView = document.getElementById('debtor-list-view');
+        const debtorDetailView = document.getElementById('debtor-detail-view');
+        
+        const showAddDebtorModalBtn = document.getElementById('show-add-debtor-modal-btn');
+        const debtorFormModal = document.getElementById('debtor-form-modal');
+        const debtorForm = document.getElementById('debtor-form');
+        const debtorModalTitle = document.getElementById('debtor-modal-title');
+        
+        const showAddPaymentModalBtn = document.getElementById('show-add-payment-modal-btn');
+        const showAddIncreaseModalBtn = document.getElementById('show-add-increase-modal-btn');
+        const transactionFormModal = document.getElementById('transaction-form-modal');
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionModalTitle = document.getElementById('transaction-modal-title');
+        
+        const debtorsListUl = document.getElementById('debtors-list-ul');
+        const transactionsListUl = document.getElementById('transactions-list-ul');
 
-            const backToListBtn = document.getElementById('back-to-list-btn');
-            const deleteDebtorBtn = document.getElementById('delete-debtor-btn');
+        const backToListBtn = document.getElementById('back-to-list-btn');
+        const editDebtorDataBtn = document.getElementById('edit-debtor-data-btn');
+        const deleteDebtorBtn = document.getElementById('delete-debtor-btn');
 
-            let debtors = JSON.parse(localStorage.getItem('debtors')) || [];
-            let currentDebtorId = null;
+        const searchDebtorInput = document.getElementById('search-debtor-input');
 
-            // --- Modal Handling ---
-            function openModal(modalId) {
-                document.getElementById(modalId).style.display = 'block';
-                 if (modalId === 'add-debtor-modal') {
-                    document.getElementById('debtor-date').valueAsDate = new Date(); // Pre-fill date
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        const generatePdfBtn = document.getElementById('generate-pdf-btn');
+        const shareWhatsappBtn = document.getElementById('share-whatsapp-btn');
+        const shareEmailBtn = document.getElementById('share-email-btn');
+
+        let debtors = JSON.parse(localStorage.getItem('debtorsV2')) || []; // Changed key for V2
+        let currentDebtorId = null;
+
+        // --- Modal Handling ---
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            if (modalId === 'debtor-form-modal' && !document.getElementById('debtor-id-edit').value) { // Only for new debtor
+                document.getElementById('debtor-date-input').valueAsDate = new Date();
+            }
+            if (modalId === 'transaction-form-modal' && !document.getElementById('transaction-id-edit').value) { // Only for new transaction
+                document.getElementById('transaction-date-input').valueAsDate = new Date();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'debtor-form-modal') {
+                debtorForm.reset();
+                document.getElementById('debtor-id-edit').value = ''; // Clear edit ID
+            }
+            if (modalId === 'transaction-form-modal') {
+                transactionForm.reset();
+                document.getElementById('transaction-id-edit').value = ''; // Clear edit ID
+            }
+        }
+
+        document.querySelectorAll('.close-button').forEach(button => {
+            button.addEventListener('click', (e) => closeModal(e.target.dataset.modalId));
+        });
+        
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        };
+
+        // --- Show Modals ---
+        showAddDebtorModalBtn.addEventListener('click', () => {
+            debtorModalTitle.textContent = 'Nuevo Deudor';
+            debtorForm.reset();
+            document.getElementById('debtor-id-edit').value = '';
+            openModal('debtor-form-modal');
+        });
+        
+        editDebtorDataBtn.addEventListener('click', () => {
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if (!debtor) return;
+            debtorModalTitle.textContent = 'Editar Deudor';
+            document.getElementById('debtor-id-edit').value = debtor.id;
+            document.getElementById('debtor-name-input').value = debtor.name;
+            document.getElementById('debtor-amount-input').value = debtor.initialAmount;
+            document.getElementById('debtor-concept-input').value = debtor.concept;
+            document.getElementById('debtor-date-input').value = debtor.dateAdded;
+            document.getElementById('debtor-address-input').value = debtor.address || '';
+            document.getElementById('debtor-phone-input').value = debtor.phone || '';
+            openModal('debtor-form-modal');
+        });
+        
+        showAddPaymentModalBtn.addEventListener('click', () => openTransactionModal('payment'));
+        showAddIncreaseModalBtn.addEventListener('click', () => openTransactionModal('increase'));
+
+        function openTransactionModal(type, transactionIdToEdit = null) {
+            transactionForm.reset();
+            document.getElementById('transaction-id-edit').value = '';
+            document.getElementById('transaction-type-input').value = type;
+
+            if (transactionIdToEdit) {
+                const debtor = debtors.find(d => d.id === currentDebtorId);
+                const transaction = debtor.transactions.find(tx => tx.id === transactionIdToEdit);
+                if (transaction) {
+                    document.getElementById('transaction-id-edit').value = transaction.id;
+                    transactionModalTitle.textContent = `Editar ${transaction.type === 'payment' ? 'Pago' : 'Aumento'}`;
+                    document.getElementById('transaction-description-input').value = transaction.description;
+                    document.getElementById('transaction-amount-input').value = transaction.amount;
+                    document.getElementById('transaction-date-input').value = transaction.date;
+                    document.getElementById('transaction-type-input').value = transaction.type; // Keep original type on edit
                 }
-                 if (modalId === 'add-transaction-modal') {
-                    document.getElementById('transaction-date').valueAsDate = new Date(); // Pre-fill date
-                }
+            } else {
+                transactionModalTitle.textContent = type === 'payment' ? 'Registrar Pago' : 'Aumentar Deuda';
+            }
+            openModal('transaction-form-modal');
+        }
+
+        // --- Data Persistence ---
+        function saveDebtors() {
+            localStorage.setItem('debtorsV2', JSON.stringify(debtors));
+        }
+        function generateId() { return '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36); }
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() + userTimezoneOffset).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        // --- Rendering ---
+        function renderDebtorsList(filterText = '') {
+            debtorsListUl.innerHTML = '';
+            let totalGeneralDebt = 0;
+            
+            const filteredDebtors = debtors.filter(debtor => {
+                const searchText = filterText.toLowerCase();
+                return debtor.name.toLowerCase().includes(searchText) || 
+                       debtor.concept.toLowerCase().includes(searchText);
+            }).sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+
+            if (filteredDebtors.length === 0) {
+                debtorsListUl.innerHTML = `<p style="text-align:center; color: var(--text-muted);">
+                    ${filterText ? 'No hay deudores que coincidan con su búsqueda.' : 'No hay deudores registrados.'}
+                </p>`;
             }
 
-            function closeModal(modalId) {
-                document.getElementById(modalId).style.display = 'none';
-                if (modalId === 'add-debtor-modal') addDebtorForm.reset();
-                if (modalId === 'add-transaction-modal') addTransactionForm.reset();
-            }
-
-            document.querySelectorAll('.close-button').forEach(button => {
-                button.addEventListener('click', (e) => closeModal(e.target.dataset.modalId));
+            filteredDebtors.forEach(debtor => {
+                const currentDebt = calculateCurrentDebt(debtor);
+                totalGeneralDebt += currentDebt;
+                const item = document.createElement('div');
+                item.className = 'debtor-list-item';
+                item.dataset.id = debtor.id;
+                item.innerHTML = `
+                    <div class="debtor-info">
+                        <div>
+                            <div class="debtor-name">${debtor.name}</div>
+                            <p style="font-size:0.8em; color: var(--text-muted);">${debtor.concept}</p>
+                        </div>
+                        <div class="debtor-amount">$${currentDebt.toFixed(2)}</div>
+                    </div>
+                    <p style="font-size:0.8em; color: var(--text-muted); text-align:right;">Alta: ${formatDate(debtor.dateAdded)}</p>
+                `;
+                item.addEventListener('click', () => showDebtorDetail(debtor.id));
+                debtorsListUl.appendChild(item);
             });
-            
-            window.onclick = (event) => { // Close modal if clicked outside content
-                if (event.target.classList.contains('modal')) {
-                    closeModal(event.target.id);
-                }
+            document.getElementById('total-debtors-amount').textContent = `$${totalGeneralDebt.toFixed(2)}`;
+        }
+
+        function calculateCurrentDebt(debtor) {
+            return debtor.transactions.reduce((acc, tx) => {
+                return tx.type === 'payment' ? acc - tx.amount : acc + tx.amount;
+            }, debtor.initialAmount);
+        }
+
+        function renderDebtorDetail(debtorId) {
+            const debtor = debtors.find(d => d.id === debtorId);
+            if (!debtor) return;
+
+            currentDebtorId = debtorId;
+            document.getElementById('detail-header-name').textContent = debtor.name;
+            document.getElementById('detail-header-name-print').textContent = `Estado de Cuenta: ${debtor.name}`; // For PDF
+            document.getElementById('detail-initial-debt').textContent = `$${debtor.initialAmount.toFixed(2)}`;
+            document.getElementById('detail-current-debt').textContent = `$${calculateCurrentDebt(debtor).toFixed(2)}`;
+            document.getElementById('detail-concept').textContent = debtor.concept;
+            document.getElementById('detail-date-added').textContent = formatDate(debtor.dateAdded);
+            document.getElementById('detail-address').textContent = debtor.address || 'No especificada';
+            document.getElementById('detail-phone').textContent = debtor.phone || 'No especificado';
+
+            transactionsListUl.innerHTML = '';
+            if (debtor.transactions.length === 0) {
+                transactionsListUl.innerHTML = '<p style="text-align:center; color: var(--text-muted);">No hay movimientos registrados.</p>';
+            }
+            const sortedTransactions = [...debtor.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedTransactions.forEach(tx => {
+                const item = document.createElement('div');
+                item.className = `transaction-item ${tx.type}`;
+                item.innerHTML = `
+                    <div class="transaction-top">
+                        <div class="transaction-details">
+                            <h4 style="text-transform: capitalize;">${tx.type === 'payment' ? 'Pago' : 'Aumento'}</h4>
+                            <p>${tx.description}</p>
+                            <p style="font-size:0.8em; color: var(--text-muted);">${formatDate(tx.date)}</p>
+                        </div>
+                        <span class="amount">${tx.type === 'payment' ? '-' : '+'}$${tx.amount.toFixed(2)}</span>
+                    </div>
+                    <div class="transaction-controls">
+                        <button class="control-btn edit-btn" data-tx-id="${tx.id}">✏️ Editar</button>
+                        <button class="control-btn delete-btn" data-tx-id="${tx.id}">🗑️ Eliminar</button>
+                    </div>
+                `;
+                item.querySelector('.edit-btn').addEventListener('click', () => openTransactionModal(tx.type, tx.id));
+                item.querySelector('.delete-btn').addEventListener('click', () => deleteTransaction(currentDebtorId, tx.id));
+                transactionsListUl.appendChild(item);
+            });
+        }
+        
+        searchDebtorInput.addEventListener('input', (e) => {
+            renderDebtorsList(e.target.value);
+        });
+
+        // --- CRUD Operations ---
+        debtorForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('debtor-id-edit').value;
+            const debtorData = {
+                name: document.getElementById('debtor-name-input').value.trim(),
+                initialAmount: parseFloat(document.getElementById('debtor-amount-input').value),
+                concept: document.getElementById('debtor-concept-input').value.trim(),
+                dateAdded: document.getElementById('debtor-date-input').value,
+                address: document.getElementById('debtor-address-input').value.trim(),
+                phone: document.getElementById('debtor-phone-input').value.trim(),
             };
 
-            showAddDebtorModalBtn.addEventListener('click', () => openModal('add-debtor-modal'));
-            
-            showAddPaymentModalBtn.addEventListener('click', () => {
-                transactionModalTitle.textContent = 'Registrar Pago';
-                document.getElementById('transaction-type').value = 'payment';
-                openModal('add-transaction-modal');
-            });
-
-            showAddIncreaseModalBtn.addEventListener('click', () => {
-                transactionModalTitle.textContent = 'Aumentar Deuda';
-                document.getElementById('transaction-type').value = 'increase';
-                openModal('add-transaction-modal');
-            });
-
-
-            // --- Data Persistence ---
-            function saveDebtors() {
-                localStorage.setItem('debtors', JSON.stringify(debtors));
+            if (!debtorData.name || isNaN(debtorData.initialAmount) || !debtorData.concept || !debtorData.dateAdded) {
+                alert("Por favor, completa los campos obligatorios: Nombre, Monto, Concepto y Fecha.");
+                return;
             }
 
-            function generateId() {
-                return '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+            if (id) { // Editing existing debtor
+                const debtorIndex = debtors.findIndex(d => d.id === id);
+                if (debtorIndex > -1) {
+                    debtors[debtorIndex] = { ...debtors[debtorIndex], ...debtorData };
+                }
+            } else { // Adding new debtor
+                debtors.push({ ...debtorData, id: generateId(), transactions: [] });
             }
             
-            function formatDate(dateString) {
-                if (!dateString) return 'N/A';
-                const date = new Date(dateString);
-                 // Compensar la zona horaria para mostrar la fecha correcta
-                const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-                const correctedDate = new Date(date.getTime() + userTimezoneOffset);
-
-                return correctedDate.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
-            }
-
-            // --- Rendering ---
-            function renderDebtorsList() {
-                debtorsListUl.innerHTML = '';
-                let totalGeneralDebt = 0;
-                if (debtors.length === 0) {
-                    debtorsListUl.innerHTML = '<p style="text-align:center; color: var(--text-muted);">No hay deudores registrados.</p>';
-                }
-                debtors.sort((a,b) => new Date(b.dateAdded) - new Date(a.dateAdded)); // Más recientes primero
-
-                debtors.forEach(debtor => {
-                    const currentDebt = calculateCurrentDebt(debtor);
-                    totalGeneralDebt += currentDebt;
-                    const item = document.createElement('div');
-                    item.className = 'debtor-list-item';
-                    item.dataset.id = debtor.id;
-                    item.innerHTML = `
-                        <div class="debtor-info">
-                            <div>
-                                <div class="debtor-name">${debtor.name}</div>
-                                <p style="font-size:0.8em; color: var(--text-muted);">${debtor.concept}</p>
-                            </div>
-                            <div class="debtor-amount">$${currentDebt.toFixed(2)}</div>
-                        </div>
-                        <p style="font-size:0.8em; color: var(--text-muted); text-align:right;">Alta: ${formatDate(debtor.dateAdded)}</p>
-                    `;
-                    item.addEventListener('click', () => showDebtorDetail(debtor.id));
-                    debtorsListUl.appendChild(item);
-                });
-                document.getElementById('total-debtors-amount').textContent = `$${totalGeneralDebt.toFixed(2)}`;
-            }
-
-            function calculateCurrentDebt(debtor) {
-                let currentDebt = debtor.initialAmount;
-                debtor.transactions.forEach(tx => {
-                    if (tx.type === 'payment') {
-                        currentDebt -= tx.amount;
-                    } else if (tx.type === 'increase') {
-                        currentDebt += tx.amount;
-                    }
-                });
-                return currentDebt;
-            }
-
-            function renderDebtorDetail(debtorId) {
-                const debtor = debtors.find(d => d.id === debtorId);
-                if (!debtor) return;
-
-                currentDebtorId = debtorId;
-                document.getElementById('detail-header-name').textContent = debtor.name;
-                document.getElementById('detail-initial-debt').textContent = `$${debtor.initialAmount.toFixed(2)}`;
-                document.getElementById('detail-current-debt').textContent = `$${calculateCurrentDebt(debtor).toFixed(2)}`;
-                document.getElementById('detail-concept').textContent = debtor.concept;
-                document.getElementById('detail-date-added').textContent = formatDate(debtor.dateAdded);
-                document.getElementById('detail-address').textContent = debtor.address || 'No especificada';
-                document.getElementById('detail-phone').textContent = debtor.phone || 'No especificado';
-
-                transactionsListUl.innerHTML = '';
-                 if (debtor.transactions.length === 0) {
-                    transactionsListUl.innerHTML = '<p style="text-align:center; color: var(--text-muted);">No hay movimientos registrados.</p>';
-                }
-                // Ordenar transacciones por fecha, más recientes primero
-                const sortedTransactions = [...debtor.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-                sortedTransactions.forEach(tx => {
-                    const item = document.createElement('div');
-                    item.className = `transaction-item ${tx.type}`; // 'payment' o 'increase'
-                    item.innerHTML = `
-                        <div class="transaction-top">
-                            <div>
-                                <h4 style="text-transform: capitalize;">${tx.type === 'payment' ? 'Pago' : 'Aumento'}</h4>
-                                <p>${tx.description}</p>
-                                <p style="font-size:0.8em; color: var(--text-muted);">${formatDate(tx.date)}</p>
-                            </div>
-                            <span class="amount ${tx.type === 'payment' ? '' : 'increase'}">
-                                ${tx.type === 'payment' ? '-' : '+'}$${tx.amount.toFixed(2)}
-                            </span>
-                        </div>
-                        <div class="transaction-actions">
-                            <button class="delete-transaction-btn" data-tx-id="${tx.id}">× Eliminar</button>
-                        </div>
-                    `;
-                    // Botón de eliminar transacción
-                    item.querySelector('.delete-transaction-btn').addEventListener('click', (e) => {
-                        const transactionId = e.target.dataset.txId;
-                        if (confirm('¿Seguro que quieres eliminar este movimiento?')) {
-                            deleteTransaction(currentDebtorId, transactionId);
-                        }
-                    });
-                    transactionsListUl.appendChild(item);
-                });
-            }
-
-            // --- CRUD Operations ---
-            addDebtorForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newDebtor = {
-                    id: generateId(),
-                    name: document.getElementById('debtor-name').value.trim(),
-                    initialAmount: parseFloat(document.getElementById('debtor-amount').value),
-                    concept: document.getElementById('debtor-concept').value.trim(),
-                    dateAdded: document.getElementById('debtor-date').value,
-                    address: document.getElementById('debtor-address').value.trim(),
-                    phone: document.getElementById('debtor-phone').value.trim(),
-                    transactions: []
-                };
-                if (!newDebtor.name || isNaN(newDebtor.initialAmount) || !newDebtor.concept || !newDebtor.dateAdded) {
-                    alert("Por favor, completa los campos obligatorios: Nombre, Monto, Concepto y Fecha.");
-                    return;
-                }
-                debtors.push(newDebtor);
-                saveDebtors();
-                renderDebtorsList();
-                closeModal('add-debtor-modal');
-            });
-            
-            addTransactionForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const debtor = debtors.find(d => d.id === currentDebtorId);
-                if (!debtor) return;
-
-                const newTransaction = {
-                    id: generateId(),
-                    type: document.getElementById('transaction-type').value,
-                    description: document.getElementById('transaction-description').value.trim(),
-                    amount: parseFloat(document.getElementById('transaction-amount').value),
-                    date: document.getElementById('transaction-date').value
-                };
-
-                 if (!newTransaction.description || isNaN(newTransaction.amount) || !newTransaction.date) {
-                    alert("Por favor, completa todos los campos del movimiento.");
-                    return;
-                }
-                
-                debtor.transactions.push(newTransaction);
-                saveDebtors();
-                renderDebtorDetail(currentDebtorId); // Re-renderizar detalle
-                renderDebtorsList(); // Re-renderizar lista principal (para actualizar monto total si es visible)
-                closeModal('add-transaction-modal');
-            });
-            
-            deleteDebtorBtn.addEventListener('click', () => {
-                if (currentDebtorId && confirm(`¿Seguro que quieres eliminar a este deudor (${debtors.find(d=>d.id===currentDebtorId).name}) y todos sus movimientos? Esta acción no se puede deshacer.`)) {
-                    debtors = debtors.filter(d => d.id !== currentDebtorId);
-                    saveDebtors();
-                    showListView();
-                    renderDebtorsList();
-                    currentDebtorId = null;
-                }
-            });
-
-            function deleteTransaction(debtorId, transactionId) {
-                const debtor = debtors.find(d => d.id === debtorId);
-                if (debtor) {
-                    debtor.transactions = debtor.transactions.filter(tx => tx.id !== transactionId);
-                    saveDebtors();
-                    renderDebtorDetail(debtorId); // Actualiza la vista de detalles
-                    renderDebtorsList(); // Actualiza la lista principal por si el total cambió
-                }
-            }
-
-
-            // --- View Switching ---
-            function showListView() {
-                debtorListView.classList.remove('hidden');
-                debtorDetailView.classList.add('hidden');
-            }
-
-            function showDebtorDetail(debtorId) {
-                renderDebtorDetail(debtorId);
-                debtorListView.classList.add('hidden');
-                debtorDetailView.classList.remove('hidden');
-            }
-            
-            backToListBtn.addEventListener('click', showListView);
-
-            // --- Initial Load ---
-            renderDebtorsList();
+            saveDebtors();
+            renderDebtorsList(searchDebtorInput.value);
+            if (id && id === currentDebtorId) renderDebtorDetail(id); // Re-render detail if current debtor was edited
+            closeModal('debtor-form-modal');
         });
+            
+        transactionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if (!debtor) return;
+
+            const transactionId = document.getElementById('transaction-id-edit').value;
+            const transactionData = {
+                type: document.getElementById('transaction-type-input').value,
+                description: document.getElementById('transaction-description-input').value.trim(),
+                amount: parseFloat(document.getElementById('transaction-amount-input').value),
+                date: document.getElementById('transaction-date-input').value
+            };
+
+            if (!transactionData.description || isNaN(transactionData.amount) || !transactionData.date) {
+                alert("Por favor, completa todos los campos del movimiento.");
+                return;
+            }
+
+            if (transactionId) { // Editing existing transaction
+                const txIndex = debtor.transactions.findIndex(tx => tx.id === transactionId);
+                if (txIndex > -1) {
+                    debtor.transactions[txIndex] = { ...debtor.transactions[txIndex], ...transactionData };
+                }
+            } else { // Adding new transaction
+                debtor.transactions.push({ ...transactionData, id: generateId() });
+            }
+            
+            saveDebtors();
+            renderDebtorDetail(currentDebtorId);
+            renderDebtorsList(searchDebtorInput.value);
+            closeModal('transaction-form-modal');
+        });
+        
+        deleteDebtorBtn.addEventListener('click', () => {
+            const debtorName = debtors.find(d => d.id === currentDebtorId)?.name || "este deudor";
+            if (currentDebtorId && confirm(`¿Seguro que quieres eliminar a ${debtorName} y todos sus movimientos? Esta acción no se puede deshacer.`)) {
+                debtors = debtors.filter(d => d.id !== currentDebtorId);
+                saveDebtors();
+                showListView();
+                currentDebtorId = null;
+            }
+        });
+
+        function deleteTransaction(debtorId, transactionId) {
+            if (!confirm('¿Seguro que quieres eliminar este movimiento?')) return;
+            const debtor = debtors.find(d => d.id === debtorId);
+            if (debtor) {
+                debtor.transactions = debtor.transactions.filter(tx => tx.id !== transactionId);
+                saveDebtors();
+                renderDebtorDetail(debtorId);
+                renderDebtorsList(searchDebtorInput.value);
+            }
+        }
+
+        // --- View Switching ---
+        function showListView() {
+            debtorListView.classList.remove('hidden');
+            debtorDetailView.classList.add('hidden');
+            renderDebtorsList(searchDebtorInput.value); // Ensure list is up-to-date
+        }
+
+        function showDebtorDetail(debtorId) {
+            renderDebtorDetail(debtorId);
+            debtorListView.classList.add('hidden');
+            debtorDetailView.classList.remove('hidden');
+        }
+        backToListBtn.addEventListener('click', showListView);
+
+        // --- Export and Share ---
+        exportCsvBtn.addEventListener('click', () => {
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if (!debtor) return;
+
+            let csvContent = "Fecha,Descripcion,Tipo,Monto\n";
+            const sortedTransactions = [...debtor.transactions].sort((a, b) => new Date(a.date) - new Date(b.date)); // oldest first for CSV
+            
+            sortedTransactions.forEach(tx => {
+                const type = tx.type === 'payment' ? 'Pago' : 'Aumento de Deuda';
+                const sign = tx.type === 'payment' ? '-' : '+';
+                csvContent += `${formatDate(tx.date)},"${tx.description.replace(/"/g, '""')}",${type},${sign}${tx.amount.toFixed(2)}\n`;
+            });
+            csvContent += `\nDeuda Inicial,,,${debtor.initialAmount.toFixed(2)}\n`;
+            csvContent += `Deuda Actual,,,${calculateCurrentDebt(debtor).toFixed(2)}\n`;
+
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `movimientos_${debtor.name.replace(/\s+/g, '_')}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        generatePdfBtn.addEventListener('click', () => {
+             // Asegurarse de que el nombre del deudor para el PDF está actualizado.
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if(debtor) document.getElementById('detail-header-name-print').textContent = `Estado de Cuenta: ${debtor.name}`;
+            
+            window.print();
+        });
+        
+        function getDebtorSummaryText(debtor) {
+            const currentDebt = calculateCurrentDebt(debtor);
+            let summary = `Hola ${debtor.name},\n\nResumen de tu cuenta:\n`;
+            summary += `Deuda Inicial: $${debtor.initialAmount.toFixed(2)}\n`;
+            summary += `Deuda Actual: $${currentDebt.toFixed(2)}\n\n`;
+            summary += `Concepto: ${debtor.concept}\n`;
+            
+            if(debtor.transactions.length > 0){
+                summary += `\nÚltimos movimientos:\n`;
+                const recentTransactions = [...debtor.transactions]
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 5); // Muestra hasta 5 movimientos recientes
+                recentTransactions.forEach(tx => {
+                    const type = tx.type === 'payment' ? 'Pago' : 'Aumento';
+                    const sign = tx.type === 'payment' ? '-' : '+';
+                    summary += `${formatDate(tx.date)}: ${tx.description} (${type}) ${sign}$${tx.amount.toFixed(2)}\n`;
+                });
+            } else {
+                summary += `No hay movimientos registrados.\n`;
+            }
+            return summary;
+        }
+
+        shareWhatsappBtn.addEventListener('click', () => {
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if (!debtor) return;
+            const message = getDebtorSummaryText(debtor);
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+
+        shareEmailBtn.addEventListener('click', () => {
+            const debtor = debtors.find(d => d.id === currentDebtorId);
+            if (!debtor) return;
+            const subject = `Estado de cuenta: ${debtor.name}`;
+            const body = getDebtorSummaryText(debtor);
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoUrl;
+        });
+
+        // --- Initial Load ---
+        renderDebtorsList();
+        // Si hay un # en la URL podría ser para cargar un deudor específico, pero no se implementó deep linking.
+    });
     </script>
 </body>
 </html>
