@@ -11,11 +11,12 @@
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Alinea al inicio por si el contenido crece */
             min-height: 100vh;
             margin: 0;
-            padding: 20px 0;
-            transition: background-color 0.5s ease; /* Transición suave del fondo */
+            padding: 20px; /* Padding general para el body */
+            box-sizing: border-box;
+            transition: background-color 0.5s ease;
         }
 
         .container, .dashboard-container {
@@ -23,7 +24,7 @@
             padding: 30px 40px;
             border-radius: 10px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            width: 380px; /* Un poco más ancho para el dashboard */
+            width: 400px; /* Un poco más ancho */
             text-align: center;
             margin-top: 20px;
             margin-bottom: 20px;
@@ -78,7 +79,7 @@
             margin-top: 10px;
         }
         .dashboard-container .button-secondary {
-            background-color: #6c757d; /* Gris para botones secundarios */
+            background-color: #6c757d;
         }
         .dashboard-container .button-secondary:hover {
             background-color: #5a6268;
@@ -124,12 +125,10 @@
             text-decoration: underline;
         }
 
-        /* Contenedores de vista */
         #loginContainer, #registerContainer, #dashboardContainer, #profileContainer {
-            display: none; /* Todos ocultos por defecto, JS controla cuál se muestra */
+            display: none;
         }
 
-        /* Estilos específicos del Dashboard */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -138,7 +137,7 @@
         }
 
         .dashboard-header h2 {
-            margin-bottom: 0; /* Ya tiene margen el contenedor */
+            margin-bottom: 0;
         }
 
         #welcomeMessage {
@@ -153,7 +152,7 @@
             padding: 8px 15px;
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
-            border-radius: 20px; /* Más redondeado para que parezca "etiqueta" */
+            border-radius: 20px;
             text-decoration: none;
             color: #333;
             font-size: 14px;
@@ -169,45 +168,62 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Estilos para el futuro contenedor de perfil */
-        #profileContainer label { /* Reutilizando el estilo de label de .container */
-             display: block;
-            text-align: left;
-            margin-bottom: 6px;
-            color: #555;
-            font-weight: 500;
-            font-size: 14px;
+        /* Nuevas Tarjetas del Dashboard */
+        .dashboard-options {
+            display: flex; /* Para ponerlas una al lado de la otra */
+            justify-content: space-around; /* Espacio entre ellas */
+            gap: 20px; /* Espacio entre las tarjetas */
+            margin-top: 20px; /* Espacio después del mensaje de bienvenida */
+            margin-bottom: 30px; /* Espacio antes del botón de cerrar sesión */
         }
-        #profileContainer input { /* Reutilizando el estilo de input de .container */
-            width: calc(100% - 24px);
-            padding: 12px;
-            margin-bottom: 18px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 15px;
+
+        .dashboard-card {
+            background-color: #f8f9fa; /* Fondo claro para las tarjetas */
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 45%; /* Que ocupen casi la mitad cada una con el gap */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer; /* Indica que podrían ser clickeables en el futuro */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #007bff; /* Color principal para el título de la tarjeta */
+        }
+
+        .dashboard-card p {
+            font-size: 0.9em;
+            color: #6c757d; /* Color gris para la descripción */
+            margin-bottom: 0;
+        }
+
+        /* Estilos para el futuro contenedor de perfil (sin cambios) */
+        #profileContainer label {
+             display: block; text-align: left; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px;
+        }
+        #profileContainer input {
+            width: calc(100% - 24px); padding: 12px; margin-bottom: 18px; border: 1px solid #ddd;
+            border-radius: 5px; box-sizing: border-box; font-size: 15px;
         }
         #profileContainer input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
         }
         #profileContainer button {
-             width: 100%;
-            padding: 12px;
-            background-color: #28a745; /* Botón verde para guardar perfil */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-            margin-top: 10px;
+             width: 100%; padding: 12px; background-color: #28a745; color: white; border: none;
+             border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500;
+             transition: background-color 0.3s ease; margin-top: 10px;
         }
-         #profileContainer button:hover {
-            background-color: #218838;
-        }
+         #profileContainer button:hover { background-color: #218838; }
 
     </style>
 </head>
@@ -216,14 +232,8 @@
     <div id="loginContainer" class="container">
         <h2>Iniciar Sesión</h2>
         <form id="loginForm">
-            <div>
-                <label for="loginUsername">Usuario:</label>
-                <input type="text" id="loginUsername" name="loginUsername" required>
-            </div>
-            <div>
-                <label for="loginPassword">Contraseña:</label>
-                <input type="password" id="loginPassword" name="loginPassword" required>
-            </div>
+            <div><label for="loginUsername">Usuario:</label><input type="text" id="loginUsername" required></div>
+            <div><label for="loginPassword">Contraseña:</label><input type="password" id="loginPassword" required></div>
             <button type="button" onclick="handleLogin()">Entrar</button>
         </form>
         <div id="loginMessageArea" class="message"></div>
@@ -253,37 +263,32 @@
             </a>
         </div>
         <div id="welcomeMessage"></div>
-        <!-- Más contenido del dashboard puede ir aquí -->
-        <button type="button" onclick="handleLogout()" class="button-secondary" style="margin-top:30px;">Cerrar Sesión</button>
+
+        <!-- Nuevas Opciones del Dashboard -->
+        <div class="dashboard-options">
+            <div class="dashboard-card" id="newShipmentCard">
+                <h3>🚚 NUEVO ENVÍO</h3>
+                <p>Aquí podrás gestionar tus nuevos envíos.</p>
+            </div>
+            <div class="dashboard-card" id="newManagementCard">
+                <h3>⚙️ NUEVA GESTIÓN</h3>
+                <p>Aquí podrás gestionar tus nuevas gestiones.</p>
+            </div>
+        </div>
+        <!-- Fin Nuevas Opciones -->
+
+        <button type="button" onclick="handleLogout()" class="button-secondary" style="margin-top:auto;">Cerrar Sesión</button>
     </div>
 
-    <div id="profileContainer" class="container"> <!-- Contenedor para la edición del perfil -->
+    <div id="profileContainer" class="container">
         <h2>Mi Perfil</h2>
         <form id="profileForm">
-            <div>
-                <label for="profileName">Nombre y Apellido:</label>
-                <input type="text" id="profileName" required>
-            </div>
-            <div>
-                <label for="profileUsername">Usuario (no editable):</label>
-                <input type="text" id="profileUsername" readonly disabled>
-            </div>
-            <div>
-                <label for="profileEmail">Correo Electrónico:</label>
-                <input type="email" id="profileEmail" required>
-            </div>
-            <div>
-                <label for="profilePhone">Celular:</label>
-                <input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required>
-            </div>
-            <div>
-                <label for="profileNewPassword">Nueva Contraseña (dejar en blanco para no cambiar):</label>
-                <input type="password" id="profileNewPassword">
-            </div>
-            <div>
-                <label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label>
-                <input type="password" id="profileConfirmNewPassword">
-            </div>
+            <div><label for="profileName">Nombre y Apellido:</label><input type="text" id="profileName" required></div>
+            <div><label for="profileUsername">Usuario (no editable):</label><input type="text" id="profileUsername" readonly disabled></div>
+            <div><label for="profileEmail">Correo Electrónico:</label><input type="email" id="profileEmail" required></div>
+            <div><label for="profilePhone">Celular:</label><input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required></div>
+            <div><label for="profileNewPassword">Nueva Contraseña (dejar en blanco para no cambiar):</label><input type="password" id="profileNewPassword"></div>
+            <div><label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label><input type="password" id="profileConfirmNewPassword"></div>
             <button type="button" onclick="handleUpdateProfile()">Guardar Cambios</button>
         </form>
         <div id="profileMessageArea" class="message"></div>
@@ -295,27 +300,22 @@
         // --- Constantes y Variables Globales ---
         const USERS_STORAGE_KEY = 'registeredUsers';
         let users = [];
-        let currentUser = null; // Para almacenar el usuario que ha iniciado sesión
+        let currentUser = null;
 
         // --- Selectores de Elementos del DOM ---
-        // Contenedores de Vistas
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
         const dashboardContainer = document.getElementById('dashboardContainer');
-        const profileContainer = document.getElementById('profileContainer'); // Nuevo
+        const profileContainer = document.getElementById('profileContainer');
 
-        // Formularios
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        const profileForm = document.getElementById('profileForm'); // Nuevo
+        const profileForm = document.getElementById('profileForm');
 
-
-        // Campos de Login
         const loginUsernameInput = document.getElementById('loginUsername');
         const loginPasswordInput = document.getElementById('loginPassword');
         const loginMessageArea = document.getElementById('loginMessageArea');
 
-        // Campos de Registro
         const registerNameInput = document.getElementById('registerName');
         const registerUsernameInput = document.getElementById('registerUsername');
         const registerEmailInput = document.getElementById('registerEmail');
@@ -324,11 +324,13 @@
         const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
         const registerMessageArea = document.getElementById('registerMessageArea');
 
-        // Elementos del Dashboard
         const welcomeMessageElement = document.getElementById('welcomeMessage');
-        const profileLink = document.getElementById('profileLink'); // Nuevo
+        const profileLink = document.getElementById('profileLink');
 
-        // Elementos del Perfil (Nuevo)
+        // Selectores de las nuevas tarjetas (aunque no tengan JS asociado aún, bueno tenerlos)
+        const newShipmentCard = document.getElementById('newShipmentCard');
+        const newManagementCard = document.getElementById('newManagementCard');
+
         const profileNameInput = document.getElementById('profileName');
         const profileUsernameInput = document.getElementById('profileUsername');
         const profileEmailInput = document.getElementById('profileEmail');
@@ -338,8 +340,6 @@
         const profileMessageArea = document.getElementById('profileMessageArea');
         const backToDashboardLink = document.getElementById('backToDashboardLink');
 
-
-        // Enlaces para cambiar de vista (login/registro)
         const showRegisterLink = document.getElementById('showRegisterLink');
         const showLoginLink = document.getElementById('showLoginLink');
 
@@ -348,32 +348,50 @@
         function showMessage(area, text, type) {
             area.textContent = text;
             area.className = `message ${type}`;
-            area.style.display = 'block'; // Aseguramos que sea visible
+            area.style.display = 'block';
         }
 
         function clearMessage(area) {
             area.textContent = '';
             area.className = 'message';
-            area.style.display = 'none'; // Ocultamos
+            area.style.display = 'none';
         }
 
         // --- Manejo de Vistas ---
         function showView(viewToShow) {
-            // Ocultar todas las vistas principales
             loginContainer.style.display = 'none';
             registerContainer.style.display = 'none';
             dashboardContainer.style.display = 'none';
-            profileContainer.style.display = 'none'; // Nuevo
-
-            // Mostrar la vista deseada
+            profileContainer.style.display = 'none';
             if (viewToShow) {
-                viewToShow.style.display = 'block';
+                viewToShow.style.display = 'flex'; // Usar flex para centrar contenido vertical si es corto
+                viewToShow.style.flexDirection = 'column'; // Para que los hijos se apilen
+                // Para los contenedores principales, puede que prefieras 'block' si no necesitas flex
+                // pero si el body es flex, y el container debe ocupar altura, flex puede ser util
+                 if (viewToShow === loginContainer || viewToShow === registerContainer || viewToShow === profileContainer) {
+                    viewToShow.style.display = 'block'; // Volver a block si flex da problemas de layout aquí
+                }
+                 if(viewToShow === dashboardContainer){ // dashboard si necesita flex para las opciones
+                    viewToShow.style.display = 'block'; // Block es más simple para dashboard container general
+                 }
+
+
+            }
+        }
+        function showView(viewToShow) {
+            loginContainer.style.display = 'none';
+            registerContainer.style.display = 'none';
+            dashboardContainer.style.display = 'none';
+            profileContainer.style.display = 'none';
+            if (viewToShow) {
+                viewToShow.style.display = 'block'; // Más simple y generalmente funciona bien
             }
         }
 
+
         function showLoginView() {
-            currentUser = null; // Limpiar usuario actual al mostrar login
-            sessionStorage.removeItem('loggedInUser'); // Limpiar sesión si usamos sessionStorage
+            currentUser = null;
+            sessionStorage.removeItem('loggedInUser');
             showView(loginContainer);
             clearMessage(loginMessageArea);
             clearMessage(registerMessageArea);
@@ -389,26 +407,25 @@
 
         function showDashboardView() {
             if (!currentUser) {
-                showLoginView(); // Si no hay usuario, volver al login
+                showLoginView();
                 return;
             }
             showView(dashboardContainer);
             updateWelcomeMessage();
         }
 
-        function showProfileView() { // Nueva función
+        function showProfileView() {
             if (!currentUser) {
                 showLoginView();
                 return;
             }
             showView(profileContainer);
             clearMessage(profileMessageArea);
-            // Pre-rellenar el formulario de perfil con los datos del currentUser
             profileNameInput.value = currentUser.name;
-            profileUsernameInput.value = currentUser.username; // No editable
+            profileUsernameInput.value = currentUser.username;
             profileEmailInput.value = currentUser.email;
             profilePhoneInput.value = currentUser.phone;
-            profileNewPasswordInput.value = ''; // Limpiar campos de contraseña
+            profileNewPasswordInput.value = '';
             profileConfirmNewPasswordInput.value = '';
         }
 
@@ -428,17 +445,17 @@
                 }];
                 saveUsers();
             }
-            // Comprobar si hay un usuario logueado en sessionStorage (para persistencia en refresco de página)
             const loggedInUsername = sessionStorage.getItem('loggedInUser');
             if (loggedInUsername) {
                 currentUser = users.find(u => u.username === loggedInUsername);
                 if (currentUser) {
-                     showDashboardView(); // Si se encontró, ir directo al dashboard
+                     showDashboardView();
                 } else {
-                    showLoginView(); // Si no (datos corruptos), mostrar login
+                    sessionStorage.removeItem('loggedInUser'); // limpiar si el usuario no existe en BD
+                    showLoginView();
                 }
             } else {
-                showLoginView(); // Por defecto mostrar login
+                showLoginView();
             }
         }
 
@@ -460,38 +477,35 @@
                 showMessage(registerMessageArea, "Todos los campos son obligatorios.", "error"); return;
             }
             if (/\s/.test(username)) {
-                showMessage(registerMessageArea, "El nombre de usuario no puede contener espacios.", "error"); return;
+                showMessage(registerMessageArea, "El usuario no puede contener espacios.", "error"); return;
             }
             if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
-                showMessage(registerMessageArea, "Usuario: solo letras, números, puntos, guiones y guiones bajos.", "error"); return;
+                showMessage(registerMessageArea, "Usuario: letras, números, ., -, _.", "error"); return;
             }
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showMessage(registerMessageArea, "Formato de correo electrónico inválido.", "error"); return;
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMessage(registerMessageArea, "Email inválido.", "error"); return;
             }
-            const phoneRegex = /^09[6-9]\d{7}$/;
-            if (!phoneRegex.test(phone)) {
-                showMessage(registerMessageArea, "Celular: 09XXXXXXXX (ej: 0981123456).", "error"); return;
+            if (!/^09[6-9]\d{7}$/.test(phone)) {
+                showMessage(registerMessageArea, "Celular: 09XXXXXXXX.", "error"); return;
             }
             if (password.length < 8) {
-                showMessage(registerMessageArea, "La contraseña debe tener al menos 8 caracteres.", "error"); return;
+                showMessage(registerMessageArea, "Contraseña: mín. 8 caracteres.", "error"); return;
             }
             if (password !== confirmPassword) {
                 showMessage(registerMessageArea, "Las contraseñas no coinciden.", "error"); return;
             }
             if (users.some(user => user.username === username)) {
-                showMessage(registerMessageArea, "El nombre de usuario ya está registrado.", "error"); return;
+                showMessage(registerMessageArea, "El usuario ya existe.", "error"); return;
             }
             if (users.some(user => user.email === email)) {
-                showMessage(registerMessageArea, "El correo electrónico ya está registrado.", "error"); return;
+                showMessage(registerMessageArea, "El email ya está registrado.", "error"); return;
             }
 
-            const newUser = { name, username, email, phone, password };
-            users.push(newUser);
+            users.push({ name, username, email, phone, password });
             saveUsers();
-            showMessage(registerMessageArea, "¡Usuario registrado! Ahora puedes iniciar sesión.", "success");
+            showMessage(registerMessageArea, "¡Registrado! Ahora inicia sesión.", "success");
             registerForm.reset();
-            setTimeout(showLoginView, 2000); // Volver al login después de 2 seg
+            setTimeout(showLoginView, 2000);
         }
 
         // --- Lógica de Login ---
@@ -501,15 +515,12 @@
             const password = loginPasswordInput.value;
 
             if (username === "" || password === "") {
-                showMessage(loginMessageArea, "Por favor, ingresa usuario y contraseña.", "error");
-                return;
+                showMessage(loginMessageArea, "Ingresa usuario y contraseña.", "error"); return;
             }
-
             const foundUser = users.find(user => user.username === username && user.password === password);
-
             if (foundUser) {
                 currentUser = foundUser;
-                sessionStorage.setItem('loggedInUser', currentUser.username); // Guardar en sessionStorage
+                sessionStorage.setItem('loggedInUser', currentUser.username);
                 showDashboardView();
             } else {
                 currentUser = null;
@@ -518,93 +529,80 @@
             }
         }
 
-        // --- Lógica del Dashboard y Mensaje de Bienvenida ---
+        // --- Dashboard y Bienvenida ---
         function updateWelcomeMessage() {
             if (!currentUser) return;
-
-            const now = new Date();
-            const hours = now.getHours();
-            let greeting;
-
-            if (hours < 12) {
-                greeting = "Buenos días";
-            } else if (hours < 18) { // Puedes ajustar este límite, p.ej. 19 o 20
-                greeting = "Buenas tardes";
-            } else {
-                greeting = "Buenas noches";
-            }
-            welcomeMessageElement.textContent = `${greeting}, ${currentUser.name}. ¡Bienvenido/a al panel!`;
+            const hours = new Date().getHours();
+            let greeting = hours < 12 ? "Buenos días" : hours < 18 ? "Buenas tardes" : "Buenas noches";
+            welcomeMessageElement.innerHTML = `${greeting}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a al panel!`;
         }
 
-        // --- Lógica de Logout ---
+        // --- Logout ---
         function handleLogout() {
             currentUser = null;
-            sessionStorage.removeItem('loggedInUser'); // Importante para persistencia
+            sessionStorage.removeItem('loggedInUser');
             showLoginView();
-            // Opcionalmente, mostrar un mensaje de despedida
-            // showMessage(loginMessageArea, "Has cerrado sesión.", "success");
         }
 
-        // --- Lógica para Actualizar Perfil (Placeholder por ahora) ---
+        // --- Actualizar Perfil ---
         function handleUpdateProfile() {
-            // Esta función se implementará completamente en el siguiente paso.
-            // Por ahora, solo simula que se guardan y vuelve al dashboard.
-
             clearMessage(profileMessageArea);
             const name = profileNameInput.value.trim();
             const email = profileEmailInput.value.trim();
             const phone = profilePhoneInput.value.trim();
-            const newPassword = profileNewPasswordInput.value;
-            const confirmNewPassword = profileConfirmNewPasswordInput.value;
-
-            // VALIDACIONES (simplificadas aquí, las completas en el siguiente paso)
+            // Lógica de contraseña se hará más adelante
             if (!name || !email || !phone) {
                 showMessage(profileMessageArea, "Nombre, Email y Celular son obligatorios.", "error");
                 return;
             }
+            // Validar email y phone de nuevo (podrías reutilizar funciones de validación)
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMessage(profileMessageArea, "Email inválido.", "error"); return;
+            }
+            if (!/^09[6-9]\d{7}$/.test(phone)) {
+                showMessage(profileMessageArea, "Celular: 09XXXXXXXX.", "error"); return;
+            }
 
-            // Aquí iría la lógica de actualizar `currentUser` en el array `users` y en `localStorage`
-            // Por ahora solo un mensaje:
-            showMessage(profileMessageArea, "Perfil actualizado (simulación). Volviendo al panel...", "success");
-
-            // Simular actualización de currentUser (si el usuario es real, lo actualizamos)
-            if (currentUser) {
-                currentUser.name = name;
-                currentUser.email = email;
-                currentUser.phone = phone;
-                // Manejo de contraseña (más complejo) se agregará después
-
-                // Actualizar en el array `users` y `localStorage`
-                const userIndex = users.findIndex(u => u.username === currentUser.username);
-                if (userIndex > -1) {
-                    users[userIndex] = { ...users[userIndex], ...currentUser }; // Actualizar campos
-                    saveUsers();
-                }
+            // Verificar si el email es único (si se cambió y no es el del propio usuario)
+            if (email !== currentUser.email && users.some(u => u.email === email)) {
+                 showMessage(profileMessageArea, "Ese correo electrónico ya está en uso por otro usuario.", "error"); return;
             }
 
 
-            setTimeout(showDashboardView, 1500); // Volver al dashboard después de mensaje
+            currentUser.name = name;
+            currentUser.email = email;
+            currentUser.phone = phone;
+
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            if (userIndex > -1) {
+                users[userIndex] = { ...users[userIndex], ...currentUser };
+                saveUsers();
+                 showMessage(profileMessageArea, "Perfil actualizado. Volviendo al panel...", "success");
+                 updateWelcomeMessage(); // Para que si el nombre cambió se refleje en el dashboard
+                 setTimeout(showDashboardView, 1500);
+            } else {
+                 showMessage(profileMessageArea, "Error al actualizar el perfil.", "error");
+            }
+
+
         }
 
 
         // --- Event Listeners ---
         showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
         showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
-        profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); }); // Nuevo
-        backToDashboardLink.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); }); // Nuevo
+        profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); });
+        backToDashboardLink.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
 
-
-        // Permitir submit con Enter
         loginPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
         loginUsernameInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); loginPasswordInput.focus(); } });
         registerConfirmPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleRegister(); } });
-        // Para perfil, enter en el último campo de contraseña intenta guardar
         profileConfirmNewPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleUpdateProfile(); }});
 
 
         // --- Inicialización ---
         window.addEventListener('DOMContentLoaded', () => {
-            loadUsers(); // Carga usuarios y decide qué vista mostrar (login o dashboard si hay sesión)
+            loadUsers();
         });
 
     </script>
