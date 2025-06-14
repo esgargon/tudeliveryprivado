@@ -3,644 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Web - Demo con Mapas</title>
+    <title>Sistema Web - Demo (Carga Segura)</title>
 
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhpmA9dtpgGlPγηLaUv9nMpట్‌Πςάς=="
-     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhpmA9dtpgBPnPnqaxhLEVhV1A9mswLFvHeM=" crossorigin=""/>
     <!-- Leaflet Routing Machine CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5;
-            display: flex; justify-content: center; align-items: flex-start; min-height: 100vh;
-            margin: 0; padding: 20px; box-sizing: border-box; transition: background-color 0.5s ease;
-        }
-
-        .container, .dashboard-container, .contacts-container, .new-shipment-container {
-            background-color: #fff; padding: 30px 40px; border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); width: 550px; /* Un poco más ancho para los mapas */
-            text-align: center; margin-top: 20px; margin-bottom: 20px;
-        }
-
-        .container h2, .dashboard-container h2, .contacts-container h2, .new-shipment-container h2 {
-            margin-top: 0; margin-bottom: 25px; color: #333; font-weight: 600;
-        }
-        .new-shipment-container h3 {
-            margin-top: 20px; margin-bottom: 15px; color: #007bff; font-size: 1.3em;
-            border-bottom: 1px solid #eee; padding-bottom: 10px;
-        }
-
-        label {
-            display: block; text-align: left; margin-bottom: 6px; color: #555;
-            font-weight: 500; font-size: 14px;
-        }
-
-        input[type="text"], input[type="password"], input[type="email"],
-        input[type="tel"], input[type="number"], select, textarea {
-            width: calc(100% - 24px); padding: 12px; margin-bottom: 18px;
-            border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 15px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .container, .dashboard-container, .contacts-container, .new-shipment-container { background-color: #fff; padding: 30px 40px; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); width: 550px; text-align: center; margin: 20px auto; } /* Centrado auto con margen */
+        h2 { margin-top: 0; margin-bottom: 25px; color: #333; font-weight: 600; }
+        .new-shipment-container h3 { margin: 20px 0 15px; color: #007bff; font-size: 1.3em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        label { display: block; text-align: left; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px; }
+        input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"], select, textarea { width: calc(100% - 24px); padding: 12px; margin-bottom: 18px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 15px; }
         textarea { resize: vertical; min-height: 80px;}
         input[readonly] { background-color: #e9ecef; cursor: not-allowed; }
-
-
-        input:focus, select:focus, textarea:focus {
-            outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-        }
-
-        button, .button {
-            width: auto; padding: 10px 20px; background-color: #007bff; color: white;
-            border: none; border-radius: 5px; cursor: pointer; font-size: 16px;
-            font-weight: 500; transition: background-color 0.3s ease; margin-top: 10px;
-            text-decoration: none; display: inline-block;
-        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        button, .button { width: auto; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 500; transition: background-color 0.3s ease; margin-top: 10px; text-decoration: none; display: inline-block; }
         button:hover, .button:hover { background-color: #0056b3; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-
         .form-full-width-btn { width: 100%; padding: 12px; }
-
-        .button-secondary { background-color: #6c757d; }
-        .button-secondary:hover { background-color: #5a6268; }
-        .button-success { background-color: #28a745; }
-        .button-success:hover { background-color: #218838; }
-
-
+        .button-secondary { background-color: #6c757d; } .button-secondary:hover { background-color: #5a6268; }
+        .button-success { background-color: #28a745; } .button-success:hover { background-color: #218838; }
         .message { margin-top:18px; font-size:14px; padding:10px; border-radius:5px; display:none; }
         .message.success { color:#155724; background-color:#d4edda; border:1px solid #c3e6cb; display:block; }
         .message.error { color:#721c24; background-color:#f8d7da; border:1px solid #f5c6cb; display:block; }
-
-        .form-switch-link { display:block; margin-top:20px; font-size:14px; color:#007bff; text-decoration:none; cursor:pointer; }
-        .form-switch-link:hover { text-decoration:underline; }
-
-        #loginContainer, #registerContainer, #dashboardContainer, #profileContainer, #contactsContainer, #newShipmentContainer {
-            display: none;
-        }
-
-        /* Estilos Dashboard y Contactos (sin cambios significativos) */
-        .dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; }
-        .dashboard-header h2 { margin-bottom:0; margin-right:auto; }
-        .dashboard-nav-links { display:flex; gap:15px; }
-        .profile-link, .contacts-link { display:inline-flex; align-items:center; padding:8px 15px; background-color:#f8f9fa; border:1px solid #dee2e6; border-radius:20px; text-decoration:none; color:#333; font-size:14px; transition:all 0.2s ease-in-out; }
-        .profile-link .icon, .contacts-link .icon { margin-right:5px; }
-        .profile-link:hover, .contacts-link:hover { background-color:#e9ecef; border-color:#adb5bd; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
+        .form-switch-link { display:block; margin-top:20px; font-size:14px; color:#007bff; text-decoration:none; cursor:pointer; } .form-switch-link:hover { text-decoration:underline; }
+        #loginContainer, #registerContainer, #dashboardContainer, #profileContainer, #contactsContainer, #newShipmentContainer { display: none; }
+        .dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; } .dashboard-header h2 { margin-bottom:0; margin-right:auto; } .dashboard-nav-links { display:flex; gap:15px; }
+        .profile-link, .contacts-link { display:inline-flex; align-items:center; padding:8px 15px; background-color:#f8f9fa; border:1px solid #dee2e6; border-radius:20px; text-decoration:none; color:#333; font-size:14px; transition:all 0.2s ease-in-out; } .profile-link .icon, .contacts-link .icon { margin-right:5px; } .profile-link:hover, .contacts-link:hover { background-color:#e9ecef; border-color:#adb5bd; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
         #welcomeMessage { font-size:18px; color:#333; margin-bottom:30px; line-height:1.6; }
-        .dashboard-options { display:flex; justify-content:space-around; gap:20px; margin-top:20px; margin-bottom:30px; }
-        .dashboard-card { background-color:#f8f9fa; border:1px solid #e3e6f0; border-radius:8px; padding:20px; text-align:center; width:45%; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer; transition:transform 0.2s ease,box-shadow 0.2s ease; }
-        .dashboard-card:hover { transform:translateY(-3px); box-shadow:0 4px 10px rgba(0,0,0,0.1); }
-        .dashboard-card h3 { margin-top:0; margin-bottom:10px; font-size:1.1em; color:#007bff; }
-        .dashboard-card p { font-size:0.9em; color:#6c757d; margin-bottom:0; }
-        #addContactFormContainer { background-color:#f9f9f9; padding:20px; border-radius:8px; margin-bottom:25px; border:1px dashed #ccc; }
-        #contactListArea { margin-top: 20px; text-align: left; }
-        .contact-card { background-color:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); display:flex; flex-direction:column; }
-        .contact-card-info strong { color: #007bff; } .contact-card-info p { margin: 5px 0; font-size: 0.95em; color: #555; }
-        .contact-card-actions { margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px; display:flex; justify-content:flex-end; gap:10px; }
-        .contact-card-actions button { padding:6px 12px; font-size:0.85em; width:auto; margin-top:0;}
-        .contact-card-actions .edit-btn { background-color:#ffc107; color:#333; } .contact-card-actions .edit-btn:hover { background-color:#e0a800; }
-        .contact-card-actions .delete-btn { background-color:#dc3545; } .contact-card-actions .delete-btn:hover { background-color:#c82333; }
-        .no-contacts { text-align:center; color:#777; padding:20px; border:1px dashed #ddd; border-radius:5px; background-color:#f9f9f9; }
-
-        /* Estilos para Formulario de Nuevo Envío y Mapas */
-        .shipment-step { display: none; }
-        .shipment-step.active { display: block; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group-checkbox { display: flex; align-items: center; text-align: left; margin-bottom: 15px; }
-        .form-group-checkbox input[type="checkbox"] { width: auto; margin-right: 10px; margin-bottom: 0;}
-        .form-group-radio { display: flex; align-items: center; margin-right: 20px;}
-        .form-group-radio input[type="radio"] { width: auto; margin-right: 8px; margin-bottom: 0;}
-        .radio-group-container { display: flex; flex-wrap: wrap; margin-bottom: 15px; }
-        .shipment-buttons { margin-top: 30px; display: flex; justify-content: space-between; }
-
-        .map-container {
-            width: 100%; height: 300px; /* Altura del mapa */
-            border: 1px solid #ccc;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-        /* Oculta los waypoints por defecto y el itinerario de Leaflet Routing Machine si no se quieren ver */
-        .leaflet-routing-container {
-             /* display: none; */ /* Descomentar si NO quieres ver el panel de itinerario */
-             background: white; padding: 5px; border-radius: 4px; box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-             max-height: 200px; overflow-y: auto; /* Para el itinerario */
-        }
-         .leaflet-routing-alternatives-container { display: none !important; } /* Ocultar siempre alternativas */
-         .leaflet-top.leaflet-right { /* Mover el control de capas si es necesario */
-             /* margin-top: 50px; */
-         }
-
-
+        .dashboard-options { display:flex; justify-content:space-around; gap:20px; margin:20px 0 30px; } .dashboard-card { background-color:#f8f9fa; border:1px solid #e3e6f0; border-radius:8px; padding:20px; text-align:center; width:45%; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer; transition:transform 0.2s ease,box-shadow 0.2s ease; } .dashboard-card:hover { transform:translateY(-3px); box-shadow:0 4px 10px rgba(0,0,0,0.1); } .dashboard-card h3 { margin:0 0 10px; font-size:1.1em; color:#007bff; } .dashboard-card p { font-size:0.9em; color:#6c757d; margin-bottom:0; }
+        #addContactFormContainer { background-color:#f9f9f9; padding:20px; border-radius:8px; margin-bottom:25px; border:1px dashed #ccc; } #contactListArea { margin-top:20px; text-align:left; } .contact-card { background-color:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); display:flex; flex-direction:column; } .contact-card-info strong { color:#007bff; } .contact-card-info p { margin:5px 0; font-size:0.95em; color:#555; } .contact-card-actions { margin-top:10px; border-top:1px solid #f0f0f0; padding-top:10px; display:flex; justify-content:flex-end; gap:10px; } .contact-card-actions button { padding:6px 12px; font-size:0.85em; width:auto; margin-top:0;} .contact-card-actions .edit-btn { background-color:#ffc107; color:#333; } .contact-card-actions .edit-btn:hover { background-color:#e0a800; } .contact-card-actions .delete-btn { background-color:#dc3545; } .contact-card-actions .delete-btn:hover { background-color:#c82333; } .no-contacts { text-align:center; color:#777; padding:20px; border:1px dashed #ddd; border-radius:5px; background-color:#f9f9f9; }
+        .shipment-step { display:none; } .shipment-step.active { display:block; } .form-group { margin-bottom:15px; text-align:left; } .form-group-checkbox { display:flex; align-items:center; text-align:left; margin-bottom:15px; } .form-group-checkbox input[type="checkbox"] { width:auto; margin-right:10px; margin-bottom:0; } .form-group-radio { display:flex; align-items:center; margin-right:20px; } .form-group-radio input[type="radio"] { width:auto; margin-right:8px; margin-bottom:0; } .radio-group-container { display:flex; flex-wrap:wrap; margin-bottom:15px; } .shipment-buttons { margin-top:30px; display:flex; justify-content:space-between; }
+        .map-container { width:100%; height:250px; border:1px solid #ccc; margin-bottom:15px; border-radius:5px; } /* Reducida altura para prueba */
     </style>
 </head>
 <body>
-    <!-- HTML de Login, Registro, Dashboard, Perfil, Contactos (sin cambios respecto al último código completo) -->
-    <div id="loginContainer" class="container"><h2>Iniciar Sesión</h2><form id="loginForm"><div><label for="loginUsername">Usuario:</label><input type="text" id="loginUsername" required></div><div><label for="loginPassword">Contraseña:</label><input type="password" id="loginPassword" required></div><button type="button" onclick="handleLogin()" class="form-full-width-btn">Entrar</button></form><div id="loginMessageArea" class="message"></div><a href="#" id="showRegisterLink" class="form-switch-link">¿No tienes cuenta? Regístrate aquí</a></div>
-    <div id="registerContainer" class="container"><h2>Crear Nueva Cuenta</h2><form id="registerForm"><div><label for="registerName">Nombre y Apellido:</label><input type="text" id="registerName" required></div><div><label for="registerUsername">Usuario:</label><input type="text" id="registerUsername" required></div><div><label for="registerEmail">Correo Electrónico:</label><input type="email" id="registerEmail" required></div><div><label for="registerPhone">Celular (Ej: 0981xxxxxx):</label><input type="tel" id="registerPhone" placeholder="09xxxxxxxx" required></div><div><label for="registerPassword">Contraseña (mín. 8 caracteres):</label><input type="password" id="registerPassword" required></div><div><label for="registerConfirmPassword">Confirmar Contraseña:</label><input type="password" id="registerConfirmPassword" required></div><button type="button" onclick="handleRegister()" class="form-full-width-btn">Registrar</button></form><div id="registerMessageArea" class="message"></div><a href="#" id="showLoginLink" class="form-switch-link">¿Ya tienes cuenta? Inicia Sesión</a></div>
-    <div id="dashboardContainer" class="dashboard-container"><div class="dashboard-header"><h2>Panel de Control</h2><div class="dashboard-nav-links"><a href="#" id="profileLink" class="profile-link"><span class="icon">👤</span>Mi Perfil</a><a href="#" id="contactsLink" class="contacts-link"><span class="icon">📒</span>Contactos</a></div></div><div id="welcomeMessage"></div><div class="dashboard-options"><div class="dashboard-card" id="newShipmentCard"><h3>🚚 NUEVO ENVÍO</h3><p>Gestiona tus nuevos envíos.</p></div><div class="dashboard-card" id="newManagementCard"><h3>⚙️ NUEVA GESTIÓN</h3><p>Administra nuevas gestiones.</p></div></div><button type="button" onclick="handleLogout()" class="button-secondary form-full-width-btn">Cerrar Sesión</button></div>
-    <div id="profileContainer" class="container"><h2>Mi Perfil</h2><form id="profileForm"><div><label for="profileName">Nombre y Apellido:</label><input type="text" id="profileName" required></div><div><label for="profileUsername">Usuario (no editable):</label><input type="text" id="profileUsername" readonly disabled></div><div><label for="profileEmail">Correo Electrónico:</label><input type="email" id="profileEmail" required></div><div><label for="profilePhone">Celular:</label><input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required></div><div><label for="profileNewPassword">Nueva Contraseña (vacío = no cambiar):</label><input type="password" id="profileNewPassword"></div><div><label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label><input type="password" id="profileConfirmNewPassword"></div><button type="button" onclick="handleUpdateProfile()" class="form-full-width-btn button-success">Guardar Cambios</button></form><div id="profileMessageArea" class="message"></div><a href="#" id="backToDashboardFromProfile" class="form-switch-link">Volver al Panel</a></div>
-    <div id="contactsContainer" class="contacts-container"><h2>Mis Contactos</h2><button type="button" id="toggleAddContactFormBtn" class="form-full-width-btn button-success" style="margin-bottom: 20px;">✚ Agregar Nuevo Contacto</button><div id="addContactFormContainer" style="display: none;"><h3>Nuevo Contacto</h3><form id="addContactForm"><div><label for="contactName">Nombre y Apellido:</label><input type="text" id="contactName" required></div><div><label for="contactAddress">Dirección:</label><input type="text" id="contactAddress" required></div><div><label for="contactPhone">Celular:</label><input type="tel" id="contactPhone" placeholder="09xxxxxxxx" required></div><button type="button" onclick="handleAddContact()" class="form-full-width-btn">Guardar Contacto</button></form><div id="contactFormMessageArea" class="message"></div></div><div id="contactListArea"></div><a href="#" id="backToDashboardFromContacts" class="form-switch-link" style="margin-top: 30px;">Volver al Panel</a></div>
+    <!-- HTML Estructura Principal -->
+    <div id="loginContainer" class="container"><h2>Iniciar Sesión</h2><form id="loginForm"><div><label for="loginUsername">Usuario:</label><input type="text" id="loginUsername" required></div><div><label for="loginPassword">Contraseña:</label><input type="password" id="loginPassword" required></div><button type="button" id="loginButton" class="form-full-width-btn">Entrar</button></form><div id="loginMessageArea" class="message"></div><a href="#" id="showRegisterLink" class="form-switch-link">¿No tienes cuenta? Regístrate aquí</a></div>
+    <div id="registerContainer" class="container"><h2>Crear Nueva Cuenta</h2><form id="registerForm"><div><label for="registerName">Nombre y Apellido:</label><input type="text" id="registerName" required></div><div><label for="registerUsername">Usuario:</label><input type="text" id="registerUsername" required></div><div><label for="registerEmail">Correo:</label><input type="email" id="registerEmail" required></div><div><label for="registerPhone">Celular:</label><input type="tel" id="registerPhone" placeholder="09xxxxxxxx" required></div><div><label for="registerPassword">Clave (mín. 8):</label><input type="password" id="registerPassword" required></div><div><label for="registerConfirmPassword">Confirmar Clave:</label><input type="password" id="registerConfirmPassword" required></div><button type="button" id="registerButton" class="form-full-width-btn">Registrar</button></form><div id="registerMessageArea" class="message"></div><a href="#" id="showLoginLink" class="form-switch-link">¿Ya tienes cuenta? Inicia Sesión</a></div>
+    <div id="dashboardContainer" class="dashboard-container"><div class="dashboard-header"><h2>Panel</h2><div class="dashboard-nav-links"><a href="#" id="profileLink" class="profile-link">👤Mi Perfil</a><a href="#" id="contactsLink" class="contacts-link">📒Contactos</a></div></div><div id="welcomeMessage"></div><div class="dashboard-options"><div class="dashboard-card" id="newShipmentCardDashboard"><h3>🚚 NUEVO ENVÍO</h3><p>Gestionar envíos.</p></div><div class="dashboard-card" id="newManagementCardDashboard"><h3>⚙️ NUEVA GESTIÓN</h3><p>Administrar gestiones.</p></div></div><button type="button" id="logoutButton" class="button-secondary form-full-width-btn">Cerrar Sesión</button></div>
+    <div id="profileContainer" class="container"><h2>Mi Perfil</h2><form id="profileForm"><div><label for="profileName">Nombre y Apellido:</label><input type="text" id="profileName" required></div><div><label for="profileUsername">Usuario:</label><input type="text" id="profileUsername" readonly disabled></div><div><label for="profileEmail">Correo:</label><input type="email" id="profileEmail" required></div><div><label for="profilePhone">Celular:</label><input type="tel" id="profilePhone" required></div><div><label for="profileNewPassword">Nueva Clave (vacío=no cambiar):</label><input type="password" id="profileNewPassword"></div><div><label for="profileConfirmNewPassword">Confirmar Nueva Clave:</label><input type="password" id="profileConfirmNewPassword"></div><button type="button" id="updateProfileButton" class="form-full-width-btn button-success">Guardar Cambios</button></form><div id="profileMessageArea" class="message"></div><a href="#" id="backToDashboardFromProfile" class="form-switch-link">Volver al Panel</a></div>
+    <div id="contactsContainer" class="contacts-container"><h2>Contactos</h2><button type="button" id="toggleAddContactFormBtn" class="form-full-width-btn button-success" style="margin-bottom:20px;">✚ Agregar Contacto</button><div id="addContactFormContainer" style="display:none;"><h3>Nuevo Contacto</h3><form id="addContactForm"><div><label for="contactName">Nombre:</label><input type="text" id="contactName" required></div><div><label for="contactAddress">Dirección:</label><input type="text" id="contactAddress" required></div><div><label for="contactPhone">Celular:</label><input type="tel" id="contactPhone" required></div><button type="button" id="addContactButton" class="form-full-width-btn">Guardar</button></form><div id="contactFormMessageArea" class="message"></div></div><div id="contactListArea"></div><a href="#" id="backToDashboardFromContacts" class="form-switch-link" style="margin-top:30px;">Volver al Panel</a></div>
+    <div id="newShipmentContainer" class="new-shipment-container"><h2>🚚 Nuevo Envío</h2><div id="shipmentMessageArea" class="message"></div><form id="newShipmentForm">
+        <div id="shipmentStep1" class="shipment-step active"><h3>Paso 1: Remitente y Paquete</h3><div class="form-group"><label for="shipmentSenderName">Quién envía:</label><input type="text" id="shipmentSenderName" readonly></div><div class="form-group"><label for="shipmentSenderAddress">Dirección Recogida:</label><input type="text" id="shipmentSenderAddress" required></div><div class="form-group"><label for="shipmentSenderPhone">Celular Remitente:</label><input type="tel" id="shipmentSenderPhone" readonly></div><div class="form-group"><label>Punto Recogida (clic en mapa):</label><div id="mapRecogida" class="map-container"></div><input type="hidden" id="pickupLat"><input type="hidden" id="pickupLng"><small id="pickupCoordsDisplay">Lat/Lng: (no sel.)</small></div><div class="form-group"><label for="shipmentItemType">Qué enviamos?:</label><select id="shipmentItemType"><option value="paquete">Paquete</option><option value="caja">Caja</option><option value="sobre">Sobre</option><option value="bolsa">Bolsa</option><option value="otros">Otros</option></select></div><div class="form-group"><label for="shipmentDescription">Descripción:</label><textarea id="shipmentDescription" required></textarea></div><div class="form-group-checkbox"><input type="checkbox" id="shipmentIsFragile"><label for="shipmentIsFragile">Frágil</label></div><div class="shipment-buttons"><button type="button" id="cancelShipmentStep1" class="button-secondary">Cancelar</button><button type="button" id="nextShipmentStep1Button">Siguiente ❯</button></div></div>
+        <div id="shipmentStep2" class="shipment-step"><h3>Paso 2: Destinatario y Destino</h3><div class="form-group"><label for="shipmentRecipientContactSelect">Destinatario (Contactos):</label><select id="shipmentRecipientContactSelect"><option value="">-- Seleccionar --</option></select></div><div class="form-group"><label for="shipmentRecipientName">Nombre Destinatario:</label><input type="text" id="shipmentRecipientName" required></div><div class="form-group"><label for="shipmentRecipientAddress">Dirección Entrega:</label><input type="text" id="shipmentRecipientAddress" required></div><div class="form-group"><label for="shipmentRecipientPhone">Celular Destinatario:</label><input type="tel" id="shipmentRecipientPhone" required></div><div class="form-group"><label>Punto Destino (clic en mapa):</label><div id="mapDestino" class="map-container"></div><input type="hidden" id="destLat"><input type="hidden" id="destLng"><small id="destCoordsDisplay">Lat/Lng: (no sel.)</small></div><div id="routingControlContainer"></div><div class="form-group-checkbox"><input type="checkbox" id="shipmentRoundTrip"><label for="shipmentRoundTrip">Ida y Vuelta?</label></div><div class="shipment-buttons"><button type="button" id="prevShipmentStep2Button" class="button-secondary">❮ Atrás</button><button type="button" id="nextShipmentStep2Button">Siguiente ❯</button></div></div>
+        <div id="shipmentStep3" class="shipment-step"><h3>Paso 3: Pago y Confirmación</h3><div class="form-group"><label>Forma de Pago:</label><div class="radio-group-container"><div class="form-group-radio"><input type="radio" id="paymentQR" name="paymentMethod" value="QR" checked><label for="paymentQR">QR</label></div><div class="form-group-radio"><input type="radio" id="paymentTransfer" name="paymentMethod" value="Transferencia"><label for="paymentTransfer">Transfer</label></div><div class="form-group-radio"><input type="radio" id="paymentCash" name="paymentMethod" value="Efectivo"><label for="paymentCash">Efectivo</label></div><div class="form-group-radio"><input type="radio" id="paymentAtDestination" name="paymentMethod" value="PagoEnDestino"><label for="paymentAtDestination">Pago Destino</label></div></div></div><div class="form-group"><label for="shipmentDistance">Distancia (km):</label><input type="text" id="shipmentDistance" readonly placeholder="Calculando..."></div><div class="form-group"><label for="shipmentServiceCost">Monto (Gs.):</label><input type="text" id="shipmentServiceCost" readonly placeholder="Calculando..."></div><div class="form-group"><label>Resumen:</label><div id="shipmentSummary" style="padding:10px; border:1px solid #eee; background-color:#f9f9f9;text-align:left;font-size:0.9em;min-height:50px;">Selecciona puntos...</div></div><div class="shipment-buttons"><button type="button" id="prevShipmentStep3Button" class="button-secondary">❮ Atrás</button><button type="button" id="saveShipmentButton" class="button-success" disabled>Guardar Envío ✔</button></div></div>
+    </form><a href="#" id="backToDashboardFromShipment" class="form-switch-link" style="margin-top:30px;">Volver (sin guardar)</a></div>
 
-
-    <!-- Contenedor para Nuevo Envío -->
-    <div id="newShipmentContainer" class="new-shipment-container">
-        <h2>🚚 Nuevo Envío</h2>
-        <div id="shipmentMessageArea" class="message"></div>
-
-        <form id="newShipmentForm">
-            <!-- Paso 1: Datos del Remitente y Envío -->
-            <div id="shipmentStep1" class="shipment-step active">
-                <h3>Paso 1: Remitente y Detalles del Paquete</h3>
-                <div class="form-group"><label for="shipmentSenderName">Quién envía:</label><input type="text" id="shipmentSenderName" readonly></div>
-                <div class="form-group"><label for="shipmentSenderAddress">Dirección de Recogida:</label><input type="text" id="shipmentSenderAddress" placeholder="Ej: Calle Falsa 123, Asunción" required></div>
-                <div class="form-group"><label for="shipmentSenderPhone">Celular del Remitente:</label><input type="tel" id="shipmentSenderPhone" readonly></div>
-
-                <div class="form-group">
-                    <label>Punto de Recogida (Haz clic en el mapa):</label>
-                    <div id="mapRecogida" class="map-container"></div>
-                    <input type="hidden" id="pickupLat"> <input type="hidden" id="pickupLng"> <!-- Coordenadas ocultas -->
-                    <small id="pickupCoordsDisplay" style="display:block; text-align: left; margin-top:-10px; margin-bottom:10px; color:#555;">Lat/Lng: (no seleccionado)</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="shipmentItemType">¿Qué enviamos?</label>
-                    <select id="shipmentItemType">
-                        <option value="paquete">Paquete</option><option value="caja">Caja</option><option value="sobre">Sobre</option>
-                        <option value="bolsa">Bolsa</option><option value="otros">Otros</option>
-                    </select>
-                </div>
-                <div class="form-group"><label for="shipmentDescription">Descripción del contenido:</label><textarea id="shipmentDescription" placeholder="Ej: Documentos importantes, Ropa, etc." required></textarea></div>
-                <div class="form-group-checkbox"><input type="checkbox" id="shipmentIsFragile"><label for="shipmentIsFragile">Marcar si es frágil</label></div>
-                <div class="shipment-buttons">
-                    <button type="button" onclick="showDashboardView()" class="button-secondary">Cancelar</button>
-                    <button type="button" onclick="nextShipmentStep(2)">Siguiente ❯</button>
-                </div>
-            </div>
-
-            <!-- Paso 2: Datos del Destinatario y Servicio -->
-            <div id="shipmentStep2" class="shipment-step">
-                <h3>Paso 2: Destinatario y Detalles del Destino</h3>
-                <div class="form-group">
-                    <label for="shipmentRecipientContactSelect">Destinatario (Seleccionar de contactos):</label>
-                    <select id="shipmentRecipientContactSelect"><option value="">-- Seleccionar un contacto --</option></select>
-                </div>
-                <div class="form-group"><label for="shipmentRecipientName">Nombre del Destinatario:</label><input type="text" id="shipmentRecipientName" placeholder="Nombre completo" required></div>
-                <div class="form-group"><label for="shipmentRecipientAddress">Dirección de Entrega:</label><input type="text" id="shipmentRecipientAddress" placeholder="Ej: Av. Principal 456, Lambaré" required></div>
-                <div class="form-group"><label for="shipmentRecipientPhone">Celular del Destinatario:</label><input type="tel" id="shipmentRecipientPhone" placeholder="09xxxxxxxx" required></div>
-
-                 <div class="form-group">
-                    <label>Punto de Destino (Haz clic en el mapa):</label>
-                    <div id="mapDestino" class="map-container"></div>
-                    <input type="hidden" id="destLat"> <input type="hidden" id="destLng"> <!-- Coordenadas ocultas -->
-                    <small id="destCoordsDisplay" style="display:block; text-align: left; margin-top:-10px; margin-bottom:10px; color:#555;">Lat/Lng: (no seleccionado)</small>
-                </div>
-                <div id="routingControlContainer" style="margin-bottom: 15px;">
-                    <!-- El control de ruteo de Leaflet se añadirá aquí si queremos mostrar la ruta, o solo usamos sus datos -->
-                </div>
-
-                <div class="form-group-checkbox"><input type="checkbox" id="shipmentRoundTrip"><label for="shipmentRoundTrip">¿Servicio de Ida y Vuelta?</label></div>
-                <div class="shipment-buttons">
-                    <button type="button" onclick="prevShipmentStep(1)" class="button-secondary">❮ Atrás</button>
-                    <button type="button" onclick="nextShipmentStep(3)">Siguiente ❯</button>
-                </div>
-            </div>
-
-            <!-- Paso 3: Pago y Resumen -->
-            <div id="shipmentStep3" class="shipment-step">
-                <h3>Paso 3: Pago y Confirmación</h3>
-                <div class="form-group">
-                    <label>Forma de Pago:</label>
-                    <div class="radio-group-container">
-                        <div class="form-group-radio"><input type="radio" id="paymentQR" name="paymentMethod" value="QR" checked><label for="paymentQR">QR</label></div>
-                        <div class="form-group-radio"><input type="radio" id="paymentTransfer" name="paymentMethod" value="Transferencia"><label for="paymentTransfer">Transferencia</label></div>
-                        <div class="form-group-radio"><input type="radio" id="paymentCash" name="paymentMethod" value="Efectivo"><label for="paymentCash">Efectivo</label></div>
-                        <div class="form-group-radio"><input type="radio" id="paymentAtDestination" name="paymentMethod" value="PagoEnDestino"><label for="paymentAtDestination">Pago en Destino</label></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="shipmentDistance">Distancia del Envío (km):</label>
-                    <input type="text" id="shipmentDistance" readonly placeholder="Calculando...">
-                </div>
-                <div class="form-group">
-                    <label for="shipmentServiceCost">Monto del Servicio (Gs.):</label>
-                    <input type="text" id="shipmentServiceCost" readonly style="font-weight:bold; font-size:1.1em; color: green;" placeholder="Calculando...">
-                </div>
-                 <div class="form-group">
-                    <label>Resumen del Envío:</label>
-                    <div id="shipmentSummary" style="padding:10px; border:1px solid #eee; background-color:#f9f9f9; text-align:left; font-size:0.9em; min-height: 50px;">
-                        Selecciona puntos de recogida y destino para ver el resumen y costo...
-                    </div>
-                </div>
-                <div class="shipment-buttons">
-                    <button type="button" onclick="prevShipmentStep(2)" class="button-secondary">❮ Atrás</button>
-                    <button type="button" id="saveShipmentButton" onclick="handleSaveShipment()" class="button-success" disabled>Guardar Envío ✔</button>
-                </div>
-            </div>
-        </form>
-        <a href="#" onclick="showDashboardView(); return false;" class="form-switch-link" style="margin-top: 30px;">Volver al Panel (sin guardar)</a>
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-    <!-- Leaflet Routing Machine JS -->
+    <!-- Leaflet JS y Routing Machine (DESPUÉS del HTML de los mapas) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
-
     <script>
-    // --- Constantes y Variables Globales ---
+    // --- Variables Globales ---
     const USERS_STORAGE_KEY = 'registeredUsers';
     let users = [];
     let currentUser = null;
     let currentShipmentStep = 1;
+    let mapRecogida, mapDestino, markerRecogida, markerDestino, pickupCoords, destCoords, routingControl;
 
-    // Variables para los mapas y marcadores de envío
-    let mapRecogida, mapDestino;
-    let markerRecogida, markerDestino;
-    let pickupCoords = null; // { lat, lng }
-    let destCoords = null;   // { lat, lng }
-    let routingControl = null; // Para Leaflet Routing Machine
-
-
-    // --- Selectores del DOM (Contenedores Principales de Vista) ---
+    // --- Contenedores de Vistas (se asignarán en DOMContentLoaded) ---
     let loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer, newShipmentContainer;
 
-    // --- Utility Functions ---
-    function showMessage(area, text, type) { if (area) { area.textContent = text; area.className = `message ${type}`; area.style.display = 'block'; } else { console.warn("showMessage: area es null:", text); } }
-    function clearMessage(area) { if (area) { area.textContent = ''; area.className = 'message'; area.style.display = 'none'; } }
+    // --- Funciones de Utilidad ---
+    function showMessage(area, text, type) { if(area){area.textContent=text; area.className=`message ${type}`; area.style.display='block';} }
+    function clearMessage(area) { if(area){area.textContent=''; area.className='message'; area.style.display='none';} }
 
-    // --- View Management ---
+    // --- Manejo de Vistas ---
     function showView(viewToShow) {
+        console.log("showView: Intentando mostrar", viewToShow ? viewToShow.id : "NADA");
         const allViews = [loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer, newShipmentContainer];
-        allViews.forEach(container => { if (container) container.style.display = 'none'; });
-        if (viewToShow && allViews.includes(viewToShow)) viewToShow.style.display = 'block';
-        else if (viewToShow) console.error("showView: 'viewToShow' no es reconocido:", viewToShow);
-    }
-    function showLoginView() { /* ... (como antes, funcional) ... */ currentUser = null; sessionStorage.removeItem('loggedInUser'); const f=document.getElementById('loginForm'),m=document.getElementById('loginMessageArea'); showView(loginContainer); if(m)clearMessage(m); if(f)f.reset(); }
-    function showRegisterView() { /* ... (como antes, funcional) ... */ const f=document.getElementById('registerForm'),m=document.getElementById('registerMessageArea'); showView(registerContainer); if(m)clearMessage(m); if(f)f.reset(); }
-    function showDashboardView() { if (!currentUser) { showLoginView(); return; } showView(dashboardContainer); updateWelcomeMessage(); }
-    function showProfileView() { /* ... (como antes, funcional) ... */ if(!currentUser){showLoginView();return;} const f=document.getElementById('profileForm'),m=document.getElementById('profileMessageArea'),n=document.getElementById('profileName'),u=document.getElementById('profileUsername'),e=document.getElementById('profileEmail'),p=document.getElementById('profilePhone'); showView(profileContainer); if(m)clearMessage(m);if(f)f.reset(); if(n&¤tUser)n.value=currentUser.name; if(u&¤tUser)u.value=currentUser.username; if(e&¤tUser)e.value=currentUser.email; if(p&¤tUser)p.value=currentUser.phone;}
-    function showContactsView() { /* ... (como antes, funcional) ... */ if(!currentUser){showLoginView();return;}const af=document.getElementById('addContactForm'),cfm=document.getElementById('contactFormMessageArea'),afc=document.getElementById('addContactFormContainer'),tBtn=document.getElementById('toggleAddContactFormBtn');showView(contactsContainer);if(cfm)clearMessage(cfm);if(af)af.reset();if(afc){if(afc.dataset.editingId)_resetContactFormToDefault(); afc.style.display='none';} if(tBtn)tBtn.textContent='✚ Agregar Nuevo Contacto'; renderContacts(); }
-
-    function showNewShipmentView() {
-        if (!currentUser) { showLoginView(); return; }
-        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        const shipmentSenderNameInput = document.getElementById('shipmentSenderName');
-        const shipmentSenderPhoneInput = document.getElementById('shipmentSenderPhone');
-        const saveShipmentButton = document.getElementById('saveShipmentButton');
-
-        showView(newShipmentContainer);
-        _resetShipmentForm(); // Llama a esto que también maneja mapas y coords
-        currentShipmentStep = 1;
-        updateShipmentStepView();
-        if(shipmentSenderNameInput && currentUser) shipmentSenderNameInput.value = currentUser.name || '';
-        if(shipmentSenderPhoneInput && currentUser) shipmentSenderPhoneInput.value = currentUser.phone || '';
-        _loadContactsForShipment();
-        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
-
-        // Inicializar mapas SOLO si no están ya inicializados (evitar duplicados al reentrar)
-        if (!mapRecogida) initMapRecogida(); else mapRecogida.invalidateSize();
-        if (!mapDestino) initMapDestino(); else mapDestino.invalidateSize();
-
-        // Limpiar marcadores y coordenadas al mostrar la vista de nuevo envío
-        pickupCoords = null; destCoords = null;
-        if (markerRecogida) mapRecogida.removeLayer(markerRecogida); markerRecogida = null;
-        if (markerDestino) mapDestino.removeLayer(markerDestino); markerDestino = null;
-        document.getElementById('pickupCoordsDisplay').textContent = 'Lat/Lng: (no seleccionado)';
-        document.getElementById('destCoordsDisplay').textContent = 'Lat/Lng: (no seleccionado)';
-
-        // Quitar la ruta anterior si existe
-        if (routingControl && mapDestino) { // Usamos mapDestino para mostrar ruta
-             mapDestino.removeControl(routingControl); // O el mapa donde esté el control de ruteo
-             routingControl = null;
+        allViews.forEach(c => { if (c) c.style.display = 'none'; });
+        if (viewToShow && allViews.includes(viewToShow)) {
+            viewToShow.style.display = 'block';
+            console.log("showView: Mostrado:", viewToShow.id);
+            // Si la vista de envío se está mostrando, asegurar que los mapas se redimensionen
+            if (viewToShow === newShipmentContainer) {
+                setTimeout(() => { // Pequeño delay para asegurar que el div está visible
+                    if (mapRecogida) mapRecogida.invalidateSize();
+                    if (mapDestino) mapDestino.invalidateSize();
+                    console.log("Mapas en newShipmentContainer invalidados para redimensionar.");
+                }, 100);
+            }
+        } else if(viewToShow) {
+            console.error("showView: viewToShow no es un contenedor de vista válido:", viewToShow.id);
         }
-        if(saveShipmentButton) saveShipmentButton.disabled = true; // Deshabilitar hasta que haya ruta/costo
-
-        // Para evitar problemas de renderizado de mapas en divs ocultos
-        setTimeout(() => {
-            if(mapRecogida) mapRecogida.invalidateSize();
-            if(mapDestino) mapDestino.invalidateSize();
-        }, 100);
-
     }
 
-    // --- User & Data Management ---
-    function loadUsers() { /* ... (como antes, funcional) ... */ console.log("loadUsers: Iniciando carga de usuarios.");const s=localStorage.getItem(USERS_STORAGE_KEY);if(s){try{users=JSON.parse(s).map(u=>({...u,contacts:u.contacts||[],shipments:u.shipments||[],points:u.points||0}));}catch(e){console.error("loadUsers: Error parseo",e);users=[];localStorage.removeItem(USERS_STORAGE_KEY);}}else{users=[{name:"Usuario Demo",username:"demo",email:"demo@example.com",phone:"0900000000",password:"demo",contacts:[],shipments:[],points:0}];saveUsers();}const l=sessionStorage.getItem('loggedInUser');if(l){currentUser=users.find(u=>u.username===l);if(currentUser){currentUser.contacts=currentUser.contacts||[];currentUser.shipments=currentUser.shipments||[];currentUser.points=currentUser.points||0;showDashboardView();}else{sessionStorage.removeItem('loggedInUser');showLoginView();}}else{showLoginView();}}
-    function saveUsers() { /* ... (como antes, funcional) ... */ try{localStorage.setItem(USERS_STORAGE_KEY,JSON.stringify(users));}catch(e){console.error("saveUsers: Error localStorage",e);}}
-    function updateUserInLocalStorage() { /* ... (como antes, funcional) ... */ if(!currentUser)return;const i=users.findIndex(u=>u.username===currentUser.username);if(i>-1){users[i]={...users[i],...currentUser};saveUsers();}}
-
-    // --- Logic: Registration, Login, Dashboard, Logout, Profile, Contacts ---
-    // (Estas funciones permanecen mayormente sin cambios, asegurando que los selectores se manejen bien)
-    // Se resumen aquí para brevedad, pero están completas en el código provisto en el prompt.
-    function handleRegister() { /* ... */ }
-    function handleLogin() { /* ... */ }
-    function updateWelcomeMessage() { /* ... */ }
-    function handleLogout() { /* ... */ }
-    function handleUpdateProfile() { /* ... */ }
-    function _resetContactFormToDefault() { /* ... */ }
-    function toggleAddContactForm() { /* ... */ }
-    function handleAddContact() { /* ... */ }
-    function renderContacts() { /* ... */ }
-    function handleEditContact(contactId) { /* ... */ }
-    function handleUpdateExistingContact(contactIdToUpdate) { /* ... */ }
-    function handleDeleteContact(contactId) { /* ... */ }
-    // --- Fin de funciones resumidas --- (Se usarán las definiciones previas completas)
-
-    // --- MAPAS y RUTEO ---
-    function initMapRecogida() {
-        if (mapRecogida) return; // Ya inicializado
-        mapRecogida = L.map('mapRecogida').setView([-25.2822, -57.6352], 13); // Asunción
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(mapRecogida);
-
-        mapRecogida.on('click', function(e) {
-            pickupCoords = e.latlng;
-            if (markerRecogida) mapRecogida.removeLayer(markerRecogida);
-            markerRecogida = L.marker(pickupCoords).addTo(mapRecogida).bindPopup("Punto de Recogida").openPopup();
-            document.getElementById('pickupLat').value = pickupCoords.lat.toFixed(6);
-            document.getElementById('pickupLng').value = pickupCoords.lng.toFixed(6);
-            document.getElementById('pickupCoordsDisplay').textContent = `Lat/Lng: ${pickupCoords.lat.toFixed(4)}, ${pickupCoords.lng.toFixed(4)}`;
-            attemptCalculateRoute(); // Intentar calcular ruta si ambos puntos están
-        });
+    function showLoginView() {
+        console.log("showLoginView: Iniciando.");
+        currentUser = null; sessionStorage.removeItem('loggedInUser');
+        const form = document.getElementById('loginForm');
+        const msgArea = document.getElementById('loginMessageArea');
+        if (!loginContainer) { console.error("CRÍTICO: loginContainer NULO en showLoginView."); return; }
+        showView(loginContainer);
+        if (msgArea) clearMessage(msgArea); if (form) form.reset();
+        console.log("showLoginView: Finalizado.");
     }
 
-    function initMapDestino() {
-        if (mapDestino) return;
-        mapDestino = L.map('mapDestino').setView([-25.2822, -57.6352], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(mapDestino);
-
-        mapDestino.on('click', function(e) {
-            destCoords = e.latlng;
-            if (markerDestino) mapDestino.removeLayer(markerDestino);
-            markerDestino = L.marker(destCoords).addTo(mapDestino).bindPopup("Punto de Destino").openPopup();
-            document.getElementById('destLat').value = destCoords.lat.toFixed(6);
-            document.getElementById('destLng').value = destCoords.lng.toFixed(6);
-            document.getElementById('destCoordsDisplay').textContent = `Lat/Lng: ${destCoords.lat.toFixed(4)}, ${destCoords.lng.toFixed(4)}`;
-            attemptCalculateRoute();
-        });
-    }
-
-    function attemptCalculateRoute() {
-        const shipmentDistanceInput = document.getElementById('shipmentDistance');
-        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
-        const saveShipmentButton = document.getElementById('saveShipmentButton');
-
-        if(saveShipmentButton) saveShipmentButton.disabled = true; // Deshabilitar mientras se calcula
-        if (shipmentDistanceInput) shipmentDistanceInput.value = "Calculando...";
-        if (shipmentServiceCostInput) shipmentServiceCostInput.value = "Calculando...";
-
-
-        if (pickupCoords && destCoords) {
-            console.log("Calculando ruta desde:", pickupCoords, "hasta:", destCoords);
-            // Quitar ruta anterior si existe
-            if (routingControl && mapDestino) mapDestino.removeControl(routingControl);
-
-            routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(pickupCoords.lat, pickupCoords.lng),
-                    L.latLng(destCoords.lat, destCoords.lng)
-                ],
-                routeWhileDragging: false,
-                draggableWaypoints: false,
-                addWaypoints: false,
-                show: true, // Muestra el itinerario y la ruta en el mapa (puedes poner false si solo quieres los datos)
-                fitSelectedRoutes: 'smart',
-                lineOptions: { styles: [{color: 'blue', opacity: 0.6, weight: 4}] },
-                // Puedes personalizar el servicio de ruteo si es necesario
-                // router: L.Routing.osrmv1({ serviceUrl: 'URL_DE_TU_SERVIDOR_OSRM' }) // Si tienes uno propio
-            })
-            .on('routesfound', function(e) {
-                const routes = e.routes;
-                if (routes.length > 0) {
-                    const summary = routes[0].summary; // summary contiene distancia y tiempo
-                    const distanceKm = summary.totalDistance / 1000; // Distancia en km
-                    console.log("Ruta encontrada. Distancia:", distanceKm.toFixed(2), "km");
-
-                    if (shipmentDistanceInput) shipmentDistanceInput.value = distanceKm.toFixed(2);
-                    calculateServiceCost(); // Esto actualizará el input del costo
-                    if(saveShipmentButton) saveShipmentButton.disabled = false; // Habilitar guardado
-                    updateShipmentSummary(); // Actualizar el resumen con la nueva distancia/costo
-
-                } else {
-                    console.warn("No se encontraron rutas.");
-                    if (shipmentDistanceInput) shipmentDistanceInput.value = "Error ruta";
-                    if (shipmentServiceCostInput) shipmentServiceCostInput.value = "";
-                     showMessage(document.getElementById('shipmentMessageArea'), 'No se pudo calcular la ruta entre los puntos.', 'error');
-                }
-            })
-            .on('routingerror', function(e) {
-                console.error("Error de ruteo:", e.error);
-                if (shipmentDistanceInput) shipmentDistanceInput.value = "Error API";
-                if (shipmentServiceCostInput) shipmentServiceCostInput.value = "";
-                showMessage(document.getElementById('shipmentMessageArea'), `Error al calcular la ruta: ${e.error ? e.error.message : 'Error desconocido'}`, 'error');
-            })
-            .addTo(mapDestino); // O al mapa que prefieras para mostrar la ruta
-
+    // --- Carga de Datos y Sesión ---
+    function loadUsers() {
+        console.log("loadUsers: Iniciando.");
+        const stored = localStorage.getItem(USERS_STORAGE_KEY);
+        if (stored) {
+            try {
+                users = JSON.parse(stored).map(u => ({ ...u, contacts:u.contacts||[], shipments:u.shipments||[], points:u.points||0 }));
+            } catch (e) { console.error("loadUsers: Error parseo. Limpiando.", e); users=[]; localStorage.removeItem(USERS_STORAGE_KEY); }
         } else {
-             if (shipmentDistanceInput) shipmentDistanceInput.value = "";
-             if (shipmentServiceCostInput) shipmentServiceCostInput.value = "";
+            users = [{ name:"Demo User", username:"demo", email:"d@d.com", phone:"09", password:"demo", contacts:[], shipments:[], points:0 }];
+            saveUsers();
         }
-    }
-
-
-    // --- New Shipment Form Logic ---
-    function _resetShipmentForm() {
-        const newShipmentForm = document.getElementById('newShipmentForm');
-        const shipmentSenderNameInput = document.getElementById('shipmentSenderName');
-        const shipmentSenderPhoneInput = document.getElementById('shipmentSenderPhone');
-        const shipmentDistanceInput = document.getElementById('shipmentDistance');
-        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
-        const shipmentSummaryDiv = document.getElementById('shipmentSummary');
-        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        const saveShipmentButton = document.getElementById('saveShipmentButton');
-
-        if(newShipmentForm) newShipmentForm.reset();
-        if(shipmentSenderNameInput && currentUser) shipmentSenderNameInput.value = currentUser.name || '';
-        if(shipmentSenderPhoneInput && currentUser) shipmentSenderPhoneInput.value = currentUser.phone || '';
-
-        // Limpieza de mapas
-        pickupCoords = null; destCoords = null;
-        if (markerRecogida && mapRecogida) mapRecogida.removeLayer(markerRecogida); markerRecogida = null;
-        if (markerDestino && mapDestino) mapDestino.removeLayer(markerDestino); markerDestino = null;
-        if (routingControl && mapDestino) mapDestino.removeControl(routingControl); routingControl = null;
-
-        if (document.getElementById('pickupCoordsDisplay')) document.getElementById('pickupCoordsDisplay').textContent = 'Lat/Lng: (no seleccionado)';
-        if (document.getElementById('destCoordsDisplay')) document.getElementById('destCoordsDisplay').textContent = 'Lat/Lng: (no seleccionado)';
-        if (shipmentDistanceInput) shipmentDistanceInput.value = '';
-        if (shipmentServiceCostInput) shipmentServiceCostInput.value = '';
-        if (shipmentSummaryDiv) shipmentSummaryDiv.innerHTML = 'Selecciona puntos de recogida y destino para ver el resumen y costo...';
-        if (saveShipmentButton) saveShipmentButton.disabled = true;
-
-        currentShipmentStep = 1; updateShipmentStepView();
-        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
-    }
-    function updateShipmentStepView() {
-        document.querySelectorAll('.shipment-step').forEach(step => step.classList.remove('active'));
-        const activeStep = document.getElementById(`shipmentStep${currentShipmentStep}`);
-        if (activeStep) activeStep.classList.add('active');
-
-        // Forzar actualización del tamaño del mapa si está en el paso activo
-        // Esto es crucial si el mapa se inicializa mientras el div está oculto
-        setTimeout(() => {
-            if (currentShipmentStep === 1 && mapRecogida) mapRecogida.invalidateSize();
-            if (currentShipmentStep === 2 && mapDestino) mapDestino.invalidateSize();
-        }, 100);
-    }
-    function nextShipmentStep(nextStep) {
-        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        const shipmentSenderAddressInput = document.getElementById('shipmentSenderAddress');
-        const shipmentDescriptionTextarea = document.getElementById('shipmentDescription');
-        const shipmentRecipientNameInput = document.getElementById('shipmentRecipientName');
-        const shipmentRecipientAddressInput = document.getElementById('shipmentRecipientAddress');
-        const shipmentRecipientPhoneInput = document.getElementById('shipmentRecipientPhone');
-
-        // Validaciones previas
-        if (currentShipmentStep === 1) {
-            if (!shipmentSenderAddressInput.value.trim() || !shipmentDescriptionTextarea.value.trim()) {
-                showMessage(shipmentMessageArea, "Completa dirección de recogida y descripción.", "error"); return;
+        const loggedUser = sessionStorage.getItem('loggedInUser');
+        if (loggedUser) {
+            currentUser = users.find(u => u.username === loggedUser);
+            if (currentUser) {
+                currentUser.contacts = currentUser.contacts||[]; currentUser.shipments = currentUser.shipments||[]; currentUser.points = currentUser.points||0;
+                console.log("loadUsers: Usuario de sesión encontrado. Mostrando dashboard.");
+                showDashboardView(); // Asumimos que showDashboardView está definida después
+            } else {
+                sessionStorage.removeItem('loggedInUser');
+                console.log("loadUsers: Usuario de sesión no en DB. Mostrando login.");
+                showLoginView();
             }
-            if (!pickupCoords) {
-                 showMessage(shipmentMessageArea, "Selecciona un punto de recogida en el mapa.", "error"); return;
-            }
+        } else {
+            console.log("loadUsers: No hay sesión. Mostrando login.");
+            showLoginView();
         }
-        if (currentShipmentStep === 2) {
-            if (!shipmentRecipientNameInput.value.trim() || !shipmentRecipientAddressInput.value.trim() || !shipmentRecipientPhoneInput.value.trim()) {
-                showMessage(shipmentMessageArea, "Completa datos del destinatario.", "error"); return;
-            }
-            if (!destCoords) {
-                showMessage(shipmentMessageArea, "Selecciona un punto de destino en el mapa.", "error"); return;
-            }
-            // Al pasar al paso 3, ya se debería haber calculado la ruta/costo si ambos puntos están.
-            // La función attemptCalculateRoute() es llamada cada vez que se selecciona un punto.
-            // Si el costo no está listo, el botón de guardar estará deshabilitado.
-            updateShipmentSummary(); // Asegura que el resumen esté actualizado
+        console.log("loadUsers: Finalizado.");
+    }
+    function saveUsers() { try{localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));}catch(e){console.error("saveUsers falló",e);}}
+    function updateUserInLocalStorage() { if(!currentUser)return;const idx=users.findIndex(u=>u.username===currentUser.username);if(idx>-1){users[idx]={...users[idx],...currentUser};saveUsers();}}
+
+    // --- DOMContentLoaded: El Corazón de la Inicialización ---
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log("DOMContentLoaded: Ejecutándose.");
+
+        // PASO 1: Capturar los DIVS contenedores de las vistas principales.
+        loginContainer = document.getElementById('loginContainer');
+        registerContainer = document.getElementById('registerContainer');
+        dashboardContainer = document.getElementById('dashboardContainer');
+        profileContainer = document.getElementById('profileContainer');
+        contactsContainer = document.getElementById('contactsContainer');
+        newShipmentContainer = document.getElementById('newShipmentContainer');
+
+        // VERIFICACIÓN CRUCIAL
+        if (!loginContainer || !registerContainer || !dashboardContainer || !profileContainer || !contactsContainer || !newShipmentContainer) {
+            console.error("ERROR MUY GRAVE: IDs de contenedores principales (loginContainer, etc.) no encontrados en el HTML. Verifica que existan y estén bien escritos.");
+            document.body.innerHTML = `<div style="padding:20px;text-align:center;color:red;font-size:18px;">Error crítico: Faltan elementos esenciales para la aplicación (contenedores de vista). Revisa el HTML.</div>`;
+            return; // Detener aquí, nada más puede funcionar.
         }
-        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
-        currentShipmentStep = nextStep; updateShipmentStepView(); window.scrollTo(0,0);
-    }
-    function prevShipmentStep(prevStep) {
-        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
-        currentShipmentStep = prevStep; updateShipmentStepView(); window.scrollTo(0,0);
-    }
-    function _loadContactsForShipment() {
-        const shipmentRecipientContactSelect = document.getElementById('shipmentRecipientContactSelect');
-        if(!shipmentRecipientContactSelect) return;
-        shipmentRecipientContactSelect.innerHTML = '<option value="">-- Seleccionar contacto --</option>';
-        if (currentUser && currentUser.contacts && currentUser.contacts.length > 0) {
-            currentUser.contacts.forEach(contact => {
-                const option = document.createElement('option');
-                option.value = contact.id; option.textContent = contact.name;
-                shipmentRecipientContactSelect.appendChild(option);
-            });
-        }
-    }
-    function calculateServiceCost() {
-        const shipmentDistanceInput = document.getElementById('shipmentDistance');
-        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
-        if(!shipmentDistanceInput || !shipmentServiceCostInput) return;
-        const distanceStr = shipmentDistanceInput.value;
-        if (distanceStr === "" || isNaN(parseFloat(distanceStr)) || distanceStr.toLowerCase().includes("calculando") || distanceStr.toLowerCase().includes("error")) {
-            shipmentServiceCostInput.value = ""; return;
-        }
-        const distance = parseFloat(distanceStr);
-        let cost = distance <= 0 ? 0 : distance <= 10 ? 25000 : distance <= 20 ? 40000 : 60000;
-        shipmentServiceCostInput.value = cost > 0 ? cost.toLocaleString('es-PY') : "";
-        updateShipmentSummary(); // Llamar aquí también para asegurar actualización del resumen.
-    }
-    function updateShipmentSummary() {
-        const shipmentSummaryDiv = document.getElementById('shipmentSummary');
-        if (currentShipmentStep !== 3 || !shipmentSummaryDiv) return;
-        const s = { /* ... (igual que antes) ... */ };
-        // Lógica de llenado de 's' como antes (acortado aquí)
-        s.senderName=document.getElementById('shipmentSenderName').value; s.senderAddr=document.getElementById('shipmentSenderAddress').value; s.recName=document.getElementById('shipmentRecipientName').value; s.recAddr=document.getElementById('shipmentRecipientAddress').value; s.itemType=document.getElementById('shipmentItemType').options[document.getElementById('shipmentItemType').selectedIndex].text; s.itemDesc=document.getElementById('shipmentDescription').value; s.isFragile=document.getElementById('shipmentIsFragile').checked; s.roundTrip=document.getElementById('shipmentRoundTrip').checked; s.distance=document.getElementById('shipmentDistance').value; s.cost=document.getElementById('shipmentServiceCost').value; s.payment = document.querySelector('input[name="paymentMethod"]:checked') ? document.querySelector('input[name="paymentMethod"]:checked').parentElement.textContent.trim() : 'N/A';
-        shipmentSummaryDiv.innerHTML = `<h4>Resumen del Envío:</h4> <p><strong>Remite:</strong> ${s.senderName} (${s.senderAddr})</p> <p><strong>Recibe:</strong> ${s.recName} (${s.recAddr})</p> <p><strong>Tipo:</strong> ${s.itemType}, ${s.itemDesc.substring(0,30)}...</p> ${s.isFragile ? "<p><strong style='color:red;'>¡FRÁGIL!</strong></p>" : ""} ${s.roundTrip ? "<p><strong>Servicio:</strong> Ida y Vuelta</p>" : ""} <p><strong>Dist Aprox:</strong> ${s.distance || 'N/A'} km</p> <p><strong>Costo:</strong> Gs. ${s.cost || 'N/A'}</p> <p><strong>Pago:</strong> ${s.payment}</p>`;
-    }
-    function handleSaveShipment() {
-        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        const shipmentDistanceInput = document.getElementById('shipmentDistance');
-        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
-        if (currentShipmentStep !== 3) { showMessage(shipmentMessageArea, "Completa todos los pasos.", "error"); return; }
-        const distance = parseFloat(shipmentDistanceInput.value);
-        const costVal = shipmentServiceCostInput.value;
-        if (isNaN(distance) || distance <= 0 || !costVal || costVal.toLowerCase().includes("calculando") || costVal.toLowerCase().includes("error")) {
-            showMessage(shipmentMessageArea, "Distancia y costo deben estar calculados y ser válidos.", "error");
-            if (shipmentDistanceInput && (isNaN(distance) || distance <=0)) shipmentDistanceInput.focus();
+        console.log("DOMContentLoaded: Contenedores principales de vista asignados correctamente.");
+
+        // PASO 2: Cargar datos de usuario y determinar la vista inicial.
+        try {
+            loadUsers(); // Esta función internamente llamará a showLoginView() o showDashboardView()
+        } catch (error) {
+            console.error("ERROR CATASTRÓFICO durante loadUsers:", error);
+            document.body.innerHTML = `<div style="padding:20px;text-align:center;color:red;font-size:18px;">Error crítico al cargar datos. La aplicación no puede iniciar.</div>`;
             return;
         }
-        if (!pickupCoords || !destCoords) {
-             showMessage(shipmentMessageArea, "Faltan coordenadas de recogida o destino.", "error"); return;
+
+        // PASO 3: Definir el resto de las funciones de la aplicación
+        // Estas funciones se adjuntarán a eventos o serán llamadas por otras funciones.
+
+        window.showRegisterView = function() { const f=document.getElementById('registerForm'),m=document.getElementById('registerMessageArea');showView(registerContainer);if(m)clearMessage(m);if(f)f.reset(); };
+        window.showDashboardView = function() { if(!currentUser){showLoginView();return;}showView(dashboardContainer);updateWelcomeMessage();};
+        window.showProfileView = function() { if(!currentUser){showLoginView();return;}const f=document.getElementById('profileForm'),m=document.getElementById('profileMessageArea'),n=document.getElementById('profileName'),u=document.getElementById('profileUsername'),em=document.getElementById('profileEmail'),p=document.getElementById('profilePhone');showView(profileContainer);if(m)clearMessage(m);if(f)f.reset();if(n&¤tUser)n.value=currentUser.name;if(u&¤tUser)u.value=currentUser.username;if(em&¤tUser)em.value=currentUser.email;if(p&¤tUser)p.value=currentUser.phone; };
+        window.showContactsView = function() { if(!currentUser){showLoginView();return;}const af=document.getElementById('addContactForm'),cfm=document.getElementById('contactFormMessageArea'),afc=document.getElementById('addContactFormContainer'),tBtn=document.getElementById('toggleAddContactFormBtn');showView(contactsContainer);if(cfm)clearMessage(cfm);if(af)af.reset();if(afc){if(afc.dataset.editingId)_resetContactFormToDefault(); afc.style.display='none';} if(tBtn)tBtn.textContent='✚ Agregar Contacto'; renderContacts(); };
+        window.showNewShipmentView = function() {
+            if(!currentUser){showLoginView();return;}
+            const sMA=document.getElementById('shipmentMessageArea'),sSNI=document.getElementById('shipmentSenderName'),sSPI=document.getElementById('shipmentSenderPhone'),sSB=document.getElementById('saveShipmentButton');
+            _resetShipmentForm(); // Limpia y resetea mapas y campos
+            currentShipmentStep=1; updateShipmentStepView();
+            showView(newShipmentContainer); // Mostrar DESPUÉS de resetear y antes de init mapas si es la 1ra vez
+            if(sSNI&¤tUser)sSNI.value=currentUser.name||''; if(sSPI&¤tUser)sSPI.value=currentUser.phone||'';
+            _loadContactsForShipment(); if(sMA)clearMessage(sMA);
+            // Asegurar que los divs de mapa existen ANTES de llamar a initMap
+            if(document.getElementById('mapRecogida') && !mapRecogida) initMapRecogida(); else if (mapRecogida) mapRecogida.invalidateSize();
+            if(document.getElementById('mapDestino') && !mapDestino) initMapDestino(); else if (mapDestino) mapDestino.invalidateSize();
+            if(sSB) sSB.disabled=true;
+        };
+
+        window.handleRegister = function() { /* ... Lógica de registro completa de pasos anteriores ... */ const rMA=document.getElementById('registerMessageArea'),rNI=document.getElementById('registerName'),rUI=document.getElementById('registerUsername'),rEI=document.getElementById('registerEmail'),rPI=document.getElementById('registerPhone'),rPaI=document.getElementById('registerPassword'),rCPI=document.getElementById('registerConfirmPassword'),rF=document.getElementById('registerForm'); if(rMA)clearMessage(rMA);const n=rNI.value.trim(),u=rUI.value.trim(),e=rEI.value.trim(),p=rPI.value.trim(),pa=rPaI.value,cp=rCPI.value;if(!n||!u||!e||!p||!pa||!cp){showMessage(rMA,"Todos obligatorios.","error");return;}if(/\s/.test(u)){showMessage(rMA,"Usuario sin espacios.","error");return;}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showMessage(rMA,"Email inválido.","error");return;}if(!/^09[6-9]\d{7}$/.test(p)){showMessage(rMA,"Celular PY.","error");return;}if(pa.length<8){showMessage(rMA,"Clave: mín. 8.","error");return;}if(pa!==cp){showMessage(rMA,"Claves no coinciden.","error");return;}if(users.some(us=>us.username===u)){showMessage(rMA,"Usuario ya existe.","error");return;}if(users.some(us=>us.email===e)){showMessage(rMA,"Email ya registrado.","error");return;}users.push({name:n,username:u,email:e,phone:p,password:pa,contacts:[],shipments:[],points:0});saveUsers();showMessage(rMA,"¡Registrado!","success");if(rF)rF.reset();setTimeout(showLoginView,1500);};
+        window.handleLogin = function() { /* ... Lógica de login completa ... */ const lMA=document.getElementById('loginMessageArea'),lUI=document.getElementById('loginUsername'),lPI=document.getElementById('loginPassword');if(lMA)clearMessage(lMA);const u=lUI.value.trim(),p=lPI.value;if(!u||!p){showMessage(lMA,"Usuario y clave.","error");return;}const fU=users.find(us=>us.username===u&&us.password===p);if(fU){currentUser=fU;currentUser.contacts=currentUser.contacts||[];currentUser.shipments=currentUser.shipments||[];currentUser.points=currentUser.points||0;sessionStorage.setItem('loggedInUser',currentUser.username);showDashboardView();}else{showMessage(lMA,"Error datos.","error");}};
+        window.updateWelcomeMessage = function() { /* ... Lógica de saludo completa ... */ const wME=document.getElementById('welcomeMessage');if(!currentUser||!wME)return;const h=new Date().getHours();let g=h<12?"Buenos días":h<18?"Buenas tardes":"Buenas noches";wME.innerHTML=`${g}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a!`;};
+        window.handleLogout = function() {currentUser=null;sessionStorage.removeItem('loggedInUser');showLoginView();};
+        window.handleUpdateProfile = function() { /* ... Lógica de actualizar perfil ... */ const pMA=document.getElementById('profileMessageArea'),pNI=document.getElementById('profileName'),pEI=document.getElementById('profileEmail'),pPI=document.getElementById('profilePhone'),pNePI=document.getElementById('profileNewPassword'),pCNPI=document.getElementById('profileConfirmNewPassword');if(pMA)clearMessage(pMA);const n=pNI.value.trim(),em=pEI.value.trim(),ph=pPI.value.trim(),neP=pNePI.value,cNeP=pCNPI.value;if(!n||!em||!ph){showMessage(pMA,"Nombre,Email,Celular obligatorios.","error");return;}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){showMessage(pMA,"Email inválido.","error");return;}if(!/^09[6-9]\d{7}$/.test(ph)){showMessage(pMA,"Celular PY.","error");return;}if(em!==currentUser.email&&users.some(u=>u.email===em&&u.username!==currentUser.username)){showMessage(pMA,"Correo ya en uso.","error");return;}if(neP){if(neP.length<8){showMessage(pMA,"Nueva Clave: mín. 8.","error");return;}if(neP!==cNeP){showMessage(pMA,"Claves no coinciden.","error");return;}currentUser.password=neP;}currentUser.name=n;currentUser.email=em;currentUser.phone=ph;updateUserInLocalStorage();showMessage(pMA,"Perfil actualizado.","success");if(pNePI)pNePI.value='';if(pCNPI)pCNPI.value='';updateWelcomeMessage();};
+        window._resetContactFormToDefault = function() { /* ... Lógica de resetear form contacto ... */ const aCF=document.getElementById('addContactForm'),aCFC=document.getElementById('addContactFormContainer'),cFMA=document.getElementById('contactFormMessageArea');if(!aCF||!aCFC)return;aCF.reset();const sB=aCFC.querySelector('form#addContactForm button');if(sB){sB.textContent='Guardar Contacto';sB.onclick=handleAddContact;}delete aCFC.dataset.editingId;if(cFMA)clearMessage(cFMA);};
+        window.toggleAddContactForm = function() { /* ... Lógica de mostrar/ocultar form contacto ... */ const aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn'),cNI=document.getElementById('contactName');if(!aCFC||!tACFB)return;const iV=aCFC.style.display==='block';const eI=aCFC.dataset.editingId;if(iV){aCFC.style.display='none';tACFB.textContent='✚ Agregar Contacto';if(eI)_resetContactFormToDefault();}else{_resetContactFormToDefault();aCFC.style.display='block';tACFB.textContent='➖ Cancelar';if(cNI)cNI.focus();}};
+        window.handleAddContact = function() { /* ... Lógica de añadir contacto ... */ const cFMA=document.getElementById('contactFormMessageArea'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone');if(cFMA)clearMessage(cFMA);const n=cNI.value.trim(),a=cAI.value.trim(),p=cPI.value.trim();if(!n||!a||!p){showMessage(cFMA,"Todos los campos del contacto obligatorios.","error");return;}if(!/^\d{6,}$/.test(p.replace(/\s/g,''))){showMessage(cFMA,"Celular inválido.","error");return;}currentUser.contacts.push({id:Date.now().toString(),name:n,address:a,phone:p});updateUserInLocalStorage();showMessage(cFMA,"Contacto guardado.","success");_resetContactFormToDefault();renderContacts();setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);};
+        window.renderContacts = function() { /* ... Lógica de mostrar lista de contactos ... */ const cLA=document.getElementById('contactListArea');if(!cLA)return;cLA.innerHTML='';if(!currentUser||!currentUser.contacts||currentUser.contacts.length===0){cLA.innerHTML='<p class="no-contacts">Aún no tienes contactos.</p>';return;}currentUser.contacts.forEach(c=>{const ca=document.createElement('div');ca.className='contact-card';ca.dataset.contactId=c.id;ca.innerHTML=`<div class="contact-card-info"><p><strong>Nombre:</strong> ${c.name}</p><p><strong>Dirección:</strong> ${c.address}</p><p><strong>Celular:</strong> ${c.phone}</p></div><div class="contact-card-actions"><button class="edit-btn" onclick="handleEditContact('${c.id}')">Editar</button><button class="delete-btn" onclick="handleDeleteContact('${c.id}')">Eliminar</button></div>`;cLA.appendChild(ca);});};
+        window.handleEditContact = function(cId) { /* ... Lógica de preparar para editar contacto ... */ const aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone'),cFMA=document.getElementById('contactFormMessageArea');const c=currentUser.contacts.find(co=>co.id===cId);if(c&&aCFC){_resetContactFormToDefault();aCFC.style.display='block';if(tACFB)tACFB.textContent='📝 Editando (Cancelar)';if(cNI)cNI.value=c.name;if(cAI)cAI.value=c.address;if(cPI)cPI.value=c.phone;const sB=aCFC.querySelector('form#addContactForm button');if(sB){sB.textContent='Actualizar Contacto';sB.onclick=()=>handleUpdateExistingContact(cId);}aCFC.dataset.editingId=cId;if(cFMA)clearMessage(cFMA);if(cNI)cNI.focus();}};
+        window.handleUpdateExistingContact = function(cITU) { /* ... Lógica de guardar edición de contacto ... */ const cFMA=document.getElementById('contactFormMessageArea'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone'),aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn');if(cFMA)clearMessage(cFMA);const n=cNI.value.trim(),a=cAI.value.trim(),p=cPI.value.trim();if(!n||!a||!p){showMessage(cFMA,"Campos obligatorios.","error");return;}if(!/^\d{6,}$/.test(p.replace(/\s/g,''))){showMessage(cFMA,"Celular inválido.","error");return;}const cI=currentUser.contacts.findIndex(co=>co.id===cITU);if(cI>-1){currentUser.contacts[cI].name=n;currentUser.contacts[cI].address=a;currentUser.contacts[cI].phone=p;updateUserInLocalStorage();showMessage(cFMA,"Contacto actualizado.","success");_resetContactFormToDefault();if(aCFC)aCFC.style.display='none';if(tACFB)tACFB.textContent='✚ Agregar Contacto';renderContacts();setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);}else{showMessage(cFMA,"Error al actualizar.","error");}};
+        window.handleDeleteContact = function(cId) { /* ... Lógica de borrar contacto ... */ const cFMA=document.getElementById('contactFormMessageArea'),aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn');if(confirm("¿Eliminar contacto?")){currentUser.contacts=currentUser.contacts.filter(c=>c.id!==cId);updateUserInLocalStorage();renderContacts();if(cFMA)showMessage(cFMA,"Contacto eliminado.","success");setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);if(aCFC&&aCFC.dataset.editingId===cId){_resetContactFormToDefault();aCFC.style.display='none';if(tACFB)tACFB.textContent='✚ Agregar Contacto';}}};
+
+        // --- MAPAS y RUTEO --- (Funciones relacionadas con Leaflet)
+        window.initMapRecogida=function(){if(mapRecogida||!document.getElementById('mapRecogida'))return;mapRecogida=L.map('mapRecogida').setView([-25.2822,-57.6352],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(mapRecogida);mapRecogida.on('click',function(e){pickupCoords=e.latlng;if(markerRecogida)mapRecogida.removeLayer(markerRecogida);markerRecogida=L.marker(pickupCoords).addTo(mapRecogida).bindPopup("Recogida").openPopup();document.getElementById('pickupCoordsDisplay').textContent=`Lat/Lng: ${pickupCoords.lat.toFixed(4)}, ${pickupCoords.lng.toFixed(4)}`;attemptCalculateRoute();}); console.log("Mapa Recogida inicializado");};
+        window.initMapDestino=function(){if(mapDestino||!document.getElementById('mapDestino'))return;mapDestino=L.map('mapDestino').setView([-25.2822,-57.6352],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM'}).addTo(mapDestino);mapDestino.on('click',function(e){destCoords=e.latlng;if(markerDestino)mapDestino.removeLayer(markerDestino);markerDestino=L.marker(destCoords).addTo(mapDestino).bindPopup("Destino").openPopup();document.getElementById('destCoordsDisplay').textContent=`Lat/Lng: ${destCoords.lat.toFixed(4)}, ${destCoords.lng.toFixed(4)}`;attemptCalculateRoute();}); console.log("Mapa Destino inicializado");};
+        window.attemptCalculateRoute=function(){const sDI=document.getElementById('shipmentDistance'),sSCI=document.getElementById('shipmentServiceCost'),sSB=document.getElementById('saveShipmentButton'),sMA=document.getElementById('shipmentMessageArea');if(sSB)sSB.disabled=true;if(sDI)sDI.value="Calculando...";if(sSCI)sSCI.value="Calculando...";if(pickupCoords&&destCoords){console.log("Calculando ruta con OSRM...");if(routingControl&&mapDestino)mapDestino.removeControl(routingControl);routingControl=L.Routing.control({waypoints:[pickupCoords,destCoords],routeWhileDragging:false,draggableWaypoints:false,addWaypoints:false,show:false,fitSelectedRoutes:true}).on('routesfound',function(e){const r=e.routes;if(r.length>0){const dKm=r[0].summary.totalDistance/1000;if(sDI)sDI.value=dKm.toFixed(2);calculateServiceCost();if(sSB)sSB.disabled=false;updateShipmentSummary();console.log("Ruta encontrada:",dKm,"km");}else{if(sDI)sDI.value="Error ruta";if(sSCI)sSCI.value="";if(sMA)showMessage(sMA,'No se pudo calcular la ruta.','error');}}).on('routingerror',function(e){console.error("Error de ruteo:", e);if(sDI)sDI.value="Error API";if(sSCI)sSCI.value="";if(sMA)showMessage(sMA,`Error ruta: ${e.error?e.error.message:'Error desconocido'}`,'error');}).addTo(mapDestino);}else{if(sDI)sDI.value="";if(sSCI)sSCI.value="";}};
+
+        // --- Lógica de FORMULARIO DE ENVÍO ---
+        window._resetShipmentForm=function(){const nSF=document.getElementById('newShipmentForm'),sSNI=document.getElementById('shipmentSenderName'),sSPI=document.getElementById('shipmentSenderPhone'),sDI=document.getElementById('shipmentDistance'),sSCI=document.getElementById('shipmentServiceCost'),sSD=document.getElementById('shipmentSummary'),sMA=document.getElementById('shipmentMessageArea'),sSB=document.getElementById('saveShipmentButton'),pCD=document.getElementById('pickupCoordsDisplay'),dCD=document.getElementById('destCoordsDisplay');if(nSF)nSF.reset();if(sSNI&¤tUser)sSNI.value=currentUser.name||'';if(sSPI&¤tUser)sSPI.value=currentUser.phone||'';pickupCoords=null;destCoords=null;if(markerRecogida&&mapRecogida){mapRecogida.removeLayer(markerRecogida);markerRecogida=null;}if(markerDestino&&mapDestino){mapDestino.removeLayer(markerDestino);markerDestino=null;}if(routingControl&&mapDestino){mapDestino.removeControl(routingControl);routingControl=null;}if(pCD)pCD.textContent='Lat/Lng: (no sel.)';if(dCD)dCD.textContent='Lat/Lng: (no sel.)';if(sDI)sDI.value='';if(sSCI)sSCI.value='';if(sSD)sSD.innerHTML='Selecciona puntos...';if(sSB)sSB.disabled=true;currentShipmentStep=1;updateShipmentStepView();if(sMA)clearMessage(sMA);};
+        window.updateShipmentStepView=function(){document.querySelectorAll('.shipment-step').forEach(s=>s.classList.remove('active'));const aS=document.getElementById(`shipmentStep${currentShipmentStep}`);if(aS)aS.classList.add('active');setTimeout(()=>{if(currentShipmentStep===1&&mapRecogida)mapRecogida.invalidateSize();if(currentShipmentStep===2&&mapDestino)mapDestino.invalidateSize();},150);};
+        window.nextShipmentStep=function(nS){const sMA=document.getElementById('shipmentMessageArea'),sSAI=document.getElementById('shipmentSenderAddress'),sDT=document.getElementById('shipmentDescription'),sRNI=document.getElementById('shipmentRecipientName'),sRAI=document.getElementById('shipmentRecipientAddress'),sRPI=document.getElementById('shipmentRecipientPhone');if(currentShipmentStep===1){if(!sSAI.value.trim()||!sDT.value.trim()){if(sMA)showMessage(sMA,"Dirección y descripción.","error");return;}if(!pickupCoords){if(sMA)showMessage(sMA,"Selecciona recogida en mapa.","error");return;}}if(currentShipmentStep===2){if(!sRNI.value.trim()||!sRAI.value.trim()||!sRPI.value.trim()){if(sMA)showMessage(sMA,"Datos destinatario.","error");return;}if(!destCoords){if(sMA)showMessage(sMA,"Selecciona destino en mapa.","error");return;}updateShipmentSummary();}if(sMA)clearMessage(sMA);currentShipmentStep=nS;updateShipmentStepView();window.scrollTo(0,0);};
+        window.prevShipmentStep=function(pS){const sMA=document.getElementById('shipmentMessageArea');if(sMA)clearMessage(sMA);currentShipmentStep=pS;updateShipmentStepView();window.scrollTo(0,0);};
+        window._loadContactsForShipment=function(){const sRCSEL=document.getElementById('shipmentRecipientContactSelect');if(!sRCSEL)return;sRCSEL.innerHTML='<option value="">-- Seleccionar --</option>';if(currentUser&¤tUser.contacts&¤tUser.contacts.length>0){currentUser.contacts.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sRCSEL.appendChild(o);});}};
+        window.calculateServiceCost=function(){const sDI=document.getElementById('shipmentDistance'),sSCI=document.getElementById('shipmentServiceCost');if(!sDI||!sSCI)return;const dS=sDI.value;if(dS===""||isNaN(parseFloat(dS))||dS.toLowerCase().includes("calculando")||dS.toLowerCase().includes("error")){sSCI.value="";return;}const d=parseFloat(dS);let c=d<=0?0:d<=10?25000:d<=20?40000:60000;sSCI.value=c>0?c.toLocaleString('es-PY'):"";updateShipmentSummary();};
+        window.updateShipmentSummary=function(){const sSD=document.getElementById('shipmentSummary');if(currentShipmentStep!==3||!sSD)return;const sVals={sN:document.getElementById('shipmentSenderName').value,sA:document.getElementById('shipmentSenderAddress').value,rN:document.getElementById('shipmentRecipientName').value,rA:document.getElementById('shipmentRecipientAddress').value,iT:document.getElementById('shipmentItemType').options[document.getElementById('shipmentItemType').selectedIndex].text,iD:document.getElementById('shipmentDescription').value,iF:document.getElementById('shipmentIsFragile').checked,rT:document.getElementById('shipmentRoundTrip').checked,dist:document.getElementById('shipmentDistance').value,cost:document.getElementById('shipmentServiceCost').value,pay:document.querySelector('input[name="paymentMethod"]:checked')?document.querySelector('input[name="paymentMethod"]:checked').parentElement.textContent.trim():'N/A'};sSD.innerHTML=`<h4>Resumen:</h4><p><strong>Remite:</strong> ${sVals.sN}(${sVals.sA})</p><p><strong>Recibe:</strong> ${sVals.rN}(${sVals.rA})</p><p><strong>Tipo:</strong> ${sVals.iT}, ${sVals.iD.substring(0,30)}...</p>${sVals.iF?"<p><strong style='color:red;'>FRÁGIL</strong></p>":""}${sVals.rT?"<p><strong>Servicio:</strong> Ida y Vuelta</p>":""}<p><strong>Dist:</strong> ${sVals.dist||'N/A'} km</p><p><strong>Costo:</strong> Gs. ${sVals.cost||'N/A'}</p><p><strong>Pago:</strong> ${sVals.pay}</p>`;};
+        window.handleSaveShipment=function(){const sMA=document.getElementById('shipmentMessageArea'),sDI=document.getElementById('shipmentDistance'),sSCI=document.getElementById('shipmentServiceCost');if(currentShipmentStep!==3){if(sMA)showMessage(sMA,"Completa pasos.","error");return;}const dist=parseFloat(sDI.value);const costV=sSCI.value;if(isNaN(dist)||dist<=0||!costV||costV.toLowerCase().includes("calculando")||costV.toLowerCase().includes("error")){if(sMA)showMessage(sMA,"Distancia/Costo inválidos.","error");if(sDI&&(isNaN(dist)||dist<=0))sDI.focus();return;}if(!pickupCoords||!destCoords){if(sMA)showMessage(sMA,"Faltan coords.","error");return;}const nSD={id:Date.now().toString(),status:"Pendiente",createdAt:new Date().toISOString(),sender:{name:document.getElementById('shipmentSenderName').value,address:document.getElementById('shipmentSenderAddress').value,phone:document.getElementById('shipmentSenderPhone').value,pickupCoords:{lat:pickupCoords.lat,lng:pickupCoords.lng}},recipient:{name:document.getElementById('shipmentRecipientName').value,address:document.getElementById('shipmentRecipientAddress').value,phone:document.getElementById('shipmentRecipientPhone').value,destCoords:{lat:destCoords.lat,lng:destCoords.lng}},item:{type:document.getElementById('shipmentItemType').value,description:document.getElementById('shipmentDescription').value,isFragile:document.getElementById('shipmentIsFragile').checked},service:{roundTrip:document.getElementById('shipmentRoundTrip').checked,distanceKm:dist,costGs:parseFloat(costV.replace(/\./g,'').replace(/,/g,'.'))||0},payment:{method:document.querySelector('input[name="paymentMethod"]:checked').value}};currentUser.shipments.push(nSD);currentUser.points=(currentUser.points||0)+10;updateUserInLocalStorage();if(sMA)showMessage(sMA,`Envío guardado! ID: ${nSD.id}. Puntos: ${currentUser.points}`,"success");_resetShipmentForm();setTimeout(()=>{if(newShipmentContainer&&newShipmentContainer.style.display==='block'){showDashboardView();}},3000);};
+
+
+        // PASO 4: Asignar Event Listeners
+        console.log("DOMContentLoaded: Asignando event listeners.");
+        // Navegación principal
+        document.getElementById('loginButton').addEventListener('click', handleLogin);
+        document.getElementById('showRegisterLink').addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
+        document.getElementById('registerButton').addEventListener('click', handleRegister);
+        document.getElementById('showLoginLink').addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
+        document.getElementById('logoutButton').addEventListener('click', handleLogout);
+        document.getElementById('profileLink').addEventListener('click', (e) => { e.preventDefault(); showProfileView(); });
+        document.getElementById('contactsLink').addEventListener('click', (e) => { e.preventDefault(); showContactsView(); });
+        document.getElementById('newShipmentCardDashboard').addEventListener('click', (e) => { e.preventDefault(); showNewShipmentView(); }); // ID Corregido
+        // Botones "Volver al panel"
+        document.getElementById('backToDashboardFromProfile').addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        document.getElementById('backToDashboardFromContacts').addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        document.getElementById('backToDashboardFromShipment').addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        // Perfil
+        document.getElementById('updateProfileButton').addEventListener('click', handleUpdateProfile);
+        // Contactos
+        document.getElementById('toggleAddContactFormBtn').addEventListener('click', toggleAddContactForm);
+        // (el botón dentro del form de addContact se asigna dinámicamente en _resetContactFormToDefault)
+        // Envíos
+        document.getElementById('cancelShipmentStep1').addEventListener('click', () => showDashboardView());
+        document.getElementById('nextShipmentStep1Button').addEventListener('click', () => nextShipmentStep(2));
+        document.getElementById('prevShipmentStep2Button').addEventListener('click', () => prevShipmentStep(1));
+        document.getElementById('nextShipmentStep2Button').addEventListener('click', () => nextShipmentStep(3));
+        document.getElementById('prevShipmentStep3Button').addEventListener('click', () => prevShipmentStep(2));
+        // El saveShipmentButton ya tiene onclick en el HTML, o se puede añadir aquí
+        // Documento el shipmentDistance input listener para asegurar que existe:
+        const sdi = document.getElementById('shipmentDistance');
+        if (sdi && sdi.getAttribute('readonly') !== null) { // Si es readonly, no necesita input listener para teclear
+            console.log("shipmentDistance es readonly, el costo se calcula por mapa.");
+        } else if (sdi) {
+             sdi.addEventListener('input', calculateServiceCost); // Para cuando es entrada manual (aunque ya no debería serlo)
         }
 
-        const newShipmentData = {
-            id: Date.now().toString(), status: "Pendiente", createdAt: new Date().toISOString(),
-            sender: { name: document.getElementById('shipmentSenderName').value, address: document.getElementById('shipmentSenderAddress').value,
-                      phone: document.getElementById('shipmentSenderPhone').value, pickupCoords: pickupCoords, }, // Guardar objeto LatLng
-            recipient: { name: document.getElementById('shipmentRecipientName').value, address: document.getElementById('shipmentRecipientAddress').value,
-                         phone: document.getElementById('shipmentRecipientPhone').value, destCoords: destCoords, }, // Guardar objeto LatLng
-            item: { type: document.getElementById('shipmentItemType').value, description: document.getElementById('shipmentDescription').value,
-                    isFragile: document.getElementById('shipmentIsFragile').checked },
-            service: { roundTrip: document.getElementById('shipmentRoundTrip').checked, distanceKm: distance,
-                       costGs: parseFloat(costVal.replace(/\./g, '').replace(/,/g, '.')) || 0 },
-            payment: { method: document.querySelector('input[name="paymentMethod"]:checked').value }
-        };
-        currentUser.shipments.push(newShipmentData);
-        currentUser.points = (currentUser.points || 0) + 10;
-        updateUserInLocalStorage();
-        showMessage(shipmentMessageArea, `Envío guardado! ID: ${newShipmentData.id}. Puntos: ${currentUser.points}`, "success");
-        _resetShipmentForm();
-        setTimeout(() => { if (newShipmentContainer && newShipmentContainer.style.display === 'block') { showDashboardView(); }}, 3000);
-    }
+        document.getElementById('shipmentRecipientContactSelect').addEventListener('change', function(){
+            const selectedId = this.value;
+            const nameEl = document.getElementById('shipmentRecipientName');
+            const addrEl = document.getElementById('shipmentRecipientAddress');
+            const phoneEl = document.getElementById('shipmentRecipientPhone');
+            if(selectedId && currentUser && currentUser.contacts) {
+                const contact = currentUser.contacts.find(c => c.id === selectedId);
+                if(contact) {
+                    if(nameEl) nameEl.value = contact.name || '';
+                    if(addrEl) addrEl.value = contact.address || '';
+                    if(phoneEl) phoneEl.value = contact.phone || '';
+                }
+            } else {
+                if(nameEl) nameEl.value = ''; if(addrEl) addrEl.value = ''; if(phoneEl) phoneEl.value = '';
+            }
+        });
 
-    // --- DOMContentLoaded: Inicialización y Event Listeners ---
-    window.addEventListener('DOMContentLoaded', () => {
-        loginContainer=document.getElementById('loginContainer'); registerContainer=document.getElementById('registerContainer'); dashboardContainer=document.getElementById('dashboardContainer'); profileContainer=document.getElementById('profileContainer'); contactsContainer=document.getElementById('contactsContainer'); newShipmentContainer=document.getElementById('newShipmentContainer');
-        if (!loginContainer||!registerContainer||!dashboardContainer||!profileContainer||!contactsContainer||!newShipmentContainer) { console.error("CRITICAL: Missing main view containers."); document.body.innerHTML="<h1>Critical Error</h1>"; return; }
-        loadUsers();
+        // Listeners para Enter (simplificado para brevedad, verificar IDs)
+        document.getElementById('loginPassword').addEventListener('keypress', (e)=>{if(e.key==='Enter')handleLogin();});
+        document.getElementById('registerConfirmPassword').addEventListener('keypress', (e)=>{if(e.key==='Enter')handleRegister();});
+        // ... añadir más listeners de Enter si son cruciales
 
-        // Cargar definiciones completas de funciones resumidas
-        // (handleRegister, handleLogin, etc.) como fueron definidas en los pasos anteriores.
-        // Aquí se re-definen las funciones para completitud del script auto-contenido
-        // Si las funciones son exactamente iguales, no hay problema. Si fueron modificadas arriba, usar esas.
-
-        // Esta redefinición de handleRegister y otras debe ser LA versión funcional que teníamos antes
-        // Es un placeholder para asegurar que el script se entienda como autocontenido
-        // --- Registration Logic (Completa) ---
-        window.handleRegister = function() { const rMA=document.getElementById('registerMessageArea'),rNI=document.getElementById('registerName'),rUI=document.getElementById('registerUsername'),rEI=document.getElementById('registerEmail'),rPI=document.getElementById('registerPhone'),rPaI=document.getElementById('registerPassword'),rCPI=document.getElementById('registerConfirmPassword'),rF=document.getElementById('registerForm'); if(rMA)clearMessage(rMA);const n=rNI.value.trim(),u=rUI.value.trim(),e=rEI.value.trim(),p=rPI.value.trim(),pa=rPaI.value,cp=rCPI.value;if(!n||!u||!e||!p||!pa||!cp){showMessage(rMA,"Todos obligatorios.","error");return;}if(/\s/.test(u)){showMessage(rMA,"Usuario sin espacios.","error");return;}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showMessage(rMA,"Email inválido.","error");return;}if(!/^09[6-9]\d{7}$/.test(p)){showMessage(rMA,"Celular PY.","error");return;}if(pa.length<8){showMessage(rMA,"Clave: mín. 8.","error");return;}if(pa!==cp){showMessage(rMA,"Claves no coinciden.","error");return;}if(users.some(us=>us.username===u)){showMessage(rMA,"Usuario ya existe.","error");return;}if(users.some(us=>us.email===e)){showMessage(rMA,"Email ya registrado.","error");return;}users.push({name:n,username:u,email:e,phone:p,password:pa,contacts:[],shipments:[],points:0});saveUsers();showMessage(rMA,"¡Registrado!","success");if(rF)rF.reset();setTimeout(showLoginView,1500);};
-        window.handleLogin = function() { const lMA=document.getElementById('loginMessageArea'),lUI=document.getElementById('loginUsername'),lPI=document.getElementById('loginPassword');if(lMA)clearMessage(lMA);const u=lUI.value.trim(),p=lPI.value;if(!u||!p){showMessage(lMA,"Usuario y clave.","error");return;}const fU=users.find(us=>us.username===u&&us.password===p);if(fU){currentUser=fU;currentUser.contacts=currentUser.contacts||[];currentUser.shipments=currentUser.shipments||[];currentUser.points=currentUser.points||0;sessionStorage.setItem('loggedInUser',currentUser.username);showDashboardView();}else{showMessage(lMA,"Error datos.","error");}};
-        window.updateWelcomeMessage = function() {const wME=document.getElementById('welcomeMessage');if(!currentUser||!wME)return;const h=new Date().getHours();let g=h<12?"Buenos días":h<18?"Buenas tardes":"Buenas noches";wME.innerHTML=`${g}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a!`;};
-        window.handleLogout = function() {currentUser=null;sessionStorage.removeItem('loggedInUser');showLoginView();};
-        window.handleUpdateProfile = function() {const pMA=document.getElementById('profileMessageArea'),pNI=document.getElementById('profileName'),pEI=document.getElementById('profileEmail'),pPI=document.getElementById('profilePhone'),pNePI=document.getElementById('profileNewPassword'),pCNPI=document.getElementById('profileConfirmNewPassword');if(pMA)clearMessage(pMA);const n=pNI.value.trim(),e=pEI.value.trim(),p=pPI.value.trim(),neP=pNePI.value,cNeP=pCNPI.value;if(!n||!e||!p){showMessage(pMA,"Nombre,Email,Celular obligatorios.","error");return;}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){showMessage(pMA,"Email inválido.","error");return;}if(!/^09[6-9]\d{7}$/.test(p)){showMessage(pMA,"Celular PY.","error");return;}if(e!==currentUser.email&&users.some(u=>u.email===e&&u.username!==currentUser.username)){showMessage(pMA,"Correo ya en uso.","error");return;}if(neP){if(neP.length<8){showMessage(pMA,"Nueva Clave: mín. 8.","error");return;}if(neP!==cNeP){showMessage(pMA,"Claves no coinciden.","error");return;}currentUser.password=neP;}currentUser.name=n;currentUser.email=e;currentUser.phone=p;updateUserInLocalStorage();showMessage(pMA,"Perfil actualizado.","success");if(pNePI)pNePI.value='';if(pCNPI)pCNPI.value='';updateWelcomeMessage();};
-        window._resetContactFormToDefault = function() {const aCF=document.getElementById('addContactForm'),aCFC=document.getElementById('addContactFormContainer'),cFMA=document.getElementById('contactFormMessageArea');if(!aCF||!aCFC)return;aCF.reset();const sB=aCFC.querySelector('form#addContactForm button');if(sB){sB.textContent='Guardar Contacto';sB.onclick=handleAddContact;}delete aCFC.dataset.editingId;if(cFMA)clearMessage(cFMA);};
-        window.toggleAddContactForm = function() {const aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn'),cNI=document.getElementById('contactName');if(!aCFC||!tACFB)return;const iV=aCFC.style.display==='block';const eI=aCFC.dataset.editingId;if(iV){aCFC.style.display='none';tACFB.textContent='✚ Agregar Nuevo Contacto';if(eI)_resetContactFormToDefault();}else{_resetContactFormToDefault();aCFC.style.display='block';tACFB.textContent='➖ Cancelar Nuevo Contacto';if(cNI)cNI.focus();}};
-        window.handleAddContact = function() {const cFMA=document.getElementById('contactFormMessageArea'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone');if(cFMA)clearMessage(cFMA);const n=cNI.value.trim(),a=cAI.value.trim(),p=cPI.value.trim();if(!n||!a||!p){showMessage(cFMA,"Todos los campos del contacto obligatorios.","error");return;}if(!/^\d{6,}$/.test(p.replace(/\s/g,''))){showMessage(cFMA,"Celular inválido.","error");return;}currentUser.contacts.push({id:Date.now().toString(),name:n,address:a,phone:p});updateUserInLocalStorage();showMessage(cFMA,"Contacto guardado.","success");_resetContactFormToDefault();renderContacts();setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);};
-        window.renderContacts = function() {const cLA=document.getElementById('contactListArea');if(!cLA)return;cLA.innerHTML='';if(!currentUser||!currentUser.contacts||currentUser.contacts.length===0){cLA.innerHTML='<p class="no-contacts">Aún no tienes contactos.</p>';return;}currentUser.contacts.forEach(c=>{const ca=document.createElement('div');ca.className='contact-card';ca.dataset.contactId=c.id;ca.innerHTML=`<div class="contact-card-info"><p><strong>Nombre:</strong> ${c.name}</p><p><strong>Dirección:</strong> ${c.address}</p><p><strong>Celular:</strong> ${c.phone}</p></div><div class="contact-card-actions"><button class="edit-btn" onclick="handleEditContact('${c.id}')">Editar</button><button class="delete-btn" onclick="handleDeleteContact('${c.id}')">Eliminar</button></div>`;cLA.appendChild(ca);});};
-        window.handleEditContact = function(cId) {const aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone'),cFMA=document.getElementById('contactFormMessageArea');const c=currentUser.contacts.find(co=>co.id===cId);if(c&&aCFC){_resetContactFormToDefault();aCFC.style.display='block';if(tACFB)tACFB.textContent='📝 Editando (Cancelar/Nuevo)';if(cNI)cNI.value=c.name;if(cAI)cAI.value=c.address;if(cPI)cPI.value=c.phone;const sB=aCFC.querySelector('form#addContactForm button');if(sB){sB.textContent='Actualizar Contacto';sB.onclick=()=>handleUpdateExistingContact(cId);}aCFC.dataset.editingId=cId;if(cFMA)clearMessage(cFMA);if(cNI)cNI.focus();}};
-        window.handleUpdateExistingContact = function(cITU) {const cFMA=document.getElementById('contactFormMessageArea'),cNI=document.getElementById('contactName'),cAI=document.getElementById('contactAddress'),cPI=document.getElementById('contactPhone'),aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn');if(cFMA)clearMessage(cFMA);const n=cNI.value.trim(),a=cAI.value.trim(),p=cPI.value.trim();if(!n||!a||!p){showMessage(cFMA,"Campos obligatorios.","error");return;}if(!/^\d{6,}$/.test(p.replace(/\s/g,''))){showMessage(cFMA,"Celular inválido.","error");return;}const cI=currentUser.contacts.findIndex(co=>co.id===cITU);if(cI>-1){currentUser.contacts[cI].name=n;currentUser.contacts[cI].address=a;currentUser.contacts[cI].phone=p;updateUserInLocalStorage();showMessage(cFMA,"Contacto actualizado.","success");_resetContactFormToDefault();if(aCFC)aCFC.style.display='none';if(tACFB)tACFB.textContent='✚ Agregar Nuevo Contacto';renderContacts();setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);}else{showMessage(cFMA,"Error al actualizar.","error");}};
-        window.handleDeleteContact = function(cId) {const cFMA=document.getElementById('contactFormMessageArea'),aCFC=document.getElementById('addContactFormContainer'),tACFB=document.getElementById('toggleAddContactFormBtn');if(confirm("¿Eliminar contacto?")){currentUser.contacts=currentUser.contacts.filter(c=>c.id!==cId);updateUserInLocalStorage();renderContacts();if(cFMA)showMessage(cFMA,"Contacto eliminado.","success");setTimeout(()=>{if(cFMA)clearMessage(cFMA);},2000);if(aCFC&&aCFC.dataset.editingId===cId){_resetContactFormToDefault();aCFC.style.display='none';if(tACFB)tACFB.textContent='✚ Agregar Nuevo Contacto';}}};
-
-        // Event Listeners principales
-        const sRL=document.getElementById('showRegisterLink'),sLL=document.getElementById('showLoginLink'),pL=document.getElementById('profileLink'),cL=document.getElementById('contactsLink'),nSCFD=document.getElementById('newShipmentCard'),bTDFP=document.getElementById('backToDashboardFromProfile'),bTDFC=document.getElementById('backToDashboardFromContacts'),tACFB=document.getElementById('toggleAddContactFormBtn'),lPI=document.getElementById('loginPassword'),rCPI=document.getElementById('registerConfirmPassword'),pCNPI=document.getElementById('profileConfirmNewPassword'),cPI=document.getElementById('contactPhone'),sDI=document.getElementById('shipmentDistance'),sRCSEL=document.getElementById('shipmentRecipientContactSelect');
-        if(sRL)sRL.addEventListener('click',(e)=>{e.preventDefault();showRegisterView();});
-        if(sLL)sLL.addEventListener('click',(e)=>{e.preventDefault();showLoginView();});
-        if(pL)pL.addEventListener('click',(e)=>{e.preventDefault();showProfileView();});
-        if(cL)cL.addEventListener('click',(e)=>{e.preventDefault();showContactsView();});
-        if(nSCFD)nSCFD.addEventListener('click',(e)=>{e.preventDefault();showNewShipmentView();});
-        if(bTDFP)bTDFP.addEventListener('click',(e)=>{e.preventDefault();showDashboardView();});
-        if(bTDFC)bTDFC.addEventListener('click',(e)=>{e.preventDefault();showDashboardView();});
-        if(tACFB)tACFB.addEventListener('click',toggleAddContactForm);
-        if(lPI)lPI.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();handleLogin();}});
-        if(rCPI)rCPI.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();handleRegister();}});
-        if(pCNPI)pCNPI.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();handleUpdateProfile();}});
-        if(cPI)cPI.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();const aCFC=document.getElementById('addContactFormContainer');const eI=aCFC?aCFC.dataset.editingId:null;if(eI){handleUpdateExistingContact(eI);}else{handleAddContact();}}});
-        if(sDI)sDI.addEventListener('input', calculateServiceCost); // Ya se usa para la entrada manual, ahora también para la automática
-        if(sRCSEL){sRCSEL.addEventListener('change',function(){const sCID=this.value;const sRN=document.getElementById('shipmentRecipientName'),sRA=document.getElementById('shipmentRecipientAddress'),sRP=document.getElementById('shipmentRecipientPhone');if(sCID&¤tUser&¤tUser.contacts){const c=currentUser.contacts.find(co=>co.id===sCID);if(c){if(sRN)sRN.value=c.name||'';if(sRA)sRA.value=c.address||'';if(sRP)sRP.value=c.phone||'';}}else{if(sRN)sRN.value='';if(sRA)sRA.value='';if(sRP)sRP.value='';}});};
-        console.log("DOMContentLoaded: Fin.");
+        console.log("DOMContentLoaded: Todo inicializado.");
     });
     </script>
 </body>
