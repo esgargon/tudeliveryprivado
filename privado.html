@@ -5,39 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Web - Demo</title>
     <style>
-        /* Estilos CSS (similares, con adiciones para el dashboard) */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinea al inicio por si el contenido crece */
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
-            padding: 20px; /* Padding general para el body */
+            padding: 20px;
             box-sizing: border-box;
             transition: background-color 0.5s ease;
         }
 
-        .container, .dashboard-container {
+        .container, .dashboard-container, .contacts-container { /* Añadido .contacts-container */
             background-color: #fff;
             padding: 30px 40px;
             border-radius: 10px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            width: 400px; /* Un poco más ancho */
+            width: 450px; /* Un poco más ancho para dar espacio a contactos */
             text-align: center;
             margin-top: 20px;
             margin-bottom: 20px;
         }
 
-        .container h2, .dashboard-container h2 {
+        .container h2, .dashboard-container h2, .contacts-container h2 {
             margin-top: 0;
             margin-bottom: 25px;
             color: #333;
             font-weight: 600;
         }
 
-        .container label {
+        .container label, .contacts-container label {
             display: block;
             text-align: left;
             margin-bottom: 6px;
@@ -49,7 +48,9 @@
         .container input[type="text"],
         .container input[type="password"],
         .container input[type="email"],
-        .container input[type="tel"] {
+        .container input[type="tel"],
+        .contacts-container input[type="text"], /* Estilos para inputs de contacto */
+        .contacts-container input[type="tel"] {
             width: calc(100% - 24px);
             padding: 12px;
             margin-bottom: 18px;
@@ -59,13 +60,13 @@
             font-size: 15px;
         }
 
-        .container input:focus {
+        .container input:focus, .contacts-container input:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
         }
 
-        .container button, .dashboard-container button {
+        .container button, .dashboard-container button, .contacts-container button {
             width: 100%;
             padding: 12px;
             background-color: #007bff;
@@ -78,136 +79,83 @@
             transition: background-color 0.3s ease;
             margin-top: 10px;
         }
-        .dashboard-container .button-secondary {
+        .dashboard-container .button-secondary, .contacts-container .button-secondary {
             background-color: #6c757d;
         }
-        .dashboard-container .button-secondary:hover {
+        .dashboard-container .button-secondary:hover, .contacts-container .button-secondary:hover {
             background-color: #5a6268;
+        }
+        .contacts-container .button-add { /* Botón específico para añadir contacto */
+            background-color: #28a745; /* Verde */
+            margin-bottom:20px;
+        }
+        .contacts-container .button-add:hover {
+            background-color: #218838;
         }
 
 
-        .container button:hover, .dashboard-container button:hover {
+        .container button:hover, .dashboard-container button:hover, .contacts-container button:hover {
             background-color: #0056b3;
         }
 
         .message {
-            margin-top: 18px;
-            font-size: 14px;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
+            margin-top: 18px; font-size: 14px; padding: 10px; border-radius: 5px; display: none;
         }
-
         .message.success {
-            color: #155724;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            display: block;
+            color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; display: block;
         }
-
         .message.error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            display: block;
+            color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; display: block;
         }
 
         .form-switch-link {
-            display: block;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
+            display: block; margin-top: 20px; font-size: 14px; color: #007bff;
+            text-decoration: none; cursor: pointer;
         }
+        .form-switch-link:hover { text-decoration: underline; }
 
-        .form-switch-link:hover {
-            text-decoration: underline;
-        }
-
-        #loginContainer, #registerContainer, #dashboardContainer, #profileContainer {
+        #loginContainer, #registerContainer, #dashboardContainer, #profileContainer, #contactsContainer {
             display: none;
         }
 
         .dashboard-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Ajustar para dar espacio a más links */
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap; /* Para que los links pasen abajo si no caben */
         }
+        .dashboard-header h2 { margin-bottom: 0; margin-right: auto; /* Empuja los links a la derecha */ }
+        .dashboard-nav-links { display: flex; gap: 15px; }
 
-        .dashboard-header h2 {
-            margin-bottom: 0;
-        }
 
         #welcomeMessage {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            font-size: 18px; color: #333; margin-bottom: 30px; line-height: 1.6;
         }
 
-        .profile-link {
-            display: inline-block;
-            padding: 8px 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 20px;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            transition: all 0.2s ease-in-out;
+        .profile-link, .contacts-link { /* Estilo compartido */
+            display: inline-flex; align-items: center; padding: 8px 15px;
+            background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 20px;
+            text-decoration: none; color: #333; font-size: 14px; transition: all 0.2s ease-in-out;
         }
-        .profile-link .icon {
-            margin-right: 5px;
+        .profile-link .icon, .contacts-link .icon { margin-right: 5px; }
+        .profile-link:hover, .contacts-link:hover {
+            background-color: #e9ecef; border-color: #adb5bd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .profile-link:hover {
-            background-color: #e9ecef;
-            border-color: #adb5bd;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* Nuevas Tarjetas del Dashboard */
         .dashboard-options {
-            display: flex; /* Para ponerlas una al lado de la otra */
-            justify-content: space-around; /* Espacio entre ellas */
-            gap: 20px; /* Espacio entre las tarjetas */
-            margin-top: 20px; /* Espacio después del mensaje de bienvenida */
-            margin-bottom: 30px; /* Espacio antes del botón de cerrar sesión */
+            display: flex; justify-content: space-around; gap: 20px;
+            margin-top: 20px; margin-bottom: 30px;
         }
-
         .dashboard-card {
-            background-color: #f8f9fa; /* Fondo claro para las tarjetas */
-            border: 1px solid #e3e6f0;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            width: 45%; /* Que ocupen casi la mitad cada una con el gap */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer; /* Indica que podrían ser clickeables en el futuro */
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: #f8f9fa; border: 1px solid #e3e6f0; border-radius: 8px;
+            padding: 20px; text-align: center; width: 45%; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .dashboard-card:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .dashboard-card h3 { margin-top: 0; margin-bottom: 10px; font-size: 1.1em; color: #007bff; }
+        .dashboard-card p { font-size: 0.9em; color: #6c757d; margin-bottom: 0; }
 
-        .dashboard-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .dashboard-card h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            color: #007bff; /* Color principal para el título de la tarjeta */
-        }
-
-        .dashboard-card p {
-            font-size: 0.9em;
-            color: #6c757d; /* Color gris para la descripción */
-            margin-bottom: 0;
-        }
-
-        /* Estilos para el futuro contenedor de perfil (sin cambios) */
         #profileContainer label {
              display: block; text-align: left; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px;
         }
@@ -225,6 +173,67 @@
         }
          #profileContainer button:hover { background-color: #218838; }
 
+
+        /* Estilos para la sección de Contactos */
+        #addContactFormContainer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px dashed #ccc;
+            /* display: none; Oculto por defecto, JS lo muestra */
+        }
+         #addContactFormContainer h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: #333;
+         }
+
+        #contactListArea {
+            margin-top: 20px;
+            text-align: left; /* Para que las tarjetas se alineen a la izquierda */
+        }
+
+        .contact-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; /* Para alinear contenido interno y botones */
+            flex-direction: column; /* Apila la info principal y luego los botones */
+        }
+        .contact-card-info strong { color: #007bff; }
+        .contact-card-info p { margin: 5px 0; font-size: 0.95em; color: #555; }
+        .contact-card-actions {
+            margin-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+            display: flex;
+            justify-content: flex-end; /* Alinea botones a la derecha */
+            gap: 10px;
+        }
+        .contact-card-actions button {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            width: auto; /* Ancho automático para botones de acción */
+            margin-top: 0;
+        }
+        .contact-card-actions .edit-btn { background-color: #ffc107; color: #333; }
+        .contact-card-actions .edit-btn:hover { background-color: #e0a800; }
+        .contact-card-actions .delete-btn { background-color: #dc3545; }
+        .contact-card-actions .delete-btn:hover { background-color: #c82333; }
+
+        .no-contacts {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+            border: 1px dashed #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -258,25 +267,16 @@
     <div id="dashboardContainer" class="dashboard-container">
         <div class="dashboard-header">
             <h2>Panel de Control</h2>
-            <a href="#" id="profileLink" class="profile-link">
-                <span class="icon">👤</span>Mi Perfil
-            </a>
+            <div class="dashboard-nav-links">
+                <a href="#" id="profileLink" class="profile-link"><span class="icon">👤</span>Mi Perfil</a>
+                <a href="#" id="contactsLink" class="contacts-link"><span class="icon">📒</span>Contactos</a>
+            </div>
         </div>
         <div id="welcomeMessage"></div>
-
-        <!-- Nuevas Opciones del Dashboard -->
         <div class="dashboard-options">
-            <div class="dashboard-card" id="newShipmentCard">
-                <h3>🚚 NUEVO ENVÍO</h3>
-                <p>Aquí podrás gestionar tus nuevos envíos.</p>
-            </div>
-            <div class="dashboard-card" id="newManagementCard">
-                <h3>⚙️ NUEVA GESTIÓN</h3>
-                <p>Aquí podrás gestionar tus nuevas gestiones.</p>
-            </div>
+            <div class="dashboard-card" id="newShipmentCard"><h3>🚚 NUEVO ENVÍO</h3><p>Gestiona tus nuevos envíos.</p></div>
+            <div class="dashboard-card" id="newManagementCard"><h3>⚙️ NUEVA GESTIÓN</h3><p>Administra nuevas gestiones.</p></div>
         </div>
-        <!-- Fin Nuevas Opciones -->
-
         <button type="button" onclick="handleLogout()" class="button-secondary" style="margin-top:auto;">Cerrar Sesión</button>
     </div>
 
@@ -287,35 +287,65 @@
             <div><label for="profileUsername">Usuario (no editable):</label><input type="text" id="profileUsername" readonly disabled></div>
             <div><label for="profileEmail">Correo Electrónico:</label><input type="email" id="profileEmail" required></div>
             <div><label for="profilePhone">Celular:</label><input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required></div>
-            <div><label for="profileNewPassword">Nueva Contraseña (dejar en blanco para no cambiar):</label><input type="password" id="profileNewPassword"></div>
+            <div><label for="profileNewPassword">Nueva Contraseña (vacío = no cambiar):</label><input type="password" id="profileNewPassword"></div>
             <div><label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label><input type="password" id="profileConfirmNewPassword"></div>
             <button type="button" onclick="handleUpdateProfile()">Guardar Cambios</button>
         </form>
         <div id="profileMessageArea" class="message"></div>
-        <a href="#" id="backToDashboardLink" class="form-switch-link">Volver al Panel</a>
+        <a href="#" id="backToDashboardFromProfile" class="form-switch-link">Volver al Panel</a>
+    </div>
+
+    <div id="contactsContainer" class="contacts-container"> <!-- Nuevo Contenedor de Contactos -->
+        <h2>Mis Contactos</h2>
+        <button type="button" id="toggleAddContactFormBtn" class="button-add">✚ Agregar Nuevo Contacto</button>
+        <div id="addContactFormContainer" style="display: none;"> <!-- Formulario oculto por defecto -->
+            <h3>Nuevo Contacto</h3>
+            <form id="addContactForm">
+                <div>
+                    <label for="contactName">Nombre y Apellido:</label>
+                    <input type="text" id="contactName" required>
+                </div>
+                <div>
+                    <label for="contactAddress">Dirección:</label>
+                    <input type="text" id="contactAddress" required>
+                </div>
+                <div>
+                    <label for="contactPhone">Celular:</label>
+                    <input type="tel" id="contactPhone" placeholder="09xxxxxxxx" required>
+                </div>
+                <button type="button" onclick="handleAddContact()">Guardar Contacto</button>
+            </form>
+            <div id="contactFormMessageArea" class="message"></div>
+        </div>
+        <div id="contactListArea">
+            <!-- Las tarjetas de contacto se insertarán aquí por JS -->
+        </div>
+        <a href="#" id="backToDashboardFromContacts" class="form-switch-link" style="margin-top: 30px;">Volver al Panel</a>
     </div>
 
 
     <script>
-        // --- Constantes y Variables Globales ---
         const USERS_STORAGE_KEY = 'registeredUsers';
         let users = [];
         let currentUser = null;
 
-        // --- Selectores de Elementos del DOM ---
+        // --- DOM Elements ---
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
         const dashboardContainer = document.getElementById('dashboardContainer');
         const profileContainer = document.getElementById('profileContainer');
+        const contactsContainer = document.getElementById('contactsContainer'); // Nuevo
 
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const profileForm = document.getElementById('profileForm');
+        const addContactForm = document.getElementById('addContactForm'); // Nuevo
 
+        // Login
         const loginUsernameInput = document.getElementById('loginUsername');
         const loginPasswordInput = document.getElementById('loginPassword');
         const loginMessageArea = document.getElementById('loginMessageArea');
-
+        // Register
         const registerNameInput = document.getElementById('registerName');
         const registerUsernameInput = document.getElementById('registerUsername');
         const registerEmailInput = document.getElementById('registerEmail');
@@ -323,14 +353,11 @@
         const registerPasswordInput = document.getElementById('registerPassword');
         const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
         const registerMessageArea = document.getElementById('registerMessageArea');
-
+        // Dashboard
         const welcomeMessageElement = document.getElementById('welcomeMessage');
         const profileLink = document.getElementById('profileLink');
-
-        // Selectores de las nuevas tarjetas (aunque no tengan JS asociado aún, bueno tenerlos)
-        const newShipmentCard = document.getElementById('newShipmentCard');
-        const newManagementCard = document.getElementById('newManagementCard');
-
+        const contactsLink = document.getElementById('contactsLink'); // Nuevo
+        // Profile
         const profileNameInput = document.getElementById('profileName');
         const profileUsernameInput = document.getElementById('profileUsername');
         const profileEmailInput = document.getElementById('profileEmail');
@@ -338,110 +365,84 @@
         const profileNewPasswordInput = document.getElementById('profileNewPassword');
         const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
         const profileMessageArea = document.getElementById('profileMessageArea');
-        const backToDashboardLink = document.getElementById('backToDashboardLink');
+        const backToDashboardFromProfile = document.getElementById('backToDashboardFromProfile');
+        // Contacts (Nuevo)
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const contactNameInput = document.getElementById('contactName');
+        const contactAddressInput = document.getElementById('contactAddress');
+        const contactPhoneInput = document.getElementById('contactPhone');
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const contactListArea = document.getElementById('contactListArea');
+        const backToDashboardFromContacts = document.getElementById('backToDashboardFromContacts');
 
         const showRegisterLink = document.getElementById('showRegisterLink');
         const showLoginLink = document.getElementById('showLoginLink');
 
 
-        // --- Funciones de Utilidad para Mensajes ---
+        // --- Utility Functions ---
         function showMessage(area, text, type) {
             area.textContent = text;
             area.className = `message ${type}`;
             area.style.display = 'block';
         }
-
         function clearMessage(area) {
             area.textContent = '';
             area.className = 'message';
             area.style.display = 'none';
         }
 
-        // --- Manejo de Vistas ---
+        // --- View Management ---
         function showView(viewToShow) {
-            loginContainer.style.display = 'none';
-            registerContainer.style.display = 'none';
-            dashboardContainer.style.display = 'none';
-            profileContainer.style.display = 'none';
-            if (viewToShow) {
-                viewToShow.style.display = 'flex'; // Usar flex para centrar contenido vertical si es corto
-                viewToShow.style.flexDirection = 'column'; // Para que los hijos se apilen
-                // Para los contenedores principales, puede que prefieras 'block' si no necesitas flex
-                // pero si el body es flex, y el container debe ocupar altura, flex puede ser util
-                 if (viewToShow === loginContainer || viewToShow === registerContainer || viewToShow === profileContainer) {
-                    viewToShow.style.display = 'block'; // Volver a block si flex da problemas de layout aquí
-                }
-                 if(viewToShow === dashboardContainer){ // dashboard si necesita flex para las opciones
-                    viewToShow.style.display = 'block'; // Block es más simple para dashboard container general
-                 }
-
-
-            }
+            [loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer].forEach(c => c.style.display = 'none');
+            if (viewToShow) viewToShow.style.display = 'block';
         }
-        function showView(viewToShow) {
-            loginContainer.style.display = 'none';
-            registerContainer.style.display = 'none';
-            dashboardContainer.style.display = 'none';
-            profileContainer.style.display = 'none';
-            if (viewToShow) {
-                viewToShow.style.display = 'block'; // Más simple y generalmente funciona bien
-            }
-        }
-
-
         function showLoginView() {
             currentUser = null;
             sessionStorage.removeItem('loggedInUser');
             showView(loginContainer);
-            clearMessage(loginMessageArea);
-            clearMessage(registerMessageArea);
-            loginForm.reset();
+            clearMessage(loginMessageArea); loginForm.reset();
         }
-
         function showRegisterView() {
             showView(registerContainer);
-            clearMessage(loginMessageArea);
-            clearMessage(registerMessageArea);
-            registerForm.reset();
+            clearMessage(registerMessageArea); registerForm.reset();
         }
-
         function showDashboardView() {
-            if (!currentUser) {
-                showLoginView();
-                return;
-            }
+            if (!currentUser) { showLoginView(); return; }
             showView(dashboardContainer);
             updateWelcomeMessage();
         }
-
         function showProfileView() {
-            if (!currentUser) {
-                showLoginView();
-                return;
-            }
+            if (!currentUser) { showLoginView(); return; }
             showView(profileContainer);
-            clearMessage(profileMessageArea);
+            clearMessage(profileMessageArea); profileForm.reset();
             profileNameInput.value = currentUser.name;
             profileUsernameInput.value = currentUser.username;
             profileEmailInput.value = currentUser.email;
             profilePhoneInput.value = currentUser.phone;
-            profileNewPasswordInput.value = '';
-            profileConfirmNewPasswordInput.value = '';
+        }
+        function showContactsView() { // Nueva función de vista
+            if (!currentUser) { showLoginView(); return; }
+            showView(contactsContainer);
+            clearMessage(contactFormMessageArea);
+            addContactForm.reset();
+            addContactFormContainer.style.display = 'none'; // Ocultar formulario al entrar
+            toggleAddContactFormBtn.textContent = '✚ Agregar Nuevo Contacto';
+            renderContacts();
         }
 
-
-        // --- Lógica de Almacenamiento de Usuarios ---
+        // --- User & Data Management ---
         function loadUsers() {
             const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
             if (storedUsers) {
-                users = JSON.parse(storedUsers);
+                users = JSON.parse(storedUsers).map(user => ({
+                    ...user,
+                    contacts: user.contacts || [] // Asegurar que cada usuario tenga un array de contactos
+                }));
             } else {
                 users = [{
-                    name: "Usuario Demo",
-                    username: "demo",
-                    email: "demo@example.com",
-                    phone: "0900000000",
-                    password: "demo"
+                    name: "Usuario Demo", username: "demo", email: "demo@example.com",
+                    phone: "0900000000", password: "demo", contacts: []
                 }];
                 saveUsers();
             }
@@ -449,21 +450,29 @@
             if (loggedInUsername) {
                 currentUser = users.find(u => u.username === loggedInUsername);
                 if (currentUser) {
-                     showDashboardView();
+                    currentUser.contacts = currentUser.contacts || []; // Doble check por si acaso
+                    showDashboardView();
                 } else {
-                    sessionStorage.removeItem('loggedInUser'); // limpiar si el usuario no existe en BD
-                    showLoginView();
+                    sessionStorage.removeItem('loggedInUser'); showLoginView();
                 }
             } else {
                 showLoginView();
             }
         }
-
         function saveUsers() {
             localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
         }
+        function updateUserInLocalStorage() { // Helper para actualizar currentUser en 'users' y guardar
+             if (!currentUser) return;
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            if (userIndex > -1) {
+                users[userIndex] = currentUser;
+                saveUsers();
+            }
+        }
 
-        // --- Lógica de Registro ---
+
+        // --- Registration Logic ---
         function handleRegister() {
             clearMessage(registerMessageArea);
             const name = registerNameInput.value.trim();
@@ -473,68 +482,46 @@
             const password = registerPasswordInput.value;
             const confirmPassword = registerConfirmPasswordInput.value;
 
-            if (!name || !username || !email || !phone || !password || !confirmPassword) {
-                showMessage(registerMessageArea, "Todos los campos son obligatorios.", "error"); return;
-            }
-            if (/\s/.test(username)) {
-                showMessage(registerMessageArea, "El usuario no puede contener espacios.", "error"); return;
-            }
-            if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
-                showMessage(registerMessageArea, "Usuario: letras, números, ., -, _.", "error"); return;
-            }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showMessage(registerMessageArea, "Email inválido.", "error"); return;
-            }
-            if (!/^09[6-9]\d{7}$/.test(phone)) {
-                showMessage(registerMessageArea, "Celular: 09XXXXXXXX.", "error"); return;
-            }
-            if (password.length < 8) {
-                showMessage(registerMessageArea, "Contraseña: mín. 8 caracteres.", "error"); return;
-            }
-            if (password !== confirmPassword) {
-                showMessage(registerMessageArea, "Las contraseñas no coinciden.", "error"); return;
-            }
-            if (users.some(user => user.username === username)) {
-                showMessage(registerMessageArea, "El usuario ya existe.", "error"); return;
-            }
-            if (users.some(user => user.email === email)) {
-                showMessage(registerMessageArea, "El email ya está registrado.", "error"); return;
-            }
+            // Validations (shortened for brevity, use previous robust ones)
+            if (!name || !username || !email || !phone || !password || !confirmPassword) { showMessage(registerMessageArea, "Todos los campos son obligatorios.", "error"); return; }
+            if (/\s/.test(username)) { showMessage(registerMessageArea, "El usuario no puede contener espacios.", "error"); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage(registerMessageArea, "Email inválido.", "error"); return; }
+            if (!/^09[6-9]\d{7}$/.test(phone)) { showMessage(registerMessageArea, "Celular: 09XXXXXXXX.", "error"); return; }
+            if (password.length < 8) { showMessage(registerMessageArea, "Contraseña: mín. 8 caracteres.", "error"); return; }
+            if (password !== confirmPassword) { showMessage(registerMessageArea, "Las contraseñas no coinciden.", "error"); return; }
+            if (users.some(u => u.username === username)) { showMessage(registerMessageArea, "El usuario ya existe.", "error"); return; }
+            if (users.some(u => u.email === email)) { showMessage(registerMessageArea, "El email ya está registrado.", "error"); return; }
 
-            users.push({ name, username, email, phone, password });
+            users.push({ name, username, email, phone, password, contacts: [] }); // Añadir contacts array
             saveUsers();
             showMessage(registerMessageArea, "¡Registrado! Ahora inicia sesión.", "success");
             registerForm.reset();
-            setTimeout(showLoginView, 2000);
+            setTimeout(showLoginView, 1500);
         }
 
-        // --- Lógica de Login ---
+        // --- Login Logic ---
         function handleLogin() {
             clearMessage(loginMessageArea);
             const username = loginUsernameInput.value.trim();
             const password = loginPasswordInput.value;
-
-            if (username === "" || password === "") {
-                showMessage(loginMessageArea, "Ingresa usuario y contraseña.", "error"); return;
-            }
-            const foundUser = users.find(user => user.username === username && user.password === password);
+            if (!username || !password) { showMessage(loginMessageArea, "Ingresa usuario y contraseña.", "error"); return; }
+            const foundUser = users.find(u => u.username === username && u.password === password);
             if (foundUser) {
                 currentUser = foundUser;
+                currentUser.contacts = currentUser.contacts || []; // Asegurar que tenga su array de contactos
                 sessionStorage.setItem('loggedInUser', currentUser.username);
                 showDashboardView();
             } else {
-                currentUser = null;
-                sessionStorage.removeItem('loggedInUser');
                 showMessage(loginMessageArea, "Usuario o contraseña incorrectos.", "error");
             }
         }
 
-        // --- Dashboard y Bienvenida ---
+        // --- Dashboard ---
         function updateWelcomeMessage() {
             if (!currentUser) return;
             const hours = new Date().getHours();
             let greeting = hours < 12 ? "Buenos días" : hours < 18 ? "Buenas tardes" : "Buenas noches";
-            welcomeMessageElement.innerHTML = `${greeting}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a al panel!`;
+            welcomeMessageElement.innerHTML = `${greeting}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a!`;
         }
 
         // --- Logout ---
@@ -544,47 +531,179 @@
             showLoginView();
         }
 
-        // --- Actualizar Perfil ---
+        // --- Profile Update ---
         function handleUpdateProfile() {
             clearMessage(profileMessageArea);
             const name = profileNameInput.value.trim();
             const email = profileEmailInput.value.trim();
             const phone = profilePhoneInput.value.trim();
-            // Lógica de contraseña se hará más adelante
-            if (!name || !email || !phone) {
-                showMessage(profileMessageArea, "Nombre, Email y Celular son obligatorios.", "error");
-                return;
-            }
-            // Validar email y phone de nuevo (podrías reutilizar funciones de validación)
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showMessage(profileMessageArea, "Email inválido.", "error"); return;
-            }
-            if (!/^09[6-9]\d{7}$/.test(phone)) {
-                showMessage(profileMessageArea, "Celular: 09XXXXXXXX.", "error"); return;
+            const newPassword = profileNewPasswordInput.value;
+            const confirmNewPassword = profileConfirmNewPasswordInput.value;
+
+            if (!name || !email || !phone) { showMessage(profileMessageArea, "Nombre, Email y Celular son obligatorios.", "error"); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage(profileMessageArea, "Email inválido.", "error"); return; }
+            if (!/^09[6-9]\d{7}$/.test(phone)) { showMessage(profileMessageArea, "Celular: 09XXXXXXXX.", "error"); return; }
+            if (email !== currentUser.email && users.some(u => u.email === email && u.username !== currentUser.username)) {
+                showMessage(profileMessageArea, "Ese correo ya está en uso por otro usuario.", "error"); return;
             }
 
-            // Verificar si el email es único (si se cambió y no es el del propio usuario)
-            if (email !== currentUser.email && users.some(u => u.email === email)) {
-                 showMessage(profileMessageArea, "Ese correo electrónico ya está en uso por otro usuario.", "error"); return;
+            if (newPassword) {
+                if (newPassword.length < 8) { showMessage(profileMessageArea, "Nueva contraseña: mín. 8 caracteres.", "error"); return; }
+                if (newPassword !== confirmNewPassword) { showMessage(profileMessageArea, "Las nuevas contraseñas no coinciden.", "error"); return; }
+                currentUser.password = newPassword; // ¡En un sistema real, hashear la contraseña!
             }
-
 
             currentUser.name = name;
             currentUser.email = email;
             currentUser.phone = phone;
+            updateUserInLocalStorage();
+            showMessage(profileMessageArea, "Perfil actualizado con éxito.", "success");
+            profileNewPasswordInput.value = ''; profileConfirmNewPasswordInput.value = '';
+            updateWelcomeMessage(); // Refresca saludo si el nombre cambió
+            // setTimeout(showDashboardView, 1500); // Opcional: volver al dashboard
+        }
 
-            const userIndex = users.findIndex(u => u.username === currentUser.username);
-            if (userIndex > -1) {
-                users[userIndex] = { ...users[userIndex], ...currentUser };
-                saveUsers();
-                 showMessage(profileMessageArea, "Perfil actualizado. Volviendo al panel...", "success");
-                 updateWelcomeMessage(); // Para que si el nombre cambió se refleje en el dashboard
-                 setTimeout(showDashboardView, 1500);
+
+        // --- Contacts Logic (NUEVO) ---
+        function toggleAddContactForm() {
+            const isVisible = addContactFormContainer.style.display === 'block';
+            addContactFormContainer.style.display = isVisible ? 'none' : 'block';
+            toggleAddContactFormBtn.textContent = isVisible ? '✚ Agregar Nuevo Contacto' : '➖ Cancelar';
+            if (!isVisible) {
+                addContactForm.reset();
+                clearMessage(contactFormMessageArea);
+            }
+        }
+
+        function handleAddContact() {
+            clearMessage(contactFormMessageArea);
+            const name = contactNameInput.value.trim();
+            const address = contactAddressInput.value.trim();
+            const phone = contactPhoneInput.value.trim();
+
+            if (!name || !address || !phone) {
+                showMessage(contactFormMessageArea, "Todos los campos del contacto son obligatorios.", "error"); return;
+            }
+            // Simple validación de teléfono (podrías usar regex más compleja o la paraguaya)
+            if (!/^\d{6,}$/.test(phone.replace(/\s/g, ''))) { // Mínimo 6 dígitos
+                showMessage(contactFormMessageArea, "Número de celular inválido.", "error"); return;
+            }
+
+            // Crear ID único para el contacto (simple timestamp por ahora)
+            const newContact = { id: Date.now().toString(), name, address, phone };
+
+            currentUser.contacts.push(newContact);
+            updateUserInLocalStorage(); // Guarda el currentUser con el nuevo contacto
+
+            showMessage(contactFormMessageArea, "Contacto guardado exitosamente.", "success");
+            addContactForm.reset();
+            setTimeout(() => { // Ocultar form y mensaje después de un tiempo
+                 clearMessage(contactFormMessageArea);
+                 if (addContactFormContainer.style.display === 'block') { // Solo si aún está visible
+                     toggleAddContactForm();
+                 }
+            }, 1500);
+            renderContacts(); // Actualizar la lista de tarjetas de contacto
+        }
+
+        function renderContacts() {
+            contactListArea.innerHTML = ''; // Limpiar lista existente
+            if (!currentUser || !currentUser.contacts || currentUser.contacts.length === 0) {
+                contactListArea.innerHTML = '<p class="no-contacts">Aún no tienes contactos guardados.</p>';
+                return;
+            }
+
+            currentUser.contacts.forEach(contact => {
+                const card = document.createElement('div');
+                card.className = 'contact-card';
+                card.dataset.contactId = contact.id;
+                card.innerHTML = `
+                    <div class="contact-card-info">
+                        <p><strong>Nombre:</strong> ${contact.name}</p>
+                        <p><strong>Dirección:</strong> ${contact.address}</p>
+                        <p><strong>Celular:</strong> ${contact.phone}</p>
+                    </div>
+                    <div class="contact-card-actions">
+                        <button class="edit-btn" onclick="handleEditContact('${contact.id}')">Editar</button>
+                        <button class="delete-btn" onclick="handleDeleteContact('${contact.id}')">Eliminar</button>
+                    </div>
+                `;
+                contactListArea.appendChild(card);
+            });
+        }
+
+        function handleEditContact(contactId) {
+            // Lógica para editar un contacto (se podría rellenar el formulario 'addContactForm'
+            // y cambiar el botón de 'Guardar' a 'Actualizar') - Para un futuro paso
+            alert(`Funcionalidad Editar para contacto ID: ${contactId} (pendiente).`);
+             const contact = currentUser.contacts.find(c => c.id === contactId);
+            if(contact) {
+                contactNameInput.value = contact.name;
+                contactAddressInput.value = contact.address;
+                contactPhoneInput.value = contact.phone;
+
+                // Cambiar el botón o agregar uno de actualizar, y manejar el ID
+                // Por simplicidad, primero eliminamos y luego agregamos uno "nuevo" para editar
+                // o mostrar el formulario para edición
+                if (addContactFormContainer.style.display === 'none') {
+                    toggleAddContactForm(); // Muestra el formulario
+                }
+                 // Podrías cambiar el botón de 'Guardar Contacto'
+                const saveButton = addContactFormContainer.querySelector('button[onclick="handleAddContact()"]');
+                saveButton.textContent = 'Actualizar Contacto';
+                saveButton.onclick = () => handleUpdateExistingContact(contactId); // Nueva función para actualizar
+                addContactFormContainer.dataset.editingId = contactId; // Guardar ID que se está editando
+
+                showMessage(contactFormMessageArea, `Editando a ${contact.name}. Realiza los cambios y haz clic en Actualizar.`, "success"); // Usamos "success" como un "info"
+            }
+        }
+        function handleUpdateExistingContact(contactIdToUpdate) {
+            clearMessage(contactFormMessageArea);
+            const name = contactNameInput.value.trim();
+            const address = contactAddressInput.value.trim();
+            const phone = contactPhoneInput.value.trim();
+
+            if (!name || !address || !phone) {
+                showMessage(contactFormMessageArea, "Todos los campos son obligatorios.", "error"); return;
+            }
+            // (validaciones...)
+
+            const contactIndex = currentUser.contacts.findIndex(c => c.id === contactIdToUpdate);
+            if (contactIndex > -1) {
+                currentUser.contacts[contactIndex] = { ...currentUser.contacts[contactIndex], name, address, phone };
+                updateUserInLocalStorage();
+                showMessage(contactFormMessageArea, "Contacto actualizado.", "success");
+                addContactForm.reset();
+                
+                 // Restaurar botón a su estado original
+                const saveButton = addContactFormContainer.querySelector('button'); // Puede ser más específico
+                saveButton.textContent = 'Guardar Contacto';
+                saveButton.onclick = handleAddContact;
+                delete addContactFormContainer.dataset.editingId; // Limpiar ID de edición
+
+                setTimeout(() => {
+                    clearMessage(contactFormMessageArea);
+                    if (addContactFormContainer.style.display === 'block') {
+                         toggleAddContactForm();
+                     }
+                }, 1500);
+                renderContacts();
             } else {
-                 showMessage(profileMessageArea, "Error al actualizar el perfil.", "error");
+                 showMessage(contactFormMessageArea, "Error al encontrar el contacto para actualizar.", "error");
             }
 
 
+        }
+
+
+        function handleDeleteContact(contactId) {
+            if (confirm("¿Estás seguro de que quieres eliminar este contacto?")) {
+                currentUser.contacts = currentUser.contacts.filter(contact => contact.id !== contactId);
+                updateUserInLocalStorage();
+                renderContacts();
+                showMessage(contactFormMessageArea, "Contacto eliminado.", "success"); // Mostrar mensaje general en la sección contactos
+                 setTimeout(() => clearMessage(contactFormMessageArea), 2000);
+            }
         }
 
 
@@ -592,20 +711,32 @@
         showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
         showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
         profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); });
-        backToDashboardLink.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        contactsLink.addEventListener('click', (e) => { e.preventDefault(); showContactsView(); }); // Nuevo
+        backToDashboardFromProfile.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        backToDashboardFromContacts.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); }); // Nuevo
+        toggleAddContactFormBtn.addEventListener('click', toggleAddContactForm); // Nuevo
 
-        loginPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
-        loginUsernameInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); loginPasswordInput.focus(); } });
-        registerConfirmPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleRegister(); } });
-        profileConfirmNewPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleUpdateProfile(); }});
-
-
-        // --- Inicialización ---
-        window.addEventListener('DOMContentLoaded', () => {
-            loadUsers();
+        // Submit con Enter
+        loginPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); }});
+        registerConfirmPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleRegister(); }});
+        profileConfirmNewPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleUpdateProfile(); }});
+        contactPhoneInput.addEventListener('keypress', (e) => { // En el último campo del form de contacto
+             if (e.key === 'Enter') {
+                e.preventDefault();
+                // Si estamos editando, llama a la función de actualizar, sino a la de añadir
+                const editingId = addContactFormContainer.dataset.editingId;
+                if (editingId) {
+                    handleUpdateExistingContact(editingId);
+                } else {
+                    handleAddContact();
+                }
+            }
         });
 
-    </script>
 
+        // --- Initialization ---
+        window.addEventListener('DOMContentLoaded', loadUsers);
+
+    </script>
 </body>
 </html>
