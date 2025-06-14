@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Login y Registro</title>
+    <title>Sistema Web - Demo</title>
     <style>
-        /* Estilos CSS (similares a antes, con algunos ajustes) */
+        /* Estilos CSS (similares, con adiciones para el dashboard) */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
@@ -14,19 +14,23 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px 0; /* Espacio por si el contenido es más largo */
+            padding: 20px 0;
+            transition: background-color 0.5s ease; /* Transición suave del fondo */
         }
 
-        .container {
+        .container, .dashboard-container {
             background-color: #fff;
             padding: 30px 40px;
             border-radius: 10px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            width: 360px;
+            width: 380px; /* Un poco más ancho para el dashboard */
             text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
-        .container h2 {
+        .container h2, .dashboard-container h2 {
+            margin-top: 0;
             margin-bottom: 25px;
             color: #333;
             font-weight: 600;
@@ -45,7 +49,7 @@
         .container input[type="password"],
         .container input[type="email"],
         .container input[type="tel"] {
-            width: calc(100% - 24px); /* Ajuste para padding */
+            width: calc(100% - 24px);
             padding: 12px;
             margin-bottom: 18px;
             border: 1px solid #ddd;
@@ -60,7 +64,7 @@
             box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
         }
 
-        .container button {
+        .container button, .dashboard-container button {
             width: 100%;
             padding: 12px;
             background-color: #007bff;
@@ -73,8 +77,15 @@
             transition: background-color 0.3s ease;
             margin-top: 10px;
         }
+        .dashboard-container .button-secondary {
+            background-color: #6c757d; /* Gris para botones secundarios */
+        }
+        .dashboard-container .button-secondary:hover {
+            background-color: #5a6268;
+        }
 
-        .container button:hover {
+
+        .container button:hover, .dashboard-container button:hover {
             background-color: #0056b3;
         }
 
@@ -83,7 +94,7 @@
             font-size: 14px;
             padding: 10px;
             border-radius: 5px;
-            display: none; /* Oculto por defecto, se muestra con JS */
+            display: none;
         }
 
         .message.success {
@@ -113,10 +124,91 @@
             text-decoration: underline;
         }
 
-        /* Ocultar secciones por defecto */
-        #registerContainer {
-            display: none;
+        /* Contenedores de vista */
+        #loginContainer, #registerContainer, #dashboardContainer, #profileContainer {
+            display: none; /* Todos ocultos por defecto, JS controla cuál se muestra */
         }
+
+        /* Estilos específicos del Dashboard */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            margin-bottom: 0; /* Ya tiene margen el contenedor */
+        }
+
+        #welcomeMessage {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .profile-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px; /* Más redondeado para que parezca "etiqueta" */
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+        }
+        .profile-link .icon {
+            margin-right: 5px;
+        }
+
+        .profile-link:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Estilos para el futuro contenedor de perfil */
+        #profileContainer label { /* Reutilizando el estilo de label de .container */
+             display: block;
+            text-align: left;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        #profileContainer input { /* Reutilizando el estilo de input de .container */
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+        #profileContainer input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        #profileContainer button {
+             width: 100%;
+            padding: 12px;
+            background-color: #28a745; /* Botón verde para guardar perfil */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+         #profileContainer button:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 <body>
@@ -141,49 +233,82 @@
     <div id="registerContainer" class="container">
         <h2>Crear Nueva Cuenta</h2>
         <form id="registerForm">
-            <div>
-                <label for="registerName">Nombre y Apellido:</label>
-                <input type="text" id="registerName" name="registerName" required>
-            </div>
-            <div>
-                <label for="registerUsername">Usuario:</label>
-                <input type="text" id="registerUsername" name="registerUsername" required>
-            </div>
-            <div>
-                <label for="registerEmail">Correo Electrónico:</label>
-                <input type="email" id="registerEmail" name="registerEmail" required>
-            </div>
-            <div>
-                <label for="registerPhone">Celular (Ej: 0981xxxxxx):</label>
-                <input type="tel" id="registerPhone" name="registerPhone" placeholder="09xxxxxxxx" required>
-            </div>
-            <div>
-                <label for="registerPassword">Contraseña (mín. 8 caracteres):</label>
-                <input type="password" id="registerPassword" name="registerPassword" required>
-            </div>
-            <div>
-                <label for="registerConfirmPassword">Confirmar Contraseña:</label>
-                <input type="password" id="registerConfirmPassword" name="registerConfirmPassword" required>
-            </div>
+            <div><label for="registerName">Nombre y Apellido:</label><input type="text" id="registerName" required></div>
+            <div><label for="registerUsername">Usuario:</label><input type="text" id="registerUsername" required></div>
+            <div><label for="registerEmail">Correo Electrónico:</label><input type="email" id="registerEmail" required></div>
+            <div><label for="registerPhone">Celular (Ej: 0981xxxxxx):</label><input type="tel" id="registerPhone" placeholder="09xxxxxxxx" required></div>
+            <div><label for="registerPassword">Contraseña (mín. 8 caracteres):</label><input type="password" id="registerPassword" required></div>
+            <div><label for="registerConfirmPassword">Confirmar Contraseña:</label><input type="password" id="registerConfirmPassword" required></div>
             <button type="button" onclick="handleRegister()">Registrar</button>
         </form>
         <div id="registerMessageArea" class="message"></div>
         <a href="#" id="showLoginLink" class="form-switch-link">¿Ya tienes cuenta? Inicia Sesión</a>
     </div>
 
+    <div id="dashboardContainer" class="dashboard-container">
+        <div class="dashboard-header">
+            <h2>Panel de Control</h2>
+            <a href="#" id="profileLink" class="profile-link">
+                <span class="icon">👤</span>Mi Perfil
+            </a>
+        </div>
+        <div id="welcomeMessage"></div>
+        <!-- Más contenido del dashboard puede ir aquí -->
+        <button type="button" onclick="handleLogout()" class="button-secondary" style="margin-top:30px;">Cerrar Sesión</button>
+    </div>
+
+    <div id="profileContainer" class="container"> <!-- Contenedor para la edición del perfil -->
+        <h2>Mi Perfil</h2>
+        <form id="profileForm">
+            <div>
+                <label for="profileName">Nombre y Apellido:</label>
+                <input type="text" id="profileName" required>
+            </div>
+            <div>
+                <label for="profileUsername">Usuario (no editable):</label>
+                <input type="text" id="profileUsername" readonly disabled>
+            </div>
+            <div>
+                <label for="profileEmail">Correo Electrónico:</label>
+                <input type="email" id="profileEmail" required>
+            </div>
+            <div>
+                <label for="profilePhone">Celular:</label>
+                <input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required>
+            </div>
+            <div>
+                <label for="profileNewPassword">Nueva Contraseña (dejar en blanco para no cambiar):</label>
+                <input type="password" id="profileNewPassword">
+            </div>
+            <div>
+                <label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label>
+                <input type="password" id="profileConfirmNewPassword">
+            </div>
+            <button type="button" onclick="handleUpdateProfile()">Guardar Cambios</button>
+        </form>
+        <div id="profileMessageArea" class="message"></div>
+        <a href="#" id="backToDashboardLink" class="form-switch-link">Volver al Panel</a>
+    </div>
+
+
     <script>
         // --- Constantes y Variables Globales ---
         const USERS_STORAGE_KEY = 'registeredUsers';
         let users = [];
+        let currentUser = null; // Para almacenar el usuario que ha iniciado sesión
 
         // --- Selectores de Elementos del DOM ---
-        // Contenedores
+        // Contenedores de Vistas
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
+        const dashboardContainer = document.getElementById('dashboardContainer');
+        const profileContainer = document.getElementById('profileContainer'); // Nuevo
 
         // Formularios
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
+        const profileForm = document.getElementById('profileForm'); // Nuevo
+
 
         // Campos de Login
         const loginUsernameInput = document.getElementById('loginUsername');
@@ -199,7 +324,22 @@
         const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
         const registerMessageArea = document.getElementById('registerMessageArea');
 
-        // Enlaces para cambiar de vista
+        // Elementos del Dashboard
+        const welcomeMessageElement = document.getElementById('welcomeMessage');
+        const profileLink = document.getElementById('profileLink'); // Nuevo
+
+        // Elementos del Perfil (Nuevo)
+        const profileNameInput = document.getElementById('profileName');
+        const profileUsernameInput = document.getElementById('profileUsername');
+        const profileEmailInput = document.getElementById('profileEmail');
+        const profilePhoneInput = document.getElementById('profilePhone');
+        const profileNewPasswordInput = document.getElementById('profileNewPassword');
+        const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
+        const profileMessageArea = document.getElementById('profileMessageArea');
+        const backToDashboardLink = document.getElementById('backToDashboardLink');
+
+
+        // Enlaces para cambiar de vista (login/registro)
         const showRegisterLink = document.getElementById('showRegisterLink');
         const showLoginLink = document.getElementById('showLoginLink');
 
@@ -207,30 +347,71 @@
         // --- Funciones de Utilidad para Mensajes ---
         function showMessage(area, text, type) {
             area.textContent = text;
-            area.className = `message ${type}`; // Asegura que 'message' esté y luego añade 'success' o 'error'
+            area.className = `message ${type}`;
+            area.style.display = 'block'; // Aseguramos que sea visible
         }
 
         function clearMessage(area) {
             area.textContent = '';
             area.className = 'message';
+            area.style.display = 'none'; // Ocultamos
         }
 
-        // --- Manejo de Vistas (Login/Registro) ---
-        function showLoginView() {
-            loginContainer.style.display = 'block';
+        // --- Manejo de Vistas ---
+        function showView(viewToShow) {
+            // Ocultar todas las vistas principales
+            loginContainer.style.display = 'none';
             registerContainer.style.display = 'none';
+            dashboardContainer.style.display = 'none';
+            profileContainer.style.display = 'none'; // Nuevo
+
+            // Mostrar la vista deseada
+            if (viewToShow) {
+                viewToShow.style.display = 'block';
+            }
+        }
+
+        function showLoginView() {
+            currentUser = null; // Limpiar usuario actual al mostrar login
+            sessionStorage.removeItem('loggedInUser'); // Limpiar sesión si usamos sessionStorage
+            showView(loginContainer);
             clearMessage(loginMessageArea);
             clearMessage(registerMessageArea);
-            loginForm.reset(); // Limpia el formulario de login
+            loginForm.reset();
         }
 
         function showRegisterView() {
-            loginContainer.style.display = 'none';
-            registerContainer.style.display = 'block';
+            showView(registerContainer);
             clearMessage(loginMessageArea);
             clearMessage(registerMessageArea);
-            registerForm.reset(); // Limpia el formulario de registro
+            registerForm.reset();
         }
+
+        function showDashboardView() {
+            if (!currentUser) {
+                showLoginView(); // Si no hay usuario, volver al login
+                return;
+            }
+            showView(dashboardContainer);
+            updateWelcomeMessage();
+        }
+
+        function showProfileView() { // Nueva función
+            if (!currentUser) {
+                showLoginView();
+                return;
+            }
+            showView(profileContainer);
+            clearMessage(profileMessageArea);
+            // Pre-rellenar el formulario de perfil con los datos del currentUser
+            profileNameInput.value = currentUser.name;
+            profileUsernameInput.value = currentUser.username; // No editable
+            profileEmailInput.value = currentUser.email;
+            profilePhoneInput.value = currentUser.phone;
+            profileNewPasswordInput.value = ''; // Limpiar campos de contraseña
+            profileConfirmNewPasswordInput.value = '';
+        }
+
 
         // --- Lógica de Almacenamiento de Usuarios ---
         function loadUsers() {
@@ -238,15 +419,26 @@
             if (storedUsers) {
                 users = JSON.parse(storedUsers);
             } else {
-                // Si no hay usuarios, creamos el usuario demo/demo por defecto
                 users = [{
                     name: "Usuario Demo",
                     username: "demo",
                     email: "demo@example.com",
                     phone: "0900000000",
-                    password: "demo" // ¡En un sistema real, NUNCA guardar contraseñas así!
+                    password: "demo"
                 }];
                 saveUsers();
+            }
+            // Comprobar si hay un usuario logueado en sessionStorage (para persistencia en refresco de página)
+            const loggedInUsername = sessionStorage.getItem('loggedInUser');
+            if (loggedInUsername) {
+                currentUser = users.find(u => u.username === loggedInUsername);
+                if (currentUser) {
+                     showDashboardView(); // Si se encontró, ir directo al dashboard
+                } else {
+                    showLoginView(); // Si no (datos corruptos), mostrar login
+                }
+            } else {
+                showLoginView(); // Por defecto mostrar login
             }
         }
 
@@ -257,7 +449,6 @@
         // --- Lógica de Registro ---
         function handleRegister() {
             clearMessage(registerMessageArea);
-
             const name = registerNameInput.value.trim();
             const username = registerUsernameInput.value.trim();
             const email = registerEmailInput.value.trim();
@@ -265,75 +456,47 @@
             const password = registerPasswordInput.value;
             const confirmPassword = registerConfirmPasswordInput.value;
 
-            // Validaciones
             if (!name || !username || !email || !phone || !password || !confirmPassword) {
-                showMessage(registerMessageArea, "Todos los campos son obligatorios.", "error");
-                return;
+                showMessage(registerMessageArea, "Todos los campos son obligatorios.", "error"); return;
             }
-
-            // Validar formato de usuario (ej: sin espacios, alfanumérico)
             if (/\s/.test(username)) {
-                showMessage(registerMessageArea, "El nombre de usuario no puede contener espacios.", "error");
-                return;
+                showMessage(registerMessageArea, "El nombre de usuario no puede contener espacios.", "error"); return;
             }
             if (!/^[a-zA-Z0-9_.-]+$/.test(username)) {
-                showMessage(registerMessageArea, "El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos.", "error");
-                return;
+                showMessage(registerMessageArea, "Usuario: solo letras, números, puntos, guiones y guiones bajos.", "error"); return;
             }
-
-
-            // Validar correo
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                showMessage(registerMessageArea, "Formato de correo electrónico inválido.", "error");
-                return;
+                showMessage(registerMessageArea, "Formato de correo electrónico inválido.", "error"); return;
             }
-
-            // Validar celular paraguayo (ej: 09xxxxxxx, 9 dígitos comenzando con 09)
-            // Una expresión regular más permisiva para Paraguay (096,097,098,099)
             const phoneRegex = /^09[6-9]\d{7}$/;
             if (!phoneRegex.test(phone)) {
-                showMessage(registerMessageArea, "Formato de celular inválido. Debe ser 09XXXXXXXX (ej: 0981123456).", "error");
-                return;
+                showMessage(registerMessageArea, "Celular: 09XXXXXXXX (ej: 0981123456).", "error"); return;
             }
-
-            // Validar longitud de contraseña
             if (password.length < 8) {
-                showMessage(registerMessageArea, "La contraseña debe tener al menos 8 caracteres.", "error");
-                return;
+                showMessage(registerMessageArea, "La contraseña debe tener al menos 8 caracteres.", "error"); return;
             }
-
-            // Validar que las contraseñas coincidan
             if (password !== confirmPassword) {
-                showMessage(registerMessageArea, "Las contraseñas no coinciden.", "error");
-                return;
+                showMessage(registerMessageArea, "Las contraseñas no coinciden.", "error"); return;
             }
-
-            // Verificar si el usuario o el email ya existen
             if (users.some(user => user.username === username)) {
-                showMessage(registerMessageArea, "El nombre de usuario ya está registrado.", "error");
-                return;
+                showMessage(registerMessageArea, "El nombre de usuario ya está registrado.", "error"); return;
             }
             if (users.some(user => user.email === email)) {
-                showMessage(registerMessageArea, "El correo electrónico ya está registrado.", "error");
-                return;
+                showMessage(registerMessageArea, "El correo electrónico ya está registrado.", "error"); return;
             }
 
-            // Si todas las validaciones pasan
-            const newUser = { name, username, email, phone, password }; // De nuevo, ¡la contraseña no debería guardarse así!
+            const newUser = { name, username, email, phone, password };
             users.push(newUser);
             saveUsers();
-
-            showMessage(registerMessageArea, "¡Usuario registrado exitosamente! Ahora puedes iniciar sesión.", "success");
+            showMessage(registerMessageArea, "¡Usuario registrado! Ahora puedes iniciar sesión.", "success");
             registerForm.reset();
-            // Opcional: cambiar a la vista de login después de un breve momento
-            // setTimeout(showLoginView, 2000);
+            setTimeout(showLoginView, 2000); // Volver al login después de 2 seg
         }
 
         // --- Lógica de Login ---
         function handleLogin() {
             clearMessage(loginMessageArea);
-
             const username = loginUsernameInput.value.trim();
             const password = loginPasswordInput.value;
 
@@ -345,60 +508,103 @@
             const foundUser = users.find(user => user.username === username && user.password === password);
 
             if (foundUser) {
-                showMessage(loginMessageArea, `¡Login exitoso! Bienvenido, ${foundUser.name}.`, "success");
-                console.log("Login exitoso para:", foundUser);
-                // Aquí podrías redirigir o mostrar contenido de la aplicación
-                // loginForm.reset(); // Opcional
-                // loginUsernameInput.disabled = true;
-                // loginPasswordInput.disabled = true;
-                // document.querySelector('#loginContainer button').disabled = true;
+                currentUser = foundUser;
+                sessionStorage.setItem('loggedInUser', currentUser.username); // Guardar en sessionStorage
+                showDashboardView();
             } else {
+                currentUser = null;
+                sessionStorage.removeItem('loggedInUser');
                 showMessage(loginMessageArea, "Usuario o contraseña incorrectos.", "error");
-                console.log("Login fallido");
             }
         }
 
-        // --- Event Listeners para cambios de vista y Enter ---
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showRegisterView();
-        });
+        // --- Lógica del Dashboard y Mensaje de Bienvenida ---
+        function updateWelcomeMessage() {
+            if (!currentUser) return;
 
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting;
+
+            if (hours < 12) {
+                greeting = "Buenos días";
+            } else if (hours < 18) { // Puedes ajustar este límite, p.ej. 19 o 20
+                greeting = "Buenas tardes";
+            } else {
+                greeting = "Buenas noches";
+            }
+            welcomeMessageElement.textContent = `${greeting}, ${currentUser.name}. ¡Bienvenido/a al panel!`;
+        }
+
+        // --- Lógica de Logout ---
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('loggedInUser'); // Importante para persistencia
             showLoginView();
-        });
+            // Opcionalmente, mostrar un mensaje de despedida
+            // showMessage(loginMessageArea, "Has cerrado sesión.", "success");
+        }
 
-        // Permitir submit con Enter en los formularios
-        loginPasswordInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                handleLogin();
-            }
-        });
-        loginUsernameInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                loginPasswordInput.focus();
-            }
-        });
+        // --- Lógica para Actualizar Perfil (Placeholder por ahora) ---
+        function handleUpdateProfile() {
+            // Esta función se implementará completamente en el siguiente paso.
+            // Por ahora, solo simula que se guardan y vuelve al dashboard.
 
-        // Para el formulario de registro, el último campo antes del botón
-        registerConfirmPasswordInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                handleRegister();
+            clearMessage(profileMessageArea);
+            const name = profileNameInput.value.trim();
+            const email = profileEmailInput.value.trim();
+            const phone = profilePhoneInput.value.trim();
+            const newPassword = profileNewPasswordInput.value;
+            const confirmNewPassword = profileConfirmNewPasswordInput.value;
+
+            // VALIDACIONES (simplificadas aquí, las completas en el siguiente paso)
+            if (!name || !email || !phone) {
+                showMessage(profileMessageArea, "Nombre, Email y Celular son obligatorios.", "error");
+                return;
             }
-        });
-        // Simplificación: Enter en cualquier campo de registro podría intentar registrar,
-        // o podrías añadir lógica para pasar al siguiente campo.
-        // Aquí lo haré solo en el último campo de contraseña para disparar el registro.
+
+            // Aquí iría la lógica de actualizar `currentUser` en el array `users` y en `localStorage`
+            // Por ahora solo un mensaje:
+            showMessage(profileMessageArea, "Perfil actualizado (simulación). Volviendo al panel...", "success");
+
+            // Simular actualización de currentUser (si el usuario es real, lo actualizamos)
+            if (currentUser) {
+                currentUser.name = name;
+                currentUser.email = email;
+                currentUser.phone = phone;
+                // Manejo de contraseña (más complejo) se agregará después
+
+                // Actualizar en el array `users` y `localStorage`
+                const userIndex = users.findIndex(u => u.username === currentUser.username);
+                if (userIndex > -1) {
+                    users[userIndex] = { ...users[userIndex], ...currentUser }; // Actualizar campos
+                    saveUsers();
+                }
+            }
+
+
+            setTimeout(showDashboardView, 1500); // Volver al dashboard después de mensaje
+        }
+
+
+        // --- Event Listeners ---
+        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
+        profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); }); // Nuevo
+        backToDashboardLink.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); }); // Nuevo
+
+
+        // Permitir submit con Enter
+        loginPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
+        loginUsernameInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); loginPasswordInput.focus(); } });
+        registerConfirmPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleRegister(); } });
+        // Para perfil, enter en el último campo de contraseña intenta guardar
+        profileConfirmNewPasswordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); handleUpdateProfile(); }});
 
 
         // --- Inicialización ---
         window.addEventListener('DOMContentLoaded', () => {
-            loadUsers(); // Carga usuarios existentes o el 'demo' por defecto
-            showLoginView(); // Muestra la vista de login por defecto
+            loadUsers(); // Carga usuarios y decide qué vista mostrar (login o dashboard si hay sesión)
         });
 
     </script>
