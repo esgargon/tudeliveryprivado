@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Login</title>
+    <style>
+        /* Estilos CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: calc(100% - 22px); /* Ajuste para padding */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Incluye padding y border en el width/height */
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <div>
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="button" onclick="handleLogin()">Entrar</button>
+        </form>
+        <div id="messageArea" class="message"></div>
+    </div>
+
+    <script>
+        // Lógica JavaScript
+        function handleLogin() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const messageArea = document.getElementById('messageArea');
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            // Limpiar mensajes anteriores
+            messageArea.textContent = '';
+            messageArea.className = 'message'; // Resetea clases
+
+            // Credenciales de prueba
+            const validUsername = "demo";
+            const validPassword = "demo";
+
+            if (username === "" || password === "") {
+                messageArea.textContent = "Por favor, ingresa usuario y contraseña.";
+                messageArea.classList.add('error');
+                return;
+            }
+
+            if (username === validUsername && password === validPassword) {
+                messageArea.textContent = "¡Login exitoso! Bienvenido.";
+                messageArea.classList.add('success');
+                // Aquí podrías redirigir o mostrar más contenido
+                console.log("Login exitoso");
+                // Por ejemplo, deshabilitar el formulario después del login:
+                // usernameInput.disabled = true;
+                // passwordInput.disabled = true;
+                // document.querySelector('.login-container button').disabled = true;
+            } else {
+                messageArea.textContent = "Usuario o contraseña incorrectos.";
+                messageArea.classList.add('error');
+                console.log("Login fallido");
+            }
+        }
+
+        // Opcional: permitir enviar el formulario con la tecla Enter en el campo de contraseña
+        document.getElementById('password').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevenir el comportamiento por defecto del Enter en formularios
+                handleLogin();
+            }
+        });
+        document.getElementById('username').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('password').focus(); // Mover foco al siguiente campo
+            }
+        });
+    </script>
+
+</body>
+  </html
