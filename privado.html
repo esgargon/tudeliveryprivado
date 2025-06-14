@@ -11,28 +11,27 @@
             margin: 0; padding: 20px; box-sizing: border-box; transition: background-color 0.5s ease;
         }
 
-        .container, .dashboard-container, .contacts-container, .new-shipment-container { /* Añadido .new-shipment-container */
+        .container, .dashboard-container, .contacts-container, .new-shipment-container {
             background-color: #fff; padding: 30px 40px; border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); width: 500px; /* Ancho ajustado */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); width: 500px;
             text-align: center; margin-top: 20px; margin-bottom: 20px;
         }
 
         .container h2, .dashboard-container h2, .contacts-container h2, .new-shipment-container h2 {
             margin-top: 0; margin-bottom: 25px; color: #333; font-weight: 600;
         }
-        .new-shipment-container h3 { /* Títulos para pasos */
+        .new-shipment-container h3 {
             margin-top: 20px; margin-bottom: 15px; color: #007bff; font-size: 1.3em;
             border-bottom: 1px solid #eee; padding-bottom: 10px;
         }
 
-
-        label { /* Estilo general para labels */
+        label {
             display: block; text-align: left; margin-bottom: 6px; color: #555;
             font-weight: 500; font-size: 14px;
         }
 
         input[type="text"], input[type="password"], input[type="email"],
-        input[type="tel"], input[type="number"], select, textarea { /* Estilo general para inputs */
+        input[type="tel"], input[type="number"], select, textarea {
             width: calc(100% - 24px); padding: 12px; margin-bottom: 18px;
             border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 15px;
         }
@@ -42,20 +41,19 @@
             outline: none; border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
         }
 
-        button, .button { /* Clase .button para enlaces que parecen botones */
-            width: auto; /* Ajuste para botones no full-width */
-            padding: 10px 20px; background-color: #007bff; color: white;
+        button, .button {
+            width: auto; padding: 10px 20px; background-color: #007bff; color: white;
             border: none; border-radius: 5px; cursor: pointer; font-size: 16px;
             font-weight: 500; transition: background-color 0.3s ease; margin-top: 10px;
             text-decoration: none; display: inline-block;
         }
         button:hover, .button:hover { background-color: #0056b3; }
 
-        .form-full-width-btn { width: 100%; padding: 12px; } /* Para botones que sí deben ser anchos */
+        .form-full-width-btn { width: 100%; padding: 12px; }
 
         .button-secondary { background-color: #6c757d; }
         .button-secondary:hover { background-color: #5a6268; }
-        .button-success { background-color: #28a745; } /* Verde para guardar/finalizar */
+        .button-success { background-color: #28a745; }
         .button-success:hover { background-color: #218838; }
 
 
@@ -67,7 +65,7 @@
         .form-switch-link:hover { text-decoration:underline; }
 
         #loginContainer, #registerContainer, #dashboardContainer, #profileContainer, #contactsContainer, #newShipmentContainer {
-            display: none; /* Ocultos por defecto */
+            display: none;
         }
 
         .dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; }
@@ -84,13 +82,30 @@
         .dashboard-card h3 { margin-top:0; margin-bottom:10px; font-size:1.1em; color:#007bff; }
         .dashboard-card p { font-size:0.9em; color:#6c757d; margin-bottom:0; }
 
-        /* Contactos (resumido, sin cambios) */
+        /* Contactos */
         #addContactFormContainer { background-color:#f9f9f9; padding:20px; border-radius:8px; margin-bottom:25px; border:1px dashed #ccc; }
-        .contact-card { background-color:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:15px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
+        #contactListArea { margin-top: 20px; text-align: left; }
+        .contact-card {
+            background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px;
+            padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .contact-card-info strong { color: #007bff; }
+        .contact-card-info p { margin: 5px 0; font-size: 0.95em; color: #555; }
+        .contact-card-actions {
+            margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 10px;
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+        .contact-card-actions button { padding: 6px 12px; font-size: 0.85em; width: auto; margin-top: 0;}
+        .contact-card-actions .edit-btn { background-color: #ffc107; color: #333; }
+        .contact-card-actions .edit-btn:hover { background-color: #e0a800; }
+        .contact-card-actions .delete-btn { background-color: #dc3545; }
+        .contact-card-actions .delete-btn:hover { background-color: #c82333; }
+        .no-contacts { text-align:center; color:#777; padding:20px; border:1px dashed #ddd; border-radius:5px; background-color:#f9f9f9; }
 
         /* Estilos para Formulario de Nuevo Envío */
-        .shipment-step { display: none; } /* Ocultar pasos por defecto */
-        .shipment-step.active { display: block; } /* Mostrar paso activo */
+        .shipment-step { display: none; }
+        .shipment-step.active { display: block; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group-checkbox { display: flex; align-items: center; text-align: left; margin-bottom: 15px; }
         .form-group-checkbox input[type="checkbox"] { width: auto; margin-right: 10px; margin-bottom: 0;}
@@ -109,8 +124,31 @@
 </head>
 <body>
 
-    <div id="loginContainer" class="container"><h2>Iniciar Sesión</h2><!-- ... (sin cambios) ... --></div>
-    <div id="registerContainer" class="container"><h2>Crear Nueva Cuenta</h2><!-- ... (sin cambios) ... --></div>
+    <div id="loginContainer" class="container">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <div><label for="loginUsername">Usuario:</label><input type="text" id="loginUsername" required></div>
+            <div><label for="loginPassword">Contraseña:</label><input type="password" id="loginPassword" required></div>
+            <button type="button" onclick="handleLogin()" class="form-full-width-btn">Entrar</button>
+        </form>
+        <div id="loginMessageArea" class="message"></div>
+        <a href="#" id="showRegisterLink" class="form-switch-link">¿No tienes cuenta? Regístrate aquí</a>
+    </div>
+
+    <div id="registerContainer" class="container">
+        <h2>Crear Nueva Cuenta</h2>
+        <form id="registerForm">
+            <div><label for="registerName">Nombre y Apellido:</label><input type="text" id="registerName" required></div>
+            <div><label for="registerUsername">Usuario:</label><input type="text" id="registerUsername" required></div>
+            <div><label for="registerEmail">Correo Electrónico:</label><input type="email" id="registerEmail" required></div>
+            <div><label for="registerPhone">Celular (Ej: 0981xxxxxx):</label><input type="tel" id="registerPhone" placeholder="09xxxxxxxx" required></div>
+            <div><label for="registerPassword">Contraseña (mín. 8 caracteres):</label><input type="password" id="registerPassword" required></div>
+            <div><label for="registerConfirmPassword">Confirmar Contraseña:</label><input type="password" id="registerConfirmPassword" required></div>
+            <button type="button" onclick="handleRegister()" class="form-full-width-btn">Registrar</button>
+        </form>
+        <div id="registerMessageArea" class="message"></div>
+        <a href="#" id="showLoginLink" class="form-switch-link">¿Ya tienes cuenta? Inicia Sesión</a>
+    </div>
 
     <div id="dashboardContainer" class="dashboard-container">
         <div class="dashboard-header">
@@ -118,7 +156,6 @@
             <div class="dashboard-nav-links">
                 <a href="#" id="profileLink" class="profile-link"><span class="icon">👤</span>Mi Perfil</a>
                 <a href="#" id="contactsLink" class="contacts-link"><span class="icon">📒</span>Contactos</a>
-                <!-- Podríamos añadir "Mis Envíos" aquí en el futuro -->
             </div>
         </div>
         <div id="welcomeMessage"></div>
@@ -129,103 +166,88 @@
         <button type="button" onclick="handleLogout()" class="button-secondary form-full-width-btn">Cerrar Sesión</button>
     </div>
 
-    <div id="profileContainer" class="container"><h2>Mi Perfil</h2><!-- ... (sin cambios) ... --></div>
-    <div id="contactsContainer" class="contacts-container"><h2>Mis Contactos</h2><!-- ... (sin cambios) ... --></div>
+    <div id="profileContainer" class="container">
+        <h2>Mi Perfil</h2>
+        <form id="profileForm">
+            <div><label for="profileName">Nombre y Apellido:</label><input type="text" id="profileName" required></div>
+            <div><label for="profileUsername">Usuario (no editable):</label><input type="text" id="profileUsername" readonly disabled></div>
+            <div><label for="profileEmail">Correo Electrónico:</label><input type="email" id="profileEmail" required></div>
+            <div><label for="profilePhone">Celular:</label><input type="tel" id="profilePhone" placeholder="09xxxxxxxx" required></div>
+            <div><label for="profileNewPassword">Nueva Contraseña (vacío = no cambiar):</label><input type="password" id="profileNewPassword"></div>
+            <div><label for="profileConfirmNewPassword">Confirmar Nueva Contraseña:</label><input type="password" id="profileConfirmNewPassword"></div>
+            <button type="button" onclick="handleUpdateProfile()" class="form-full-width-btn button-success">Guardar Cambios</button>
+        </form>
+        <div id="profileMessageArea" class="message"></div>
+        <a href="#" id="backToDashboardFromProfile" class="form-switch-link">Volver al Panel</a>
+    </div>
 
-    <!-- Contenedor para Nuevo Envío -->
+    <div id="contactsContainer" class="contacts-container">
+        <h2>Mis Contactos</h2>
+        <button type="button" id="toggleAddContactFormBtn" class="form-full-width-btn button-success" style="margin-bottom: 20px;">✚ Agregar Nuevo Contacto</button>
+        <div id="addContactFormContainer" style="display: none;">
+            <h3>Nuevo Contacto</h3>
+            <form id="addContactForm">
+                <div><label for="contactName">Nombre y Apellido:</label><input type="text" id="contactName" required></div>
+                <div><label for="contactAddress">Dirección:</label><input type="text" id="contactAddress" required></div>
+                <div><label for="contactPhone">Celular:</label><input type="tel" id="contactPhone" placeholder="09xxxxxxxx" required></div>
+                <button type="button" onclick="handleAddContact()" class="form-full-width-btn">Guardar Contacto</button>
+            </form>
+            <div id="contactFormMessageArea" class="message"></div>
+        </div>
+        <div id="contactListArea"></div>
+        <a href="#" id="backToDashboardFromContacts" class="form-switch-link" style="margin-top: 30px;">Volver al Panel</a>
+    </div>
+
     <div id="newShipmentContainer" class="new-shipment-container">
         <h2>🚚 Nuevo Envío</h2>
         <div id="shipmentMessageArea" class="message"></div>
-
         <form id="newShipmentForm">
-            <!-- Paso 1: Datos del Remitente y Envío -->
             <div id="shipmentStep1" class="shipment-step active">
                 <h3>Paso 1: Remitente y Detalles del Paquete</h3>
-                <div class="form-group">
-                    <label for="shipmentSenderName">Quién envía:</label>
-                    <input type="text" id="shipmentSenderName" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="shipmentSenderAddress">Dirección de Recogida:</label>
-                    <input type="text" id="shipmentSenderAddress" placeholder="Ej: Calle Falsa 123, Asunción" required>
-                </div>
-                <div class="form-group">
-                    <label for="shipmentSenderPhone">Celular del Remitente:</label>
-                    <input type="tel" id="shipmentSenderPhone" readonly>
-                </div>
+                <div class="form-group"><label for="shipmentSenderName">Quién envía:</label><input type="text" id="shipmentSenderName" readonly></div>
+                <div class="form-group"><label for="shipmentSenderAddress">Dirección de Recogida:</label><input type="text" id="shipmentSenderAddress" placeholder="Ej: Calle Falsa 123, Asunción" required></div>
+                <div class="form-group"><label for="shipmentSenderPhone">Celular del Remitente:</label><input type="tel" id="shipmentSenderPhone" readonly></div>
                 <div class="form-group">
                     <label>Mapa de Recogida (Asunción por defecto):</label>
-                    <div class="map-placeholder">Placeholder para Mapa de Recogida.<br>Coordenadas se ingresarán manualmente por ahora.</div>
-                    <label for="pickupLat">Latitud Recogida (simulado):</label>
-                    <input type="number" step="any" id="pickupLat" placeholder="Ej: -25.2821">
-                    <label for="pickupLng">Longitud Recogida (simulado):</label>
-                    <input type="number" step="any" id="pickupLng" placeholder="Ej: -57.6352">
+                    <div class="map-placeholder">Placeholder para Mapa de Recogida.<br>Coordenadas (simulado).</div>
+                    <label for="pickupLat">Latitud Recogida:</label><input type="number" step="any" id="pickupLat" placeholder="Ej: -25.2821">
+                    <label for="pickupLng">Longitud Recogida:</label><input type="number" step="any" id="pickupLng" placeholder="Ej: -57.6352">
                 </div>
                 <div class="form-group">
                     <label for="shipmentItemType">¿Qué enviamos?</label>
                     <select id="shipmentItemType">
-                        <option value="paquete">Paquete</option>
-                        <option value="caja">Caja</option>
-                        <option value="sobre">Sobre</option>
-                        <option value="bolsa">Bolsa</option>
-                        <option value="otros">Otros</option>
+                        <option value="paquete">Paquete</option><option value="caja">Caja</option><option value="sobre">Sobre</option>
+                        <option value="bolsa">Bolsa</option><option value="otros">Otros</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="shipmentDescription">Descripción del contenido:</label>
-                    <textarea id="shipmentDescription" placeholder="Ej: Documentos importantes, Ropa, etc." required></textarea>
-                </div>
-                <div class="form-group-checkbox">
-                    <input type="checkbox" id="shipmentIsFragile">
-                    <label for="shipmentIsFragile">Marcar si es frágil</label>
-                </div>
+                <div class="form-group"><label for="shipmentDescription">Descripción del contenido:</label><textarea id="shipmentDescription" placeholder="Ej: Documentos importantes, Ropa, etc." required></textarea></div>
+                <div class="form-group-checkbox"><input type="checkbox" id="shipmentIsFragile"><label for="shipmentIsFragile">Marcar si es frágil</label></div>
                 <div class="shipment-buttons">
                     <button type="button" onclick="showDashboardView()" class="button-secondary">Cancelar</button>
                     <button type="button" onclick="nextShipmentStep(2)">Siguiente ❯</button>
                 </div>
             </div>
-
-            <!-- Paso 2: Datos del Destinatario y Servicio -->
             <div id="shipmentStep2" class="shipment-step">
                 <h3>Paso 2: Destinatario y Detalles del Destino</h3>
                 <div class="form-group">
-                    <label for="shipmentRecipientContact">Destinatario (Seleccionar de contactos):</label>
-                    <select id="shipmentRecipientContact">
-                        <option value="">-- Seleccionar un contacto --</option>
-                        <!-- Opciones de contacto se cargarán aquí -->
-                    </select>
+                    <label for="shipmentRecipientContactSelect">Destinatario (Seleccionar de contactos):</label>
+                    <select id="shipmentRecipientContactSelect"><option value="">-- Seleccionar un contacto --</option></select>
                 </div>
-                <div class="form-group">
-                    <label for="shipmentRecipientName">Nombre del Destinatario:</label>
-                    <input type="text" id="shipmentRecipientName" placeholder="Nombre completo" required>
-                </div>
-                <div class="form-group">
-                    <label for="shipmentRecipientAddress">Dirección de Entrega:</label>
-                    <input type="text" id="shipmentRecipientAddress" placeholder="Ej: Av. Principal 456, Lambaré" required>
-                </div>
-                <div class="form-group">
-                    <label for="shipmentRecipientPhone">Celular del Destinatario:</label>
-                    <input type="tel" id="shipmentRecipientPhone" placeholder="09xxxxxxxx" required>
-                </div>
+                <div class="form-group"><label for="shipmentRecipientName">Nombre del Destinatario:</label><input type="text" id="shipmentRecipientName" placeholder="Nombre completo" required></div>
+                <div class="form-group"><label for="shipmentRecipientAddress">Dirección de Entrega:</label><input type="text" id="shipmentRecipientAddress" placeholder="Ej: Av. Principal 456, Lambaré" required></div>
+                <div class="form-group"><label for="shipmentRecipientPhone">Celular del Destinatario:</label><input type="tel" id="shipmentRecipientPhone" placeholder="09xxxxxxxx" required></div>
                  <div class="form-group">
                     <label>Mapa de Destino:</label>
-                    <div class="map-placeholder">Placeholder para Mapa de Destino.<br>Coordenadas se ingresarán manualmente por ahora.</div>
-                    <label for="destLat">Latitud Destino (simulado):</label>
-                    <input type="number" step="any" id="destLat" placeholder="Ej: -25.3325">
-                    <label for="destLng">Longitud Destino (simulado):</label>
-                    <input type="number" step="any" id="destLng" placeholder="Ej: -57.5230">
+                    <div class="map-placeholder">Placeholder para Mapa de Destino.<br>Coordenadas (simulado).</div>
+                    <label for="destLat">Latitud Destino:</label><input type="number" step="any" id="destLat" placeholder="Ej: -25.3325">
+                    <label for="destLng">Longitud Destino:</label><input type="number" step="any" id="destLng" placeholder="Ej: -57.5230">
                 </div>
-                <div class="form-group-checkbox">
-                    <input type="checkbox" id="shipmentRoundTrip">
-                    <label for="shipmentRoundTrip">¿Servicio de Ida y Vuelta? (Regresar al punto de recogida)</label>
-                </div>
+                <div class="form-group-checkbox"><input type="checkbox" id="shipmentRoundTrip"><label for="shipmentRoundTrip">¿Servicio de Ida y Vuelta?</label></div>
                 <div class="shipment-buttons">
                     <button type="button" onclick="prevShipmentStep(1)" class="button-secondary">❮ Atrás</button>
                     <button type="button" onclick="nextShipmentStep(3)">Siguiente ❯</button>
                 </div>
             </div>
-
-            <!-- Paso 3: Pago y Resumen -->
             <div id="shipmentStep3" class="shipment-step">
                 <h3>Paso 3: Pago y Confirmación</h3>
                 <div class="form-group">
@@ -238,7 +260,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="shipmentDistance">Distancia Estimada del Envío (km) - <span style="font-weight:bold; color:red;">INGRESO MANUAL POR AHORA:</span></label>
+                    <label for="shipmentDistance">Distancia Estimada (km) - <span style="font-weight:bold; color:red;">INGRESO MANUAL:</span></label>
                     <input type="number" id="shipmentDistance" min="0" step="0.1" placeholder="Ej: 15.5" required>
                 </div>
                 <div class="form-group">
@@ -261,394 +283,561 @@
     </div>
 
     <script>
-        // --- Constantes y Globales ---
-        const USERS_STORAGE_KEY = 'registeredUsers';
-        let users = [];
-        let currentUser = null;
-        let currentShipmentStep = 1; // Para el formulario de envío
+    // --- Constantes y Variables Globales ---
+    const USERS_STORAGE_KEY = 'registeredUsers';
+    let users = [];
+    let currentUser = null;
+    let currentShipmentStep = 1;
 
-        // --- DOM Elements --- (Resumido para brevedad, son los mismos más los nuevos)
-        // ... (Todos los selectores anteriores) ...
-        const newShipmentContainer = document.getElementById('newShipmentContainer');
-        const newShipmentForm = document.getElementById('newShipmentForm');
+    // --- Selectores del DOM (Contenedores Principales de Vista - definidos temprano) ---
+    let loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer, newShipmentContainer;
+
+    // --- Utility Functions ---
+    function showMessage(area, text, type) {
+        if (area) {
+            area.textContent = text;
+            area.className = `message ${type}`;
+            area.style.display = 'block';
+        } else {
+            console.warn("showMessage: el área de mensaje es null para el texto:", text);
+        }
+    }
+    function clearMessage(area) {
+        if (area) {
+            area.textContent = '';
+            area.className = 'message';
+            area.style.display = 'none';
+        }
+    }
+
+    // --- View Management ---
+    function showView(viewToShow) {
+        const allViews = [loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer, newShipmentContainer];
+        allViews.forEach(container => {
+            if (container) {
+                container.style.display = 'none';
+            }
+        });
+        if (viewToShow && allViews.includes(viewToShow)) {
+            viewToShow.style.display = 'block';
+        } else if (viewToShow) {
+            console.error("showView: 'viewToShow' no es un contenedor de vista reconocido:", viewToShow);
+        }
+    }
+    function showLoginView() {
+        currentUser = null;
+        sessionStorage.removeItem('loggedInUser');
+        const loginForm = document.getElementById('loginForm');
+        const loginMessageArea = document.getElementById('loginMessageArea');
+        showView(loginContainer);
+        if (loginMessageArea) clearMessage(loginMessageArea);
+        if (loginForm) loginForm.reset();
+        console.log("Mostrando vista de Login.");
+    }
+    function showRegisterView() {
+        const registerForm = document.getElementById('registerForm');
+        const registerMessageArea = document.getElementById('registerMessageArea');
+        showView(registerContainer);
+        if (registerMessageArea) clearMessage(registerMessageArea);
+        if (registerForm) registerForm.reset();
+    }
+    function showDashboardView() {
+        if (!currentUser) { showLoginView(); return; }
+        showView(dashboardContainer);
+        updateWelcomeMessage();
+    }
+    function showProfileView() {
+        if (!currentUser) { showLoginView(); return; }
+        const profileForm = document.getElementById('profileForm');
+        const profileMessageArea = document.getElementById('profileMessageArea');
+        const profileNameInput = document.getElementById('profileName');
+        const profileUsernameInput = document.getElementById('profileUsername');
+        const profileEmailInput = document.getElementById('profileEmail');
+        const profilePhoneInput = document.getElementById('profilePhone');
+        showView(profileContainer);
+        if (profileMessageArea) clearMessage(profileMessageArea);
+        if (profileForm) profileForm.reset();
+        if(profileNameInput && currentUser) profileNameInput.value = currentUser.name;
+        if(profileUsernameInput && currentUser) profileUsernameInput.value = currentUser.username;
+        if(profileEmailInput && currentUser) profileEmailInput.value = currentUser.email;
+        if(profilePhoneInput && currentUser) profilePhoneInput.value = currentUser.phone;
+    }
+    function showContactsView() {
+        if (!currentUser) { showLoginView(); return; }
+        const addContactForm = document.getElementById('addContactForm');
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        showView(contactsContainer);
+        if (contactFormMessageArea) clearMessage(contactFormMessageArea);
+        if (addContactForm) addContactForm.reset();
+        if (addContactFormContainer) {
+             if (addContactFormContainer.dataset.editingId) _resetContactFormToDefault();
+            addContactFormContainer.style.display = 'none';
+        }
+        if (toggleAddContactFormBtn) toggleAddContactFormBtn.textContent = '✚ Agregar Nuevo Contacto';
+        renderContacts();
+    }
+     function showNewShipmentView() {
+        if (!currentUser) { showLoginView(); return; }
         const shipmentMessageArea = document.getElementById('shipmentMessageArea');
-        // Paso 1
         const shipmentSenderNameInput = document.getElementById('shipmentSenderName');
-        const shipmentSenderAddressInput = document.getElementById('shipmentSenderAddress');
         const shipmentSenderPhoneInput = document.getElementById('shipmentSenderPhone');
-        const shipmentItemTypeSelect = document.getElementById('shipmentItemType');
+        showView(newShipmentContainer);
+        _resetShipmentForm();
+        currentShipmentStep = 1;
+        updateShipmentStepView();
+        if(shipmentSenderNameInput && currentUser) shipmentSenderNameInput.value = currentUser.name || '';
+        if(shipmentSenderPhoneInput && currentUser) shipmentSenderPhoneInput.value = currentUser.phone || '';
+        _loadContactsForShipment();
+        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
+    }
+
+    // --- User & Data Management ---
+    function loadUsers() {
+        console.log("loadUsers: Iniciando carga de usuarios.");
+        const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
+        if (storedUsers) {
+            try {
+                users = JSON.parse(storedUsers).map(user => ({
+                    ...user, contacts: user.contacts || [],
+                    shipments: user.shipments || [], points: user.points || 0
+                }));
+            } catch (e) {
+                console.error("loadUsers: Error al parsear usuarios de localStorage", e);
+                users = []; localStorage.removeItem(USERS_STORAGE_KEY);
+            }
+        } else {
+            users = [{ name: "Usuario Demo", username: "demo", email: "demo@example.com",
+                       phone: "0900000000", password: "demo", contacts: [], shipments: [], points: 0 }];
+            saveUsers();
+        }
+        const loggedInUsername = sessionStorage.getItem('loggedInUser');
+        if (loggedInUsername) {
+            currentUser = users.find(u => u.username === loggedInUsername);
+            if (currentUser) {
+                currentUser.contacts = currentUser.contacts || [];
+                currentUser.shipments = currentUser.shipments || [];
+                currentUser.points = currentUser.points || 0;
+                showDashboardView();
+            } else {
+                sessionStorage.removeItem('loggedInUser'); showLoginView();
+            }
+        } else {
+            showLoginView();
+        }
+    }
+    function saveUsers() {
+        try { localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users)); }
+        catch (e) { console.error("saveUsers: Error al guardar usuarios en localStorage", e); }
+    }
+    function updateUserInLocalStorage() {
+        if (!currentUser) return;
+        const userIndex = users.findIndex(u => u.username === currentUser.username);
+        if (userIndex > -1) { users[userIndex] = { ...users[userIndex], ...currentUser }; saveUsers(); }
+    }
+
+    // --- Registration Logic ---
+    function handleRegister() {
+        const registerMessageArea = document.getElementById('registerMessageArea');
+        const registerNameInput = document.getElementById('registerName');
+        const registerUsernameInput = document.getElementById('registerUsername');
+        const registerEmailInput = document.getElementById('registerEmail');
+        const registerPhoneInput = document.getElementById('registerPhone');
+        const registerPasswordInput = document.getElementById('registerPassword');
+        const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
+        const registerForm = document.getElementById('registerForm');
+        if(registerMessageArea) clearMessage(registerMessageArea);
+        const name = registerNameInput.value.trim(), username = registerUsernameInput.value.trim(),
+              email = registerEmailInput.value.trim(), phone = registerPhoneInput.value.trim(),
+              password = registerPasswordInput.value, confirmPassword = registerConfirmPasswordInput.value;
+        if (!name || !username || !email || !phone || !password || !confirmPassword) { showMessage(registerMessageArea, "Todos obligatorios.", "error"); return; }
+        if (/\s/.test(username)) { showMessage(registerMessageArea, "Usuario sin espacios.", "error"); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage(registerMessageArea, "Email inválido.", "error"); return; }
+        if (!/^09[6-9]\d{7}$/.test(phone)) { showMessage(registerMessageArea, "Celular PY: 09XXXXXXXX.", "error"); return; }
+        if (password.length < 8) { showMessage(registerMessageArea, "Clave: mín. 8 caracteres.", "error"); return; }
+        if (password !== confirmPassword) { showMessage(registerMessageArea, "Claves no coinciden.", "error"); return; }
+        if (users.some(u => u.username === username)) { showMessage(registerMessageArea, "Usuario ya existe.", "error"); return; }
+        if (users.some(u => u.email === email)) { showMessage(registerMessageArea, "Email ya registrado.", "error"); return; }
+        users.push({ name, username, email, phone, password, contacts: [], shipments: [], points: 0 });
+        saveUsers(); showMessage(registerMessageArea, "¡Registrado! Inicia sesión.", "success");
+        if (registerForm) registerForm.reset(); setTimeout(showLoginView, 1500);
+    }
+
+    // --- Login Logic ---
+    function handleLogin() {
+        const loginMessageArea = document.getElementById('loginMessageArea');
+        const loginUsernameInput = document.getElementById('loginUsername');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        if(loginMessageArea) clearMessage(loginMessageArea);
+        const username = loginUsernameInput.value.trim(), password = loginPasswordInput.value;
+        if (!username || !password) { showMessage(loginMessageArea, "Ingresa usuario y clave.", "error"); return; }
+        const foundUser = users.find(u => u.username === username && u.password === password);
+        if (foundUser) {
+            currentUser = foundUser; currentUser.contacts = currentUser.contacts || [];
+            currentUser.shipments = currentUser.shipments || []; currentUser.points = currentUser.points || 0;
+            sessionStorage.setItem('loggedInUser', currentUser.username); showDashboardView();
+        } else { showMessage(loginMessageArea, "Usuario o clave incorrectos.", "error"); }
+    }
+
+    // --- Dashboard ---
+    function updateWelcomeMessage() {
+        const welcomeMessageElement = document.getElementById('welcomeMessage');
+        if (!currentUser || !welcomeMessageElement) return;
+        const hours = new Date().getHours();
+        let greeting = hours < 12 ? "Buenos días" : hours < 18 ? "Buenas tardes" : "Buenas noches";
+        welcomeMessageElement.innerHTML = `${greeting}, <strong>${currentUser.name}</strong>. ¡Bienvenido/a!`;
+    }
+
+    // --- Logout ---
+    function handleLogout() { currentUser = null; sessionStorage.removeItem('loggedInUser'); showLoginView(); }
+
+    // --- Profile Update ---
+    function handleUpdateProfile() {
+        const profileMessageArea = document.getElementById('profileMessageArea');
+        const profileNameInput = document.getElementById('profileName');
+        const profileEmailInput = document.getElementById('profileEmail');
+        const profilePhoneInput = document.getElementById('profilePhone');
+        const profileNewPasswordInput = document.getElementById('profileNewPassword');
+        const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
+        if(profileMessageArea) clearMessage(profileMessageArea);
+        const name=profileNameInput.value.trim(), email=profileEmailInput.value.trim(), phone=profilePhoneInput.value.trim(),
+              newPassword=profileNewPasswordInput.value, confirmNewPassword=profileConfirmNewPasswordInput.value;
+        if (!name || !email || !phone) { showMessage(profileMessageArea, "Nombre, Email y Celular obligatorios.", "error"); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMessage(profileMessageArea, "Email inválido.", "error"); return; }
+        if (!/^09[6-9]\d{7}$/.test(phone)) { showMessage(profileMessageArea, "Celular PY: 09XXXXXXXX.", "error"); return; }
+        if (email !== currentUser.email && users.some(u=>u.email===email && u.username!==currentUser.username)) {
+            showMessage(profileMessageArea, "Ese correo ya está en uso.", "error"); return;
+        }
+        if (newPassword) {
+            if (newPassword.length < 8) { showMessage(profileMessageArea, "Nueva clave: mín. 8 chars.", "error"); return; }
+            if (newPassword !== confirmNewPassword) { showMessage(profileMessageArea, "Nuevas claves no coinciden.", "error"); return; }
+            currentUser.password = newPassword;
+        }
+        currentUser.name=name; currentUser.email=email; currentUser.phone=phone;
+        updateUserInLocalStorage(); showMessage(profileMessageArea, "Perfil actualizado.", "success");
+        if(profileNewPasswordInput) profileNewPasswordInput.value='';
+        if(profileConfirmNewPasswordInput) profileConfirmNewPasswordInput.value='';
+        updateWelcomeMessage();
+    }
+
+    // --- Contacts Logic ---
+    function _resetContactFormToDefault() {
+        const addContactForm = document.getElementById('addContactForm');
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        if (!addContactForm || !addContactFormContainer) return;
+        addContactForm.reset();
+        const saveButton = addContactFormContainer.querySelector('form#addContactForm button');
+        if (saveButton) { saveButton.textContent = 'Guardar Contacto'; saveButton.onclick = handleAddContact; }
+        delete addContactFormContainer.dataset.editingId;
+        if(contactFormMessageArea) clearMessage(contactFormMessageArea);
+    }
+    function toggleAddContactForm() {
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        const contactNameInput = document.getElementById('contactName');
+        if (!addContactFormContainer || !toggleAddContactFormBtn) return;
+        const isVisible = addContactFormContainer.style.display === 'block';
+        const editingId = addContactFormContainer.dataset.editingId;
+        if (isVisible) {
+            addContactFormContainer.style.display = 'none';
+            toggleAddContactFormBtn.textContent = '✚ Agregar Nuevo Contacto';
+            if (editingId) _resetContactFormToDefault();
+        } else {
+            _resetContactFormToDefault(); addContactFormContainer.style.display = 'block';
+            toggleAddContactFormBtn.textContent = '➖ Cancelar Nuevo Contacto';
+            if(contactNameInput) contactNameInput.focus();
+        }
+    }
+    function handleAddContact() {
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const contactNameInput = document.getElementById('contactName');
+        const contactAddressInput = document.getElementById('contactAddress');
+        const contactPhoneInput = document.getElementById('contactPhone');
+        if(contactFormMessageArea) clearMessage(contactFormMessageArea);
+        const name = contactNameInput.value.trim(), address = contactAddressInput.value.trim(), phone = contactPhoneInput.value.trim();
+        if (!name || !address || !phone) { showMessage(contactFormMessageArea, "Todos los campos del contacto obligatorios.", "error"); return; }
+        if (!/^\d{6,}$/.test(phone.replace(/\s/g, ''))) { showMessage(contactFormMessageArea, "Celular inválido (mín. 6 dígitos).", "error"); return; }
+        currentUser.contacts.push({ id: Date.now().toString(), name, address, phone });
+        updateUserInLocalStorage(); showMessage(contactFormMessageArea, "Contacto guardado.", "success");
+        _resetContactFormToDefault(); renderContacts();
+        setTimeout(() => { if(contactFormMessageArea) clearMessage(contactFormMessageArea); }, 2000);
+    }
+    function renderContacts() {
+        const contactListArea = document.getElementById('contactListArea');
+        if(!contactListArea) return; contactListArea.innerHTML = '';
+        if (!currentUser || !currentUser.contacts || currentUser.contacts.length === 0) {
+            contactListArea.innerHTML = '<p class="no-contacts">Aún no tienes contactos.</p>'; return;
+        }
+        currentUser.contacts.forEach(contact => {
+            const card = document.createElement('div');
+            card.className = 'contact-card'; card.dataset.contactId = contact.id;
+            card.innerHTML = `<div class="contact-card-info"><p><strong>Nombre:</strong> ${contact.name}</p><p><strong>Dirección:</strong> ${contact.address}</p><p><strong>Celular:</strong> ${contact.phone}</p></div><div class="contact-card-actions"><button class="edit-btn" onclick="handleEditContact('${contact.id}')">Editar</button><button class="delete-btn" onclick="handleDeleteContact('${contact.id}')">Eliminar</button></div>`;
+            contactListArea.appendChild(card);
+        });
+    }
+    function handleEditContact(contactId) {
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        const contactNameInput = document.getElementById('contactName');
+        const contactAddressInput = document.getElementById('contactAddress');
+        const contactPhoneInput = document.getElementById('contactPhone');
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const contact = currentUser.contacts.find(c => c.id === contactId);
+        if (contact && addContactFormContainer) {
+            _resetContactFormToDefault(); addContactFormContainer.style.display = 'block';
+            if (toggleAddContactFormBtn) toggleAddContactFormBtn.textContent = '📝 Editando (Cancelar/Nuevo)';
+            if (contactNameInput) contactNameInput.value = contact.name;
+            if (contactAddressInput) contactAddressInput.value = contact.address;
+            if (contactPhoneInput) contactPhoneInput.value = contact.phone;
+            const saveButton = addContactFormContainer.querySelector('form#addContactForm button');
+            if (saveButton) { saveButton.textContent = 'Actualizar Contacto'; saveButton.onclick = () => handleUpdateExistingContact(contactId); }
+            addContactFormContainer.dataset.editingId = contactId;
+            if(contactFormMessageArea) clearMessage(contactFormMessageArea);
+            if(contactNameInput) contactNameInput.focus();
+        }
+    }
+    function handleUpdateExistingContact(contactIdToUpdate) {
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const contactNameInput = document.getElementById('contactName');
+        const contactAddressInput = document.getElementById('contactAddress');
+        const contactPhoneInput = document.getElementById('contactPhone');
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        if(contactFormMessageArea) clearMessage(contactFormMessageArea);
+        const name=contactNameInput.value.trim(), address=contactAddressInput.value.trim(), phone=contactPhoneInput.value.trim();
+        if (!name || !address || !phone) { showMessage(contactFormMessageArea, "Campos obligatorios.", "error"); return; }
+        if (!/^\d{6,}$/.test(phone.replace(/\s/g,''))) { showMessage(contactFormMessageArea, "Celular inválido.", "error"); return; }
+        const contactIndex = currentUser.contacts.findIndex(c => c.id === contactIdToUpdate);
+        if (contactIndex > -1) {
+            currentUser.contacts[contactIndex].name = name;
+            currentUser.contacts[contactIndex].address = address;
+            currentUser.contacts[contactIndex].phone = phone;
+            updateUserInLocalStorage(); showMessage(contactFormMessageArea, "Contacto actualizado.", "success");
+            _resetContactFormToDefault();
+            if (addContactFormContainer) addContactFormContainer.style.display = 'none';
+            if (toggleAddContactFormBtn) toggleAddContactFormBtn.textContent = '✚ Agregar Nuevo Contacto';
+            renderContacts();
+            setTimeout(() => { if(contactFormMessageArea) clearMessage(contactFormMessageArea); }, 2000);
+        } else { showMessage(contactFormMessageArea, "Error al actualizar.", "error"); }
+    }
+    function handleDeleteContact(contactId) {
+        const contactFormMessageArea = document.getElementById('contactFormMessageArea');
+        const addContactFormContainer = document.getElementById('addContactFormContainer');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        if (confirm("¿Eliminar este contacto?")) {
+            currentUser.contacts = currentUser.contacts.filter(contact => contact.id !== contactId);
+            updateUserInLocalStorage(); renderContacts();
+            if (contactFormMessageArea) showMessage(contactFormMessageArea, "Contacto eliminado.", "success");
+            setTimeout(() => { if (contactFormMessageArea) clearMessage(contactFormMessageArea); }, 2000);
+            if (addContactFormContainer && addContactFormContainer.dataset.editingId === contactId) {
+                _resetContactFormToDefault(); addContactFormContainer.style.display = 'none';
+                if (toggleAddContactFormBtn) toggleAddContactFormBtn.textContent = '✚ Agregar Nuevo Contacto';
+            }
+        }
+    }
+
+    // --- New Shipment Form Logic ---
+    function _resetShipmentForm() {
+        const newShipmentForm = document.getElementById('newShipmentForm');
+        const shipmentSenderNameInput = document.getElementById('shipmentSenderName');
+        const shipmentSenderPhoneInput = document.getElementById('shipmentSenderPhone');
+        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
+        const shipmentSummaryDiv = document.getElementById('shipmentSummary');
+        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
+        if(newShipmentForm) newShipmentForm.reset();
+        if(shipmentSenderNameInput && currentUser) shipmentSenderNameInput.value = currentUser.name || '';
+        if(shipmentSenderPhoneInput && currentUser) shipmentSenderPhoneInput.value = currentUser.phone || '';
+        if(shipmentServiceCostInput) shipmentServiceCostInput.value = '';
+        if(shipmentSummaryDiv) shipmentSummaryDiv.innerHTML = 'Resumen aparecerá aquí...';
+        currentShipmentStep = 1; updateShipmentStepView();
+        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
+    }
+    function updateShipmentStepView() {
+        document.querySelectorAll('.shipment-step').forEach(step => step.classList.remove('active'));
+        const activeStep = document.getElementById(`shipmentStep${currentShipmentStep}`);
+        if (activeStep) activeStep.classList.add('active');
+    }
+    function nextShipmentStep(nextStep) {
+        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
+        const shipmentSenderAddressInput = document.getElementById('shipmentSenderAddress');
         const shipmentDescriptionTextarea = document.getElementById('shipmentDescription');
-        const shipmentIsFragileCheckbox = document.getElementById('shipmentIsFragile');
-        const pickupLatInput = document.getElementById('pickupLat'); // Simulado
-        const pickupLngInput = document.getElementById('pickupLng'); // Simulado
-        // Paso 2
-        const shipmentRecipientContactSelect = document.getElementById('shipmentRecipientContact');
         const shipmentRecipientNameInput = document.getElementById('shipmentRecipientName');
         const shipmentRecipientAddressInput = document.getElementById('shipmentRecipientAddress');
         const shipmentRecipientPhoneInput = document.getElementById('shipmentRecipientPhone');
-        const shipmentRoundTripCheckbox = document.getElementById('shipmentRoundTrip');
-        const destLatInput = document.getElementById('destLat'); // Simulado
-        const destLngInput = document.getElementById('destLng'); // Simulado
-        // Paso 3
+        if (currentShipmentStep === 1) {
+            if (!shipmentSenderAddressInput.value.trim() || !shipmentDescriptionTextarea.value.trim()) {
+                showMessage(shipmentMessageArea, "Completa dirección de recogida y descripción.", "error"); return;
+            }
+        }
+        if (currentShipmentStep === 2) {
+            if (!shipmentRecipientNameInput.value.trim() || !shipmentRecipientAddressInput.value.trim() || !shipmentRecipientPhoneInput.value.trim()) {
+                showMessage(shipmentMessageArea, "Completa datos del destinatario.", "error"); return;
+            }
+            calculateServiceCost(); updateShipmentSummary();
+        }
+        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
+        currentShipmentStep = nextStep; updateShipmentStepView(); window.scrollTo(0,0);
+    }
+    function prevShipmentStep(prevStep) {
+        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
+        if(shipmentMessageArea) clearMessage(shipmentMessageArea);
+        currentShipmentStep = prevStep; updateShipmentStepView(); window.scrollTo(0,0);
+    }
+    function _loadContactsForShipment() {
+        const shipmentRecipientContactSelect = document.getElementById('shipmentRecipientContactSelect');
+        if(!shipmentRecipientContactSelect) return;
+        shipmentRecipientContactSelect.innerHTML = '<option value="">-- Seleccionar contacto --</option>';
+        if (currentUser && currentUser.contacts && currentUser.contacts.length > 0) {
+            currentUser.contacts.forEach(contact => {
+                const option = document.createElement('option');
+                option.value = contact.id; option.textContent = contact.name;
+                shipmentRecipientContactSelect.appendChild(option);
+            });
+        }
+    }
+    function calculateServiceCost() {
         const shipmentDistanceInput = document.getElementById('shipmentDistance');
         const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
+        if(!shipmentDistanceInput || !shipmentServiceCostInput) return;
+        const distanceStr = shipmentDistanceInput.value;
+        if (distanceStr === "" || isNaN(parseFloat(distanceStr))) { shipmentServiceCostInput.value = ""; return; }
+        const distance = parseFloat(distanceStr);
+        let cost = distance <= 0 ? 0 : distance <= 10 ? 25000 : distance <= 20 ? 40000 : 60000;
+        shipmentServiceCostInput.value = cost > 0 ? cost.toLocaleString('es-PY') : "";
+        updateShipmentSummary();
+    }
+    function updateShipmentSummary() {
         const shipmentSummaryDiv = document.getElementById('shipmentSummary');
-
-        const newShipmentCard = document.getElementById('newShipmentCard'); // Del dashboard
-
-
-        // --- Utility & View Management --- (Reutilizar de antes, con adiciones)
-        function showView(viewToShow) {
-            [loginContainer, registerContainer, dashboardContainer, profileContainer, contactsContainer, newShipmentContainer].forEach(c => c.style.display = 'none');
-            if (viewToShow) viewToShow.style.display = 'block';
+        if (currentShipmentStep !== 3 || !shipmentSummaryDiv) return;
+        const s = { // Short references for convenience
+            senderName: document.getElementById('shipmentSenderName').value,
+            senderAddr: document.getElementById('shipmentSenderAddress').value,
+            recName: document.getElementById('shipmentRecipientName').value,
+            recAddr: document.getElementById('shipmentRecipientAddress').value,
+            itemType: document.getElementById('shipmentItemType').options[document.getElementById('shipmentItemType').selectedIndex].text,
+            itemDesc: document.getElementById('shipmentDescription').value,
+            isFragile: document.getElementById('shipmentIsFragile').checked,
+            roundTrip: document.getElementById('shipmentRoundTrip').checked,
+            distance: document.getElementById('shipmentDistance').value,
+            cost: document.getElementById('shipmentServiceCost').value,
+            payment: document.querySelector('input[name="paymentMethod"]:checked') ? document.querySelector('input[name="paymentMethod"]:checked').parentElement.textContent.trim() : 'N/A'
+        };
+        shipmentSummaryDiv.innerHTML = `<h4>Resumen del Envío:</h4>
+            <p><strong>Remite:</strong> ${s.senderName} (${s.senderAddr})</p>
+            <p><strong>Recibe:</strong> ${s.recName} (${s.recAddr})</p>
+            <p><strong>Tipo:</strong> ${s.itemType}, ${s.itemDesc.substring(0,30)}...</p>
+            ${s.isFragile ? "<p><strong style='color:red;'>¡FRÁGIL!</strong></p>" : ""}
+            ${s.roundTrip ? "<p><strong>Servicio:</strong> Ida y Vuelta</p>" : ""}
+            <p><strong>Dist Aprox:</strong> ${s.distance || 'N/A'} km</p>
+            <p><strong>Costo:</strong> Gs. ${s.cost || 'N/A'}</p>
+            <p><strong>Pago:</strong> ${s.payment}</p>`;
+    }
+    function handleSaveShipment() {
+        const shipmentMessageArea = document.getElementById('shipmentMessageArea');
+        const shipmentDistanceInput = document.getElementById('shipmentDistance');
+        const shipmentServiceCostInput = document.getElementById('shipmentServiceCost');
+        if (currentShipmentStep !== 3) { showMessage(shipmentMessageArea, "Completa todos los pasos.", "error"); return; }
+        const distance = parseFloat(shipmentDistanceInput.value);
+        const costVal = shipmentServiceCostInput.value;
+        if (isNaN(distance) || distance <= 0 || !costVal) {
+            showMessage(shipmentMessageArea, "Distancia y costo inválidos.", "error"); shipmentDistanceInput.focus(); return;
         }
-        // ... (showLoginView, showRegisterView, showDashboardView, showProfileView, showContactsView - sin cambios directos)
+        const newShipmentData = {
+            id: Date.now().toString(), status: "Pendiente", createdAt: new Date().toISOString(),
+            sender: { name: document.getElementById('shipmentSenderName').value, address: document.getElementById('shipmentSenderAddress').value,
+                      phone: document.getElementById('shipmentSenderPhone').value, pickupLat: document.getElementById('pickupLat').value || null,
+                      pickupLng: document.getElementById('pickupLng').value || null },
+            recipient: { name: document.getElementById('shipmentRecipientName').value, address: document.getElementById('shipmentRecipientAddress').value,
+                         phone: document.getElementById('shipmentRecipientPhone').value, destLat: document.getElementById('destLat').value || null,
+                         destLng: document.getElementById('destLng').value || null },
+            item: { type: document.getElementById('shipmentItemType').value, description: document.getElementById('shipmentDescription').value,
+                    isFragile: document.getElementById('shipmentIsFragile').checked },
+            service: { roundTrip: document.getElementById('shipmentRoundTrip').checked, distanceKm: distance,
+                       costGs: parseFloat(costVal.replace(/\./g, '').replace(/,/g, '.')) || 0 },
+            payment: { method: document.querySelector('input[name="paymentMethod"]:checked').value }
+        };
+        currentUser.shipments.push(newShipmentData);
+        currentUser.points = (currentUser.points || 0) + 10;
+        updateUserInLocalStorage();
+        showMessage(shipmentMessageArea, `Envío guardado! ID: ${newShipmentData.id}. Puntos: ${currentUser.points}`, "success");
+        _resetShipmentForm();
+        setTimeout(() => { if (newShipmentContainer && newShipmentContainer.style.display === 'block') { showDashboardView(); }}, 3000);
+    }
 
-        function showNewShipmentView() {
-            if (!currentUser) { showLoginView(); return; }
-            showView(newShipmentContainer);
-            _resetShipmentForm(); // Limpiar y resetear el formulario a su estado inicial
-            currentShipmentStep = 1;
-            updateShipmentStepView();
-            // Pre-rellenar datos del remitente
-            shipmentSenderNameInput.value = currentUser.name || '';
-            shipmentSenderPhoneInput.value = currentUser.phone || '';
-            // Cargar contactos para el destinatario
-            _loadContactsForShipment();
-            clearMessage(shipmentMessageArea);
+    // --- DOMContentLoaded: Inicialización y Event Listeners ---
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log("DOMContentLoaded: Página cargada, inicializando aplicación.");
+        loginContainer = document.getElementById('loginContainer');
+        registerContainer = document.getElementById('registerContainer');
+        dashboardContainer = document.getElementById('dashboardContainer');
+        profileContainer = document.getElementById('profileContainer');
+        contactsContainer = document.getElementById('contactsContainer');
+        newShipmentContainer = document.getElementById('newShipmentContainer');
+
+        if (!loginContainer || !registerContainer || !dashboardContainer || !profileContainer || !contactsContainer || !newShipmentContainer) {
+            console.error("ERROR CRÍTICO: Faltan contenedores principales. Revisa IDs HTML.");
+            document.body.innerHTML = "<h1 style='color:red; text-align:center;'>Error crítico. Faltan contenedores.</h1>"; return;
         }
+        loadUsers();
 
-        function _resetShipmentForm() {
-            newShipmentForm.reset(); // Resetea valores de campos de formulario
-            shipmentSenderNameInput.value = currentUser.name || ''; // Rellenar nuevamente
-            shipmentSenderPhoneInput.value = currentUser.phone || '';
-            shipmentServiceCostInput.value = '';
-            shipmentSummaryDiv.innerHTML = 'Aquí se mostrará un breve resumen antes de guardar...';
-            currentShipmentStep = 1;
-            updateShipmentStepView();
-            clearMessage(shipmentMessageArea);
-        }
+        const showRegisterLink = document.getElementById('showRegisterLink');
+        const showLoginLink = document.getElementById('showLoginLink');
+        const profileLink = document.getElementById('profileLink');
+        const contactsLink = document.getElementById('contactsLink');
+        const newShipmentCardFromDashboard = document.getElementById('newShipmentCard');
+        const backToDashboardFromProfile = document.getElementById('backToDashboardFromProfile');
+        const backToDashboardFromContacts = document.getElementById('backToDashboardFromContacts');
+        const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
+        const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
+        const contactPhoneInput = document.getElementById('contactPhone');
+        const shipmentDistanceInput = document.getElementById('shipmentDistance');
+        const shipmentRecipientContactSelect = document.getElementById('shipmentRecipientContactSelect');
 
-        // --- User, Data, Login, Register, Profile, Contacts Logic ---
-        // ... (Mantener todas las funciones previas: loadUsers, saveUsers, updateUserInLocalStorage, etc.)
-        // La estructura de 'users' y 'currentUser' debe incluir 'points' y 'shipments'
-         function loadUsers() {
-            const storedUsers = localStorage.getItem(USERS_STORAGE_KEY);
-            if (storedUsers) {
-                users = JSON.parse(storedUsers).map(user => ({
-                    ...user,
-                    contacts: user.contacts || [],
-                    shipments: user.shipments || [], // Nuevo: array para envíos
-                    points: user.points || 0         // Nuevo: puntos del usuario
-                }));
-            } else { // Usuario Demo con nuevos campos
-                users = [{
-                    name: "Usuario Demo", username: "demo", email: "demo@example.com",
-                    phone: "0900000000", password: "demo", contacts: [], shipments: [], points: 0
-                }];
-                saveUsers();
-            }
-            // Resto de loadUsers como antes...
-             const loggedInUsername = sessionStorage.getItem('loggedInUser');
-            if (loggedInUsername) {
-                currentUser = users.find(u => u.username === loggedInUsername);
-                if (currentUser) {
-                    currentUser.contacts = currentUser.contacts || [];
-                    currentUser.shipments = currentUser.shipments || [];
-                    currentUser.points = currentUser.points || 0;
-                    showDashboardView();
-                } else { sessionStorage.removeItem('loggedInUser'); showLoginView(); }
-            } else { showLoginView(); }
-        }
-        // Asegurarse de que al registrar un nuevo usuario también se inicialicen 'shipments' y 'points'
-        function handleRegister() {
-            // ... (validaciones como antes) ...
-            if (users.some(u => u.username === username)) { /* ... */ }
-            if (users.some(u => u.email === email)) { /* ... */ }
-
-            users.push({ name, username, email, phone, password, contacts: [], shipments: [], points: 0 }); // Añadir shipments y points
-            saveUsers();
-            // ... (resto como antes)
-        }
-
-
-        // --- New Shipment Form Logic ---
-        function updateShipmentStepView() {
-            document.querySelectorAll('.shipment-step').forEach(step => step.classList.remove('active'));
-            const activeStep = document.getElementById(`shipmentStep${currentShipmentStep}`);
-            if (activeStep) activeStep.classList.add('active');
-        }
-
-        function nextShipmentStep(nextStep) {
-            // Validaciones para el paso actual antes de avanzar
-            if (currentShipmentStep === 1) {
-                if (!shipmentSenderAddressInput.value.trim() || !shipmentDescriptionTextarea.value.trim()) {
-                    showMessage(shipmentMessageArea, "Por favor, completa la dirección de recogida y la descripción del paquete.", "error");
-                    return;
-                }
-            }
-            if (currentShipmentStep === 2) {
-                 if (!shipmentRecipientNameInput.value.trim() || !shipmentRecipientAddressInput.value.trim() || !shipmentRecipientPhoneInput.value.trim()) {
-                    showMessage(shipmentMessageArea, "Por favor, completa todos los datos del destinatario.", "error");
-                    return;
-                }
-                // Si llegas al paso 3, calcula el costo inicial (asumiendo que hay distancia)
-                 calculateServiceCost(); // Calcular y mostrar
-                 updateShipmentSummary(); // Actualizar el resumen
-            }
-            clearMessage(shipmentMessageArea);
-            currentShipmentStep = nextStep;
-            updateShipmentStepView();
-            window.scrollTo(0,0); // Scroll al inicio del form
-        }
-
-        function prevShipmentStep(prevStep) {
-            clearMessage(shipmentMessageArea);
-            currentShipmentStep = prevStep;
-            updateShipmentStepView();
-             window.scrollTo(0,0);
-        }
-
-        function _loadContactsForShipment() {
-            shipmentRecipientContactSelect.innerHTML = '<option value="">-- Seleccionar un contacto --</option>';
-            if (currentUser && currentUser.contacts && currentUser.contacts.length > 0) {
-                currentUser.contacts.forEach(contact => {
-                    const option = document.createElement('option');
-                    option.value = contact.id;
-                    option.textContent = contact.name;
-                    shipmentRecipientContactSelect.appendChild(option);
-                });
-            }
-        }
-
-        shipmentRecipientContactSelect.addEventListener('change', function() {
-            const selectedContactId = this.value;
-            if (selectedContactId && currentUser && currentUser.contacts) {
-                const contact = currentUser.contacts.find(c => c.id === selectedContactId);
-                if (contact) {
-                    shipmentRecipientNameInput.value = contact.name || '';
-                    shipmentRecipientAddressInput.value = contact.address || '';
-                    shipmentRecipientPhoneInput.value = contact.phone || '';
-                }
-            } else { // Si se deselecciona o no se encuentra
-                shipmentRecipientNameInput.value = '';
-                shipmentRecipientAddressInput.value = '';
-                shipmentRecipientPhoneInput.value = '';
+        if(showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
+        if(showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
+        if(profileLink) profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); });
+        if(contactsLink) contactsLink.addEventListener('click', (e) => { e.preventDefault(); showContactsView(); });
+        if(newShipmentCardFromDashboard) newShipmentCardFromDashboard.addEventListener('click', (e) => { e.preventDefault(); showNewShipmentView(); });
+        if(backToDashboardFromProfile) backToDashboardFromProfile.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        if(backToDashboardFromContacts) backToDashboardFromContacts.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
+        if(toggleAddContactFormBtn) toggleAddContactFormBtn.addEventListener('click', toggleAddContactForm);
+        if(loginPasswordInput) loginPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); }});
+        if(registerConfirmPasswordInput) registerConfirmPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleRegister(); }});
+        if(profileConfirmNewPasswordInput) profileConfirmNewPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleUpdateProfile(); }});
+        if(contactPhoneInput) contactPhoneInput.addEventListener('keypress', (e) => {
+             if (e.key === 'Enter') { e.preventDefault();
+                const addContactFormContainer = document.getElementById('addContactFormContainer'); // Necesario aquí
+                const editingId = addContactFormContainer ? addContactFormContainer.dataset.editingId : null;
+                if (editingId) { handleUpdateExistingContact(editingId); } else { handleAddContact(); }
             }
         });
-
-        shipmentDistanceInput.addEventListener('input', calculateServiceCost); // Calcular al cambiar distancia
-
-        function calculateServiceCost() {
-            const distanceStr = shipmentDistanceInput.value;
-            if (distanceStr === "" || isNaN(parseFloat(distanceStr))) {
-                shipmentServiceCostInput.value = "";
-                return;
-            }
-            const distance = parseFloat(distanceStr);
-            let cost = 0;
-
-            if (distance <= 0) {
-                cost = 0;
-            } else if (distance <= 10) {
-                cost = 25000;
-            } else if (distance <= 20) {
-                cost = 40000;
-            } else { // Más de 20 km
-                cost = 60000;
-            }
-            shipmentServiceCostInput.value = cost > 0 ? cost.toLocaleString('es-PY') : ""; // Formato Gs.
-            updateShipmentSummary(); // También actualiza el resumen cuando cambia el costo
-        }
-        function updateShipmentSummary() {
-            if (currentShipmentStep !== 3) return; // Solo actualiza en el paso 3
-
-            let summaryHTML = "<h4>Resumen del Envío:</h4>";
-            summaryHTML += `<p><strong>Remitente:</strong> ${shipmentSenderNameInput.value} (${shipmentSenderAddressInput.value})</p>`;
-            summaryHTML += `<p><strong>Destinatario:</strong> ${shipmentRecipientNameInput.value} (${shipmentRecipientAddressInput.value})</p>`;
-            summaryHTML += `<p><strong>Tipo:</strong> ${shipmentItemTypeSelect.options[shipmentItemTypeSelect.selectedIndex].text}, ${shipmentDescriptionTextarea.value.substring(0,30)}...</p>`;
-            if (shipmentIsFragileCheckbox.checked) summaryHTML += `<p><strong style='color:red;'>¡FRÁGIL!</strong></p>`;
-            if (shipmentRoundTripCheckbox.checked) summaryHTML += `<p><strong>Servicio:</strong> Ida y Vuelta</p>`;
-            summaryHTML += `<p><strong>Distancia Aprox.:</strong> ${shipmentDistanceInput.value || 'N/A'} km</p>`;
-            summaryHTML += `<p><strong>Costo del Servicio:</strong> Gs. ${shipmentServiceCostInput.value || 'N/A'}</p>`;
-            summaryHTML += `<p><strong>Forma de Pago:</strong> ${document.querySelector('input[name="paymentMethod"]:checked')?.parentElement.textContent || 'N/A'}</p>`;
-
-            shipmentSummaryDiv.innerHTML = summaryHTML;
-        }
-
-
-        function handleSaveShipment() {
-            clearMessage(shipmentMessageArea);
-            // Validaciones finales (aunque muchas se hicieron al pasar de paso)
-            if (currentShipmentStep !== 3) {
-                showMessage(shipmentMessageArea, "Completa todos los pasos primero.", "error");
-                return;
-            }
-            const distance = parseFloat(shipmentDistanceInput.value);
-            const cost = shipmentServiceCostInput.value; // Ya está formateado, pero mejor guardarlo numérico
-
-            if (isNaN(distance) || distance <= 0 || !cost) {
-                showMessage(shipmentMessageArea, "Ingresa una distancia válida para calcular el costo.", "error");
-                shipmentDistanceInput.focus();
-                return;
-            }
-
-            // Recopilar todos los datos
-            const newShipmentData = {
-                id: Date.now().toString(),
-                status: "Pendiente", // Estado inicial
-                createdAt: new Date().toISOString(),
-                sender: {
-                    name: shipmentSenderNameInput.value,
-                    address: shipmentSenderAddressInput.value,
-                    phone: shipmentSenderPhoneInput.value,
-                    pickupLat: pickupLatInput.value || null, // Guardar coords simuladas
-                    pickupLng: pickupLngInput.value || null
-                },
-                recipient: {
-                    name: shipmentRecipientNameInput.value,
-                    address: shipmentRecipientAddressInput.value,
-                    phone: shipmentRecipientPhoneInput.value,
-                    destLat: destLatInput.value || null,
-                    destLng: destLngInput.value || null
-                },
-                item: {
-                    type: shipmentItemTypeSelect.value,
-                    description: shipmentDescriptionTextarea.value,
-                    isFragile: shipmentIsFragileCheckbox.checked
-                },
-                service: {
-                    roundTrip: shipmentRoundTripCheckbox.checked,
-                    distanceKm: distance,
-                    // Para el costo, es mejor parsear el valor formateado
-                    costGs: parseFloat(shipmentServiceCostInput.value.replace(/\./g, '').replace(/,/g, '.')) || 0
-                },
-                payment: {
-                    method: document.querySelector('input[name="paymentMethod"]:checked').value
+        if(shipmentDistanceInput) shipmentDistanceInput.addEventListener('input', calculateServiceCost);
+        if (shipmentRecipientContactSelect) {
+            shipmentRecipientContactSelect.addEventListener('change', function() {
+                const selectedContactId = this.value;
+                const shipmentRecipientNameInput = document.getElementById('shipmentRecipientName');
+                const shipmentRecipientAddressInput = document.getElementById('shipmentRecipientAddress');
+                const shipmentRecipientPhoneInput = document.getElementById('shipmentRecipientPhone');
+                if (selectedContactId && currentUser && currentUser.contacts) {
+                    const contact = currentUser.contacts.find(c => c.id === selectedContactId);
+                    if (contact) {
+                        if(shipmentRecipientNameInput) shipmentRecipientNameInput.value = contact.name || '';
+                        if(shipmentRecipientAddressInput) shipmentRecipientAddressInput.value = contact.address || '';
+                        if(shipmentRecipientPhoneInput) shipmentRecipientPhoneInput.value = contact.phone || '';
+                    }
+                } else {
+                    if(shipmentRecipientNameInput) shipmentRecipientNameInput.value = '';
+                    if(shipmentRecipientAddressInput) shipmentRecipientAddressInput.value = '';
+                    if(shipmentRecipientPhoneInput) shipmentRecipientPhoneInput.value = '';
                 }
-            };
-
-            currentUser.shipments.push(newShipmentData);
-            currentUser.points += 10; // Añadir puntos
-            updateUserInLocalStorage(); // Guarda el usuario con el nuevo envío y puntos
-
-            showMessage(shipmentMessageArea, `¡Envío guardado con éxito! ID: ${newShipmentData.id}. Has ganado 10 puntos. Total Puntos: ${currentUser.points}`, "success");
-            _resetShipmentForm();
-
-            // Opcional: Después de unos segundos, volver al dashboard
-            setTimeout(() => {
-                if (newShipmentContainer.style.display === 'block'){ // solo si aún está en la vista
-                     showDashboardView();
-                }
-            }, 3000);
+            });
         }
-
-        // --- Event Listeners (Globales) ---
-        // ... (login, register, profile, contacts links como antes) ...
-        newShipmentCard.addEventListener('click', (e) => { e.preventDefault(); showNewShipmentView(); });
-
-
-        // Inicializar
-        window.addEventListener('DOMContentLoaded', () => {
-             // Definir Selectores del DOM globales aquí si no se definieron antes
-            // para login, register, profile, contacts etc.
-            // Para mantener la brevedad no los repito, pero deben estar presentes y definidos globalmente.
-            const loginContainer = document.getElementById('loginContainer');
-            const registerContainer = document.getElementById('registerContainer');
-            const dashboardContainer = document.getElementById('dashboardContainer');
-            const profileContainer = document.getElementById('profileContainer');
-            const contactsContainer = document.getElementById('contactsContainer');
-
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const profileForm = document.getElementById('profileForm');
-            const addContactForm = document.getElementById('addContactForm');
-
-            const loginUsernameInput = document.getElementById('loginUsername');
-            const loginPasswordInput = document.getElementById('loginPassword');
-            const loginMessageArea = document.getElementById('loginMessageArea');
-
-            const registerNameInput = document.getElementById('registerName');
-            const registerUsernameInput = document.getElementById('registerUsername');
-            const registerEmailInput = document.getElementById('registerEmail');
-            const registerPhoneInput = document.getElementById('registerPhone');
-            const registerPasswordInput = document.getElementById('registerPassword');
-            const registerConfirmPasswordInput = document.getElementById('registerConfirmPassword');
-            const registerMessageArea = document.getElementById('registerMessageArea');
-
-            const welcomeMessageElement = document.getElementById('welcomeMessage');
-            const profileLink = document.getElementById('profileLink');
-            const contactsLink = document.getElementById('contactsLink');
-
-            const profileNameInput = document.getElementById('profileName');
-            const profileUsernameInput = document.getElementById('profileUsername');
-            const profileEmailInput = document.getElementById('profileEmail');
-            const profilePhoneInput = document.getElementById('profilePhone');
-            const profileNewPasswordInput = document.getElementById('profileNewPassword');
-            const profileConfirmNewPasswordInput = document.getElementById('profileConfirmNewPassword');
-            const profileMessageArea = document.getElementById('profileMessageArea');
-            const backToDashboardFromProfile = document.getElementById('backToDashboardFromProfile');
-
-            const toggleAddContactFormBtn = document.getElementById('toggleAddContactFormBtn');
-            const addContactFormContainer = document.getElementById('addContactFormContainer');
-            const contactNameInput = document.getElementById('contactName');
-            const contactAddressInput = document.getElementById('contactAddress');
-            const contactPhoneInput = document.getElementById('contactPhone');
-            const contactFormMessageArea = document.getElementById('contactFormMessageArea');
-            const contactListArea = document.getElementById('contactListArea');
-            const backToDashboardFromContacts = document.getElementById('backToDashboardFromContacts');
-
-            const showRegisterLink = document.getElementById('showRegisterLink');
-            const showLoginLink = document.getElementById('showLoginLink');
-            loadUsers();
-
-             // Event Listeners específicos de cada sección
-            showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
-            showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
-            profileLink.addEventListener('click', (e) => { e.preventDefault(); showProfileView(); });
-            contactsLink.addEventListener('click', (e) => { e.preventDefault(); showContactsView(); });
-            backToDashboardFromProfile.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
-            backToDashboardFromContacts.addEventListener('click', (e) => { e.preventDefault(); showDashboardView(); });
-            if (toggleAddContactFormBtn) toggleAddContactFormBtn.addEventListener('click', toggleAddContactForm); //toggleAddContactForm
-
-             // Enter keys...
-            loginPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); }});
-            // Añadir resto de listeners para Enter si son necesarios y no están
-        });
-        // --- Pegar aquí las funciones JS previas que faltan (showMessage, _resetContactFormToDefault, handleRegister, etc. para Contacts y Profile si no están completas arriba) ---
-        // Solo para estar seguro de que tienes todas las funciones necesarias:
-        // Asegúrate de incluir aquí las definiciones completas de:
-        // showMessage, clearMessage
-        // _resetContactFormToDefault, toggleAddContactForm, handleAddContact, renderContacts, handleEditContact, handleUpdateExistingContact, handleDeleteContact
-        // handleUpdateProfile
-        // ... Y cualquier otra función helper o de manejo de eventos que se haya definido en pasos anteriores.
-
-        // Esta versión del script está autocontenida con todo lo del nuevo envío
-        // + placeholders para funciones previas, si quieres unificar el script, tendrías que pegar el resto.
-        // Dado el mensaje, parece que preferías mantener las funciones que no cambiaron, pero
-        // el código anterior SÍ depende de ellas. Por seguridad, las incluyo (reducidas) o las referencia.
-        // A continuación, las funciones de Profile y Contacts que son necesarias (pueden ser placeholders si ya las tienes definidas):
-
-        function _resetContactFormToDefault() {
-             if (!addContactForm) return; // Chequeo por si el elemento no existe en esta vista
-             addContactForm.reset();
-             const saveButton = addContactFormContainer.querySelector('form#addContactForm button');
-             if(saveButton){
-                saveButton.textContent = 'Guardar Contacto';
-                saveButton.onclick = handleAddContact;
-             }
-             delete addContactFormContainer.dataset.editingId;
-             clearMessage(contactFormMessageArea);
-        }
-        function toggleAddContactForm() { if(addContactFormContainer){ /*...Lógica de toggle...*/ } }
-        function handleAddContact() { /*...Lógica...*/ }
-        function renderContacts() { /*...Lógica...*/ }
-        function handleEditContact(id) { /*...Lógica...*/ }
-        function handleUpdateExistingContact(id) { /*...Lógica...*/ }
-        function handleDeleteContact(id) { /*...Lógica...*/ }
-        function handleUpdateProfile() { /*...Lógica...*/ }
-
-
+        console.log("DOMContentLoaded: Inicialización y listeners completados.");
+    });
     </script>
 </body>
 </html>
