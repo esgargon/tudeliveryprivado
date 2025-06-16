@@ -1,1 +1,40 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Cliente - TU DELIVERY PRIVADO</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        a { color: #007bff; text-decoration: none;}
+        a:hover {text-decoration: underline;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido, Cliente</h1>
+        <p>Esta es tu área personal. Próximamente aquí podrás gestionar tus envíos.</p>
+        <p><a href="login.html" id="logoutLinkCliente">Cerrar Sesión</a></p>
+    </div>
+    <script>
+        // Opcional: Verificar si hay un usuario en sesión, sino redirigir al login.
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser || currentUser.role !== 'cliente') {
+                // alert('Acceso denegado. Por favor, inicie sesión como cliente.');
+                // window.location.href = 'login.html';
+            }
+            // Simple logout
+            const logoutLink = document.getElementById('logoutLinkCliente');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    sessionStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
