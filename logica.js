@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showMessage(element, message, type = 'error') {
         if (!element) return;
         element.textContent = message;
-        element.className = `message ${type}`;
+        element.className = `message ${type}`; // Asegúrate que la clase 'message' base existe si es necesaria globalmente
         element.style.display = 'block';
     }
 
@@ -38,53 +38,76 @@ document.addEventListener('DOMContentLoaded', function() {
         element.style.display = 'none';
     }
 
-    // Función global para manejar visibilidad de contraseñas
     window.togglePasswordVisibility = function(inputId) {
         const passwordInput = document.getElementById(inputId);
-        // El selector del checkbox necesita ser más específico si hay múltiples checkboxes con esta función
-        // En este caso, buscaremos el checkbox que está justo después del input (o en su wrapper)
-        // Por simplicidad, y como los checkboxes tienen IDs únicos ahora:
-        const checkbox = document.getElementById(inputId.replace('password', 'showPassword').replace('Password', 'showPassword'));
+        const checkboxId = inputId.replace('password', 'showPassword').replace('Password', 'showPassword');
+        const checkbox = document.getElementById(checkboxId);
 
         if (passwordInput && checkbox) {
             passwordInput.type = checkbox.checked ? 'text' : 'password';
-        } else if (passwordInput) { // Fallback por si la estructura del checkbox es diferente
-            const relatedCheckbox = document.querySelector(`input[type="checkbox"][onclick*="${inputId}"]`);
-            if (relatedCheckbox) {
-                 passwordInput.type = relatedCheckbox.checked ? 'text' : 'password';
-            }
         }
-    }
+    };
 
     // --- INICIALIZACIÓN DE USUARIOS POR DEFECTO ---
     function initializeDefaultUsers() {
         let users = getUsersFromStorage();
-        if (!users.find(user => user.username === 'admin')) {
+        let changed = false;
+
+        // --- Administrador ---
+        let adminUser = users.find(user => user.username === 'admin');
+        if (!adminUser) {
             users.push({
                 username: 'admin', password: 'admin', role: 'admin',
-                fullName: 'Administrador del Sistema', phone: '000000000',
-                address: 'Oficina Central', email: 'admin@example.com'
+                fullName: 'Administrador Principal', phone: '000000000',
+                address: 'Oficina Central', email: 'admin@deliverysystem.com'
             });
+            changed = true;
+        } else {
+            // Asegurar que el admin tiene fullName y otros datos clave si es necesario
+            if (adminUser.fullName !== 'Administrador Principal' || !adminUser.hasOwnProperty('fullName')) {
+                adminUser.fullName = 'Administrador Principal';
+                changed = true;
+            }
+             if (adminUser.role !== 'admin') { // Corregir rol si es necesario
+                adminUser.role = 'admin';
+                changed = true;
+            }
         }
-        if (!users.find(user => user.username === 'demo')) {
+        
+        // --- Usuario Demo Cliente ---
+        let demoUser = users.find(user => user.username === 'demo');
+        if (!demoUser) {
             users.push({
                 username: 'demo', password: 'demo', role: 'cliente',
-                fullName: 'Usuario Demo Ejemplo', phone: '111111111',
-                address: 'Calle Falsa 123', email: 'demo@example.com'
+                fullName: 'Cliente de Prueba', phone: '123456789',
+                address: 'Av. Siempre Viva 742', email: 'demo@example.com'
             });
+            changed = true;
+        } else {
+            // Asegurar que el usuario demo tiene fullName y otros datos clave actualizados
+            if (demoUser.fullName !== 'Cliente de Prueba' || !demoUser.hasOwnProperty('fullName')) {
+                demoUser.fullName = 'Cliente de Prueba';
+                changed = true;
+            }
+            if (demoUser.role !== 'cliente') { // Corregir rol si es necesario
+                demoUser.role = 'cliente';
+                changed = true;
+            }
+            // Puedes añadir aquí más verificaciones si cambias los datos por defecto
         }
-        saveUsersToStorage(users);
+        
+        if (changed) {
+            saveUsersToStorage(users);
+            console.log("Usuarios por defecto verificados/actualizados en localStorage.");
+        }
     }
     
-    // Ejecutar inicialización de usuarios una vez
-    if (localStorage.getItem('usersInitialized') !== 'true') {
-        initializeDefaultUsers();
-        localStorage.setItem('usersInitialized', 'true'); // Marcar como inicializado
-    }
-
+    // Llamar SIEMPRE en esta etapa de desarrollo para asegurar datos actualizados.
+    // En producción, podrías usar una bandera de 'versión de datos' o similar.
+    initializeDefaultUsers();
 
     // --- LÓGICA ESPECÍFICA DE CADA PÁGINA ---
-    const currentPage = window.location.pathname.split("/").pop(); // Obtiene el nombre del archivo HTML
+    const currentPage = window.location.pathname.split("/").pop() || "login.html"; // Default to login if path is "/"
 
     // --- LÓGICA PARA login.html ---
     if (currentPage === 'login.html') {
@@ -97,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const rememberMeCheckbox = document.getElementById('rememberMe');
         const loginMessageDiv = document.getElementById('loginMessage');
         
-        // Cargar usuario recordado
         const rememberedUser = localStorage.getItem('rememberedUserLogin');
         if (rememberedUser && usernameLoginInput) {
             usernameLoginInput.value = rememberedUser;
@@ -120,11 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         localStorage.removeItem('rememberedUserLogin');
                     }
-                    showMessage(loginMessageDiv, `Bienvenido ${foundUser.username}! Redirigiendo...`, 'success');
+                    showMessage(loginMessageDiv, `¡Hola ${foundUser.username}! Redirigiendo...`, 'success');
                     setTimeout(() => {
                         if (foundUser.role === 'admin') window.location.href = 'administrador.html';
                         else if (foundUser.role === 'cliente') window.location.href = 'cliente.html';
-                    }, 1500);
+                    }, 1200);
                 } else {
                     showMessage(loginMessageDiv, 'Usuario o contraseña incorrectos.', 'error');
                 }
@@ -173,60 +195,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveUsersToStorage(users);
                 showMessage(registerMessageDiv, '¡Registro exitoso! Ahora puedes iniciar sesión.', 'success');
                 registrationForm.reset();
-                setTimeout(() => showLoginForm(), 2000);
+                setTimeout(() => showLoginFormView(), 2000); // Llamar showLoginFormView
             });
         }
 
-        function showRegistrationFormView() {
+        function showRegistrationFormView() { // Cambiado nombre para claridad
             if(loginForm) loginForm.style.display = 'none';
             if(registrationForm) registrationForm.style.display = 'block';
-            hideMessage(loginMessageDiv);
+            if(loginMessageDiv) hideMessage(loginMessageDiv);
         }
 
-        function showLoginForm() {
+        function showLoginFormView() { // Cambiado nombre para claridad
             if(registrationForm) registrationForm.style.display = 'none';
             if(loginForm) loginForm.style.display = 'block';
-            hideMessage(document.getElementById('registerMessage'));
+            const registerMsg = document.getElementById('registerMessage');
+            if(registerMsg) hideMessage(registerMsg);
         }
 
         if (showRegisterLink) showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegistrationFormView(); });
-        if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginForm(); });
+        if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginFormView(); });
     }
 
     // --- LÓGICA PARA cliente.html ---
     if (currentPage === 'cliente.html') {
         const currentUser = getCurrentUserFromSession();
         
-        // Protección de ruta y bienvenida
         if (!currentUser || currentUser.role !== 'cliente') {
-            alert('Acceso denegado. Por favor, inicie sesión como cliente.');
+            alert('Acceso no autorizado. Por favor, inicie sesión como cliente.');
             window.location.href = 'login.html';
-            return; // Detener ejecución si no es cliente
+            return; 
         }
 
-        const clientNameDisplay = document.getElementById('clientNameDisplay');
-        const timeGreetingDisplay = document.getElementById('timeGreeting');
+        const mainWelcomeMessageEl = document.getElementById('mainWelcomeMessage');
+        const timeSpecificGreetingEl = document.getElementById('timeSpecificGreeting');
         const logoutLink = document.getElementById('logoutLinkCliente');
 
-        // Buscar detalles completos del cliente
         const users = getUsersFromStorage();
+        // Encuentra todos los datos del usuario actual desde nuestra "BD" (localStorage)
         const clientData = users.find(user => user.username === currentUser.username && user.role === 'cliente');
 
-        if (clientData && clientNameDisplay) {
-            clientNameDisplay.textContent = `Bienvenido/a, ${clientData.fullName || currentUser.username}`;
-        } else if (clientNameDisplay) {
-             clientNameDisplay.textContent = `Bienvenido/a, ${currentUser.username}`; // Fallback si no se encuentra el nombre completo
+        let welcomeName = currentUser.username; // Fallback por si no hay nombre completo
+        if (clientData && clientData.fullName && clientData.fullName.trim() !== '') {
+            welcomeName = clientData.fullName;
         }
 
-        if (timeGreetingDisplay) {
-            const hour = new Date().getHours();
-            if (hour < 12) {
-                timeGreetingDisplay.textContent = 'Buenos días.';
-            } else if (hour < 18) {
-                timeGreetingDisplay.textContent = 'Buenas tardes.';
-            } else {
-                timeGreetingDisplay.textContent = 'Buenas noches.';
-            }
+        let timeGreeting = "";
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) { // Madrugada/Mañana
+            timeGreeting = 'Buenos días';
+        } else if (hour >= 12 && hour < 19) { // Tarde
+            timeGreeting = 'Buenas tardes';
+        } else { // Noche (y madrugada temprana)
+            timeGreeting = 'Buenas noches';
+        }
+
+        if (mainWelcomeMessageEl) {
+            mainWelcomeMessageEl.textContent = `Bienvenido/a, ${welcomeName}`;
+        }
+        
+        if (timeSpecificGreetingEl) {
+            timeSpecificGreetingEl.textContent = `${timeGreeting}.`;
         }
 
         if (logoutLink) {
@@ -241,14 +269,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- LÓGICA PARA administrador.html ---
     if (currentPage === 'administrador.html') {
         const currentUser = getCurrentUserFromSession();
-
-        // Protección de ruta
         if (!currentUser || currentUser.role !== 'admin') {
-            alert('Acceso denegado. Por favor, inicie sesión como administrador.');
+            alert('Acceso no autorizado. Por favor, inicie sesión como administrador.');
             window.location.href = 'login.html';
-            return; // Detener ejecución si no es admin
+            return;
         }
-
         const logoutLink = document.getElementById('logoutLinkAdmin');
         if (logoutLink) {
             logoutLink.addEventListener('click', function(e) {
@@ -258,6 +283,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-     // Podrías añadir lógica similar para envio.html y gestion.html si necesitas
-     // proteger esas rutas o cargar datos específicos.
 });
