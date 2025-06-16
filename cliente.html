@@ -4,97 +4,183 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Cliente - TU DELIVERY PRIVADO</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUA6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
             text-align: center;
-            background-color: #f9f9f9;
+            background-color: #f4f7f6; /* Un gris muy claro */
             color: #333;
             margin: 0;
+            line-height: 1.6;
         }
         .container {
-            max-width: 800px;
-            margin: 40px auto;
+            max-width: 900px; /* Un poco más ancho para las tarjetas lado a lado */
+            margin: 30px auto;
             background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
-        h1 {
+        #mainWelcomeMessage {
             color: #2c3e50;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 1.8em;
         }
-        .welcome-message {
-            font-size: 1.2em;
+        .welcome-subheader {
+            font-size: 1.1em;
             color: #555;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
-        .greeting {
+        #timeSpecificGreeting {
             font-weight: bold;
-            color: #16a085; /* Un color verde azulado agradable */
+            color: #1abc9c; /* Verde esmeralda */
         }
-        .options {
-            margin-top: 20px;
+        
+        .options-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: row; /* Elementos en fila */
+            justify-content: space-around; /* Espaciado uniforme */
+            gap: 25px; /* Espacio entre las tarjetas */
+            flex-wrap: wrap; /* Permitir que las tarjetas se envuelvan si no hay espacio */
+        }
+
+        .option-card {
+            background-color: #ffffff;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+            width: calc(50% - 40px); /* Para dos tarjetas, ajustado por el gap */
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 15px;
             align-items: center;
         }
-        .options a.button {
-            display: inline-block;
-            background-color: #3498db; /* Azul */
+
+        .option-card:hover {
+            transform: translateY(-7px); /* Sube un poco más */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12); /* Sombra más pronunciada */
+        }
+        
+        .option-card a.button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3498db; 
             color: white;
-            padding: 12px 25px;
+            padding: 14px 22px;
             text-decoration: none;
-            border-radius: 5px;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            width: 80%;
-            max-width: 300px; /* Ancho máximo para los botones */
+            border-radius: 6px;
+            font-size: 1.05em; /* Ligeramente más grande */
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%; 
+            margin-bottom: 12px;
             box-sizing: border-box;
         }
-        .options a.button:hover {
+        
+        .option-card a.button:hover {
             background-color: #2980b9;
+            transform: scale(1.03); /* Ligero crecimiento al pasar el mouse sobre el botón */
         }
-        .options a.button.secondary {
-            background-color: #e67e22; /* Naranja para gestión */
+
+        .option-card a.button .icon {
+            margin-right: 12px; 
+            font-size: 1.3em;
         }
-        .options a.button.secondary:hover {
+
+        .option-card a.button.secondary {
+            background-color: #e67e22; 
+        }
+        .option-card a.button.secondary:hover {
             background-color: #d35400;
         }
-        .options p {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-top: -10px; /* Acercar la descripción al botón */
-            margin-bottom: 5px;
+
+        .option-card p {
+            font-size: 0.85em; /* Más pequeño y sutil */
+            color: #6c757d; /* Gris más oscuro para el texto descriptivo */
+            margin-top: 0; 
+            margin-bottom: 0px; /* Sin margen inferior si es el último elemento */
+            line-height: 1.4;
         }
+
         .logout-link {
-            display: block;
-            margin-top: 30px;
-            color: #c0392b; /* Rojo para logout */
+            display: inline-block; /* Para mejor posicionamiento y padding */
+            margin-top: 40px;
+            padding: 8px 15px;
+            color: #e74c3c; /* Rojo más vibrante */
+            background-color: #fdedec; /* Fondo muy claro para el enlace */
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .logout-link:hover {
-            text-decoration: underline;
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
         }
+        
+        /* Media query para pantallas más pequeñas (tablets y móviles) */
+        @media (max-width: 768px) {
+            .options-container {
+                flex-direction: column; 
+                align-items: center; 
+            }
+            .option-card {
+                width: 90%; 
+                max-width: 400px; 
+                margin-bottom: 20px; /* Espacio entre tarjetas apiladas */
+            }
+            .option-card:last-child {
+                margin-bottom: 0;
+            }
+            #mainWelcomeMessage {
+                font-size: 1.6em;
+            }
+            .welcome-subheader {
+                font-size: 1em;
+            }
+        }
+         @media (max-width: 480px) { /* Móviles más pequeños */
+            .container {
+                padding: 20px 15px;
+            }
+            .option-card a.button {
+                padding: 12px 18px;
+                font-size: 1em;
+            }
+         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="clientNameDisplay">Bienvenido/a</h1>
-        <p class="welcome-message">
-            <span id="timeGreeting"></span> Te encuentras en tu panel personal de TU DELIVERY PRIVADO.
+        <!-- Contenido principal -->
+        <h1 id="mainWelcomeMessage"></h1> <!-- Para: Bienvenido/a, Nombre Cliente -->
+        <p class="welcome-subheader">
+            <span id="timeSpecificGreeting"></span> <!-- Para: Buenos días/tardes/noches. -->
+            Te encuentras en tu panel personal de TU DELIVERY PRIVADO.
         </p>
 
-        <div class="options">
-            <div>
-                <a href="envio.html" class="button">NUEVO ENVÍO</a>
-                <p>(Aquí podrás realizar tus envíos)</p>
+        <!-- Contenedor para las opciones -->
+        <div class="options-container">
+            <div class="option-card">
+                <a href="envio.html" class="button">
+                    <i class="fas fa-box icon"></i> NUEVO ENVÍO
+                </a>
+                <p>(Aquí podrás realizar tus envíos de paquetes)</p>
             </div>
-            <div>
-                <a href="gestion.html" class="button secondary">NUEVA GESTIÓN</a>
+            <div class="option-card">
+                <a href="gestion.html" class="button secondary">
+                    <i class="fas fa-file-invoice-dollar icon"></i> NUEVA GESTIÓN
+                </a>
                 <p>(Aquí podrás gestionar tus envíos de documentos)</p>
             </div>
         </div>
