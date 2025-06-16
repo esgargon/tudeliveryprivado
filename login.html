@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TU DELIVERY PRIVADO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group .password-wrapper {
+            position: relative;
+        }
+        .form-group .password-wrapper input[type="password"],
+        .form-group .password-wrapper input[type="text"] { /* para cuando se cambia el tipo */
+            padding-right: 40px; /* Espacio para el icono/checkbox */
+        }
+        .form-group input[type="checkbox"] {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .toggle-password-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .toggle-form {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .toggle-form a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        #registrationForm {
+            display: none; /* Oculto por defecto */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Formulario de Login -->
+        <form id="loginForm">
+            <h2>Iniciar Sesión</h2>
+            <div id="loginMessage" class="message" style="display:none;"></div>
+            <div class="form-group">
+                <label for="usernameLogin">Usuario:</label>
+                <input type="text" id="usernameLogin" name="usernameLogin" required>
+            </div>
+            <div class="form-group">
+                <label for="passwordLogin">Contraseña:</label>
+                <div class="password-wrapper">
+                    <input type="password" id="passwordLogin" name="passwordLogin" required>
+                </div>
+                <input type="checkbox" id="showPasswordLogin" onclick="togglePasswordVisibility('passwordLogin')">
+                <label for="showPasswordLogin" class="toggle-password-label">Ver Contraseña</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Recordar contraseña</label>
+            </div>
+            <button type="submit">Ingresar</button>
+            <p class="toggle-form">¿No tienes cuenta? <a href="#" id="showRegisterLink">Regístrate aquí</a></p>
+        </form>
 
+        <!-- Formulario de Registro -->
+        <form id="registrationForm">
+            <h2>Registrar Nuevo Usuario</h2>
+            <div id="registerMessage" class="message" style="display:none;"></div>
+            <div class="form-group">
+                <label for="fullNameReg">Nombre y Apellido:</label>
+                <input type="text" id="fullNameReg" name="fullNameReg" required>
+            </div>
+            <div class="form-group">
+                <label for="usernameReg">Usuario:</label>
+                <input type="text" id="usernameReg" name="usernameReg" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneReg">Celular:</label>
+                <input type="tel" id="phoneReg" name="phoneReg" required>
+            </div>
+            <div class="form-group">
+                <label for="passwordReg">Contraseña:</label>
+                <div class="password-wrapper">
+                     <input type="password" id="passwordReg" name="passwordReg" required>
+                </div>
+                <input type="checkbox" id="showPasswordReg" onclick="togglePasswordVisibility('passwordReg')">
+                <label for="showPasswordReg" class="toggle-password-label">Ver Contraseña</label>
+            </div>
+            <div class="form-group">
+                <label for="confirmPasswordReg">Confirmar Contraseña:</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPasswordReg" name="confirmPasswordReg" required>
+                </div>
+                 <input type="checkbox" id="showConfirmPasswordReg" onclick="togglePasswordVisibility('confirmPasswordReg')">
+                <label for="showConfirmPasswordReg" class="toggle-password-label">Ver Contraseña</label>
+            </div>
+            <div class="form-group">
+                <label for="addressReg">Dirección:</label>
+                <input type="text" id="addressReg" name="addressReg" required>
+            </div>
+            <div class="form-group">
+                <label for="emailReg">Correo Electrónico:</label>
+                <input type="email" id="emailReg" name="emailReg" required>
+            </div>
+            <button type="submit">Registrar</button>
+            <p class="toggle-form">¿Ya tienes cuenta? <a href="#" id="showLoginLink">Inicia sesión aquí</a></p>
+        </form>
+    </div>
+
+    <script src="logica.js"></script>
+</body>
+</html>
